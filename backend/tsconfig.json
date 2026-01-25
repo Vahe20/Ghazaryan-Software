@@ -3,16 +3,26 @@
 		"rootDir": "./src",
 		"outDir": "./dist",
 
+		"target": "es2017",
 		"module": "nodenext",
-		"target": "ES2020",
-
-		"esModuleInterop": true,
+		"lib": ["ES2017", "ESNext.AsyncIterable"],
 		"moduleResolution": "nodenext",
-
+		"esModuleInterop": true,
 		"strict": true,
+		"types": ["node"],
+		"typeRoots": ["node_modules/@types"],
 		"skipLibCheck": true,
-
-		"sourceMap": true
+		"sourceMap": true,
+		"resolveJsonModule": true,
+		"forceConsistentCasingInFileNames": true,
+		"allowSyntheticDefaultImports": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"pretty": true,
+		"declaration": true,
+		"allowJs": true,
+		"noEmit": false,
 	},
-	"include": ["src"]
+	"include": ["src/**/*.ts"],
+	"exclude": ["node_modules", "dist"]
 }

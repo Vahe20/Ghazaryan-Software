@@ -1,65 +1,55 @@
-version: '3.8'
+name: Ghazaryan_Software_Prod
 
-services:
-  frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
-      target: production
-      args:
-        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:4000}
-    ports:
-      - "3000:3000"
+services: 
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_db_prod
+    restart: always
     environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:4000}
-    depends_on:
-      - backend
-    restart: unless-stopped
-    networks:
-      - app-network
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Vah.gh2005}
+      POSTGRES_DB: ${POSTGRES_DB:-Ghazaryan_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-Ghazaryan_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
       context: ../backend
-      dockerfile: Dockerfile
-      target: production
+      dockerfile: Dockerfile.prod
+    container_name: backend_prod
+    restart: always
     ports:
       - "4000:4000"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@db:5432/app_db}
-      - PORT=4000
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
-    restart: unless-stopped
-    networks:
-      - app-network
-
-  db:
-    image: postgres:18-alpine
-    container_name: app_db_prod
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-app_db}
-    ports:
-      - "5432:5432"
-    volumes:
-      - db_data_prod:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-    networks:
-      - app-network
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-Vah.gh2005}@postgres:5432/${POSTGRES_DB:-Ghazaryan_DB}?schema=public"
+      NODE_ENV: production
+      PORT: 4000
+
+  # Uncomment when frontend is ready
+  # frontend:
+  #   build:
+  #     context: ../frontend
+  #     dockerfile: Dockerfile
+  #     target: production
+  #   container_name: frontend_prod
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - backend
+  #   environment:
+  #     NODE_ENV: production
+  #     NEXT_PUBLIC_API_URL: http://backend:4000
 
 volumes:
-  db_data_prod:
-
-networks:
-  app-network:
-    driver: bridge
+  postgres_data:

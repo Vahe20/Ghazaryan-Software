@@ -1,0 +1,44 @@
+name: Ghazaryan_Software_Dev
+
+services: 
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_db_dev
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: Vah.gh2005
+      POSTGRES_DB: Ghazaryan_DB
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d Ghazaryan_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: backend_dev
+    restart: always
+    ports:
+      - "4000:4000"
+      - "5555:5555"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://admin:Vah.gh2005@postgres:5432/Ghazaryan_DB?schema=public"
+      NODE_ENV: development
+      PORT: 4000
+    volumes:
+      - ../backend/src:/app/src
+      - ../backend/prisma:/app/prisma
+    command: sh -c "npx prisma generate && npx prisma migrate deploy && npm run dev"
+
+volumes:
+  postgres_data:

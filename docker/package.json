@@ -1,0 +1,23 @@
+{
+  "name": "docker-orchestration",
+  "version": "1.0.0",
+  "description": "Docker compose orchestration for Ghazaryan Software",
+  "scripts": {
+    "dev:up": "docker compose up -d",
+    "dev:down": "docker compose down",
+    "dev:logs": "docker compose logs -f",
+    "dev:logs:backend": "docker compose logs -f backend",
+    "dev:logs:postgres": "docker compose logs -f postgres",
+    "dev:restart": "docker compose restart",
+    "dev:rebuild": "docker compose up -d --build",
+    "dev:clean": "docker compose down -v",
+    "prod:up": "docker compose -f docker-compose.prod.yml up -d",
+    "prod:down": "docker compose -f docker-compose.prod.yml down",
+    "prod:logs": "docker compose -f docker-compose.prod.yml logs -f",
+    "prod:rebuild": "docker compose -f docker-compose.prod.yml up -d --build",
+    "prod:clean": "docker compose -f docker-compose.prod.yml down -v"
+  },
+  "keywords": ["docker", "compose", "orchestration"],
+  "author": "",
+  "license": "ISC"
+}

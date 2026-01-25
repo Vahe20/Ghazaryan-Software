@@ -1,14 +1,34 @@
-import express, { Application } from "express";
-import dotenv from "dotenv";
+import express from "express";
+import cors from "cors";
 
-dotenv.config({ quiet: true });
+import appsRoutes from "./routes/apps.routes";
 
-const app: Application = express();
+export const app = express();
 
+app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-	res.json("eee");
+// Health check endpoint
+app.get("/health", (req, res) => {
+	res.json({ 
+		status: "ok", 
+		timestamp: new Date().toISOString(),
+		uptime: process.uptime()
+	});
 });
 
-export default app;
+// API routes
+app.use("/api/apps", appsRoutes);
+
+// 404 handler
+app.use((req, res) => {
+	res.status(404).json({ error: "Route not found" });
+});
+
+// Error handler
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+	console.error("Error:", err);
+	res.status(err.status || 500).json({
+		error: err.message || "Internal server error",
+	});
+});
