@@ -17,7 +17,11 @@
     "prod:rebuild": "docker compose -f docker-compose.prod.yml up -d --build",
     "prod:clean": "docker compose -f docker-compose.prod.yml down -v"
   },
-  "keywords": ["docker", "compose", "orchestration"],
+  "keywords": [
+    "docker",
+    "compose",
+    "orchestration"
+  ],
   "author": "",
   "license": "ISC"
 }

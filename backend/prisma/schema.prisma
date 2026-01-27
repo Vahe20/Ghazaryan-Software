@@ -1,4 +1,4 @@
-// This is your Prisma schema file,
+// This is your Prisma schema file for Web Apps Store
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
@@ -10,12 +10,216 @@ datasource db {
   provider = "postgresql"
 }
 
-model Apps {
-  id          Int       @id @default(autoincrement())
-  name        String    @db.VarChar(50)
-  description String
-  version     String    @unique @db.VarChar(10)
+model Users {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  userName     String   @unique
+  fullName     String?
+  role         UserRole @default(USER)
+  passwordHash String
+
+  balance Decimal @default(0)
+
+  avatarUrl String?
+
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime?
+  updatedAt   DateTime  @updatedAt
+  lastLoginAt DateTime?
+
+  reviews       Reviews[]
+  downloads     Downloads[]
+  refreshTokens RefreshToken[]
+  purchases     Purchases[]
+  @@map("users")
+}
+
+model Apps {
+  id          String @id @default(uuid())
+  name        String
+  slug        String @unique
+  shortDesc   String @db.VarChar(200)
+  description String @db.Text
+
+  version   String
+  changelog String? @db.Text
+
+  iconUrl     String
+  coverUrl    String?
+  screenshots String[]
+
+  category   AppsCategory @relation(fields: [categoryId], references: [id])
+  categoryId String
+  tags       String[]
+
+  size       Int
+  platform   Platform[]
+  minVersion String?
+
+  downloadUrl      String
+  sourceUrl        String?
+  documentationUrl String?
+
+  downloadCount Int   @default(0)
+  viewCount     Int   @default(0)
+  rating        Float @default(0)
+  reviewCount   Int   @default(0)
+
+  status   AppStatus @default(BETA)
+  featured Boolean   @default(false)
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime?  @updatedAt
+
+  reviews   Reviews[]
+  downloads Downloads[]
+  versions  AppsVersion[]
+  purchases Purchases[]
+  
+  price       Float?
+  isFree      Boolean @default(true)
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([status])
+  @@index([featured])
   @@map("apps")
+}
+
+model AppsCategory {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  slug        String  @unique
+  description String?
+  order       Int     @default(0)
+
+  apps Apps[]
+
+  @@index([slug])
+  @@map("appscategory")
+}
+
+model AppsVersion {
+  id    String @id @default(uuid())
+  app   Apps    @relation(fields: [appId], references: [id], onDelete: Cascade)
+  appId String
+
+  version     String
+  changelog   String @db.Text
+  downloadUrl String
+  size        Int
+
+  isStable    Boolean  @default(true)
+  releaseDate DateTime @default(now())
+
+  @@unique([appId, version])
+  @@index([appId])
+  @@map("appsversion")
+}
+
+model Reviews {
+  id     String @id @default(uuid())
+  app    Apps    @relation(fields: [appId], references: [id], onDelete: Cascade)
+  appId  String
+  user   Users   @relation(fields: [userId], references: [id])
+  userId String
+
+  rating  Int
+  title   String?
+  comment String  @db.Text
+
+  helpful Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([appId, userId])
+  @@index([appId])
+  @@index([userId])
+  @@map("reviews")
+}
+
+model Downloads {
+  id     String  @id @default(uuid())
+  app    Apps     @relation(fields: [appId], references: [id], onDelete: Cascade)
+  appId  String
+  user   Users?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  version  String
+  platform Platform
+
+  ipAddress String?
+  userAgent String?
+  country   String?
+
+  downloadedAt DateTime @default(now())
+
+  @@index([appId])
+  @@index([userId])
+  @@index([downloadedAt])
+  @@map("downloads")
+}
+
+model RefreshToken {
+  id     String @id @default(uuid())
+  token  String @unique
+  user   Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revoked   Boolean  @default(false)
+
+  @@index([userId])
+  @@map("refreshtoken")
+}
+
+model Purchases {
+  id     String @id @default(uuid())
+  user   Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  app    Apps    @relation(fields: [appId], references: [id], onDelete: Cascade)
+  appId  String
+
+  price         Float
+  paymentMethod String?
+  transactionId String?  @unique
+  
+  status        PurchaseStatus @default(COMPLETED)
+  
+  purchasedAt   DateTime @default(now())
+  expiresAt     DateTime? // Для подписок или временного доступа
+
+  @@unique([userId, appId]) // Один пользователь не может купить одно приложение дважды
+  @@index([userId])
+  @@index([appId])
+  @@index([purchasedAt])
+  @@map("purchases")
+}
+
+enum PurchaseStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum UserRole {
+  USER
+  DEVELOPER
+  ADMIN
+}
+
+enum AppStatus {
+  BETA
+  RELEASE
+}
+
+enum Platform {
+  WINDOWS
+  MAC
+  LINUX
+  ANDROID
+  IOS
 }
