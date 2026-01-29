@@ -2,6 +2,7 @@ import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import "dotenv/config";
+import bcrypt from "bcrypt";
 
 const pool = new Pool({
 	connectionString: process.env.DATABASE_URL!,
@@ -13,30 +14,29 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
 	console.log("🌱 Start seeding...");
 
-	// Очищаем данные в правильном порядке (из-за foreign keys)
-	await prisma.download.deleteMany({});
-	await prisma.review.deleteMany({});
-	await prisma.appVersion.deleteMany({});
-	await prisma.app.deleteMany({});
-	await prisma.appCategory.deleteMany({});
-	await prisma.user.deleteMany({});
+	await prisma.downloads.deleteMany({});
+	await prisma.reviews.deleteMany({});
+	await prisma.appsVersion.deleteMany({});
+	await prisma.apps.deleteMany({});
+	await prisma.appsCategory.deleteMany({});
+	await prisma.users.deleteMany({});
 	console.log("🗑️  Cleared existing data");
 
-	// Создаем пользователя
-	const user = await prisma.user.create({
+	const passwordHash = await bcrypt.hash("admin1234", 10);
+
+	const user = await prisma.users.create({
 		data: {
 			email: "admin@ghazaryan.dev",
-			username: "ghazaryan",
+			userName: "ghazaryan",
 			fullName: "Ghazaryan Developer",
-			bio: "Full-stack developer and creator of amazing apps",
-			website: "https://ghazaryan.dev",
+			passwordHash,
+			role: "ADMIN",
 		},
 	});
-	console.log(`✅ Created user: ${user.username}`);
+	console.log(`✅ Created user: ${user.userName}`);
 
-	// Создаем категории
 	const categories = await Promise.all([
-		prisma.appCategory.create({
+		prisma.appsCategory.create({
 			data: {
 				name: "Development Tools",
 				slug: "development-tools",
@@ -44,7 +44,7 @@ async function main() {
 				order: 1,
 			},
 		}),
-		prisma.appCategory.create({
+		prisma.appsCategory.create({
 			data: {
 				name: "Productivity",
 				slug: "productivity",
@@ -52,7 +52,7 @@ async function main() {
 				order: 2,
 			},
 		}),
-		prisma.appCategory.create({
+		prisma.appsCategory.create({
 			data: {
 				name: "Utilities",
 				slug: "utilities",
@@ -60,7 +60,7 @@ async function main() {
 				order: 3,
 			},
 		}),
-		prisma.appCategory.create({
+		prisma.appsCategory.create({
 			data: {
 				name: "Business",
 				slug: "business",
@@ -71,13 +71,13 @@ async function main() {
 	]);
 	console.log(`✅ Created ${categories.length} categories`);
 
-	// Создаем приложения
 	const apps = await Promise.all([
-		prisma.app.create({
+		prisma.apps.create({
 			data: {
 				name: "Code Editor Pro",
 				slug: "code-editor-pro",
-				shortDesc: "A powerful and lightweight code editor for developers",
+				shortDesc:
+					"A powerful and lightweight code editor for developers",
 				description:
 					"Code Editor Pro is a modern, fast, and feature-rich code editor designed for professional developers. It supports multiple programming languages, has built-in Git integration, and offers intelligent code completion.",
 				version: "1.0.0",
@@ -93,9 +93,10 @@ async function main() {
 				size: 125000000,
 				platform: ["WINDOWS", "MAC", "LINUX"],
 				minVersion: "Windows 10, macOS 12, Ubuntu 20.04",
-				downloadUrl: "https://example.com/downloads/code-editor-pro.zip",
+				downloadUrl:
+					"https://example.com/downloads/code-editor-pro.zip",
 				sourceUrl: "https://github.com/ghazaryan/code-editor-pro",
-				status: "PUBLISHED",
+				status: "BETA",
 				featured: true,
 				authorId: user.id,
 				publishedAt: new Date(),
@@ -104,7 +105,7 @@ async function main() {
 				reviewCount: 45,
 			},
 		}),
-		prisma.app.create({
+		prisma.apps.create({
 			data: {
 				name: "Task Manager Plus",
 				slug: "task-manager-plus",
@@ -114,13 +115,16 @@ async function main() {
 				version: "2.1.5",
 				changelog: "Bug fixes and performance improvements",
 				iconUrl: "https://example.com/icons/task-manager.png",
-				screenshots: ["https://example.com/screenshots/task-manager-1.jpg"],
+				screenshots: [
+					"https://example.com/screenshots/task-manager-1.jpg",
+				],
 				categoryId: categories[1].id,
 				tags: ["productivity", "tasks", "management", "organization"],
 				size: 45000000,
-				platform: ["WINDOWS", "MAC", "WEB"],
-				downloadUrl: "https://example.com/downloads/task-manager-plus.zip",
-				status: "PUBLISHED",
+				platform: ["WINDOWS", "MAC"],
+				downloadUrl:
+					"https://example.com/downloads/task-manager-plus.zip",
+				status: "RELEASE",
 				featured: true,
 				authorId: user.id,
 				publishedAt: new Date(),
@@ -129,7 +133,7 @@ async function main() {
 				reviewCount: 32,
 			},
 		}),
-		prisma.app.create({
+		prisma.apps.create({
 			data: {
 				name: "System Monitor",
 				slug: "system-monitor",
@@ -144,7 +148,7 @@ async function main() {
 				size: 28000000,
 				platform: ["WINDOWS", "LINUX"],
 				downloadUrl: "https://example.com/downloads/system-monitor.zip",
-				status: "PUBLISHED",
+				status: "BETA",
 				authorId: user.id,
 				publishedAt: new Date(),
 				rating: 4.3,
@@ -155,14 +159,14 @@ async function main() {
 	]);
 	console.log(`✅ Created ${apps.length} apps`);
 
-	// Создаем версии для приложений
-	await prisma.appVersion.createMany({
+	await prisma.appsVersion.createMany({
 		data: [
 			{
 				appId: apps[0].id,
 				version: "0.9.0",
 				changelog: "Beta release",
-				downloadUrl: "https://example.com/downloads/code-editor-pro-0.9.0.zip",
+				downloadUrl:
+					"https://example.com/downloads/code-editor-pro-0.9.0.zip",
 				size: 120000000,
 				isStable: false,
 			},
@@ -170,7 +174,8 @@ async function main() {
 				appId: apps[0].id,
 				version: "1.0.0",
 				changelog: "Initial stable release",
-				downloadUrl: "https://example.com/downloads/code-editor-pro-1.0.0.zip",
+				downloadUrl:
+					"https://example.com/downloads/code-editor-pro-1.0.0.zip",
 				size: 125000000,
 				isStable: true,
 			},
@@ -178,15 +183,15 @@ async function main() {
 	});
 	console.log(`✅ Created app versions`);
 
-	// Создаем отзывы
-	await prisma.review.createMany({
+	await prisma.reviews.createMany({
 		data: [
 			{
 				appId: apps[0].id,
 				userId: user.id,
 				rating: 5,
 				title: "Amazing editor!",
-				comment: "This is the best code editor I've ever used. Fast, reliable, and feature-rich.",
+				comment:
+					"This is the best code editor I've ever used. Fast, reliable, and feature-rich.",
 				helpful: 12,
 			},
 			{
@@ -194,7 +199,8 @@ async function main() {
 				userId: user.id,
 				rating: 4,
 				title: "Great for productivity",
-				comment: "Really helps me stay organized. Would love to see more integrations.",
+				comment:
+					"Really helps me stay organized. Would love to see more integrations.",
 				helpful: 8,
 			},
 		],
@@ -205,7 +211,7 @@ async function main() {
 }
 
 main()
-	.catch((e) => {
+	.catch(e => {
 		console.error("❌ Error during seeding:", e);
 		process.exit(1);
 	})

@@ -23,7 +23,8 @@ export const validateQuery = (schema: ZodSchema) => {
 	return async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const validated = await schema.parseAsync(req.query);
-			req.query = validated as any;
+			Object.keys(req.query).forEach(key => delete req.query[key]);
+			Object.assign(req.query, validated);
 			next();
 		} catch (error) {
 			if (error instanceof ZodError) {

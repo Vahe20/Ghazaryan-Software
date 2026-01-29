@@ -1,9 +1,8 @@
 import { z } from "zod";
+import { UserRole } from "../../types";
 
-// Enum schemas
 export const userRoleSchema = z.enum(["USER", "DEVELOPER", "ADMIN"]);
 
-// Register schema
 export const registerSchema = z.object({
 	email: z.string().email("Invalid email format"),
 	userName: z
@@ -18,13 +17,11 @@ export const registerSchema = z.object({
 	fullName: z.string().max(100, "Full name must be at most 100 characters").optional(),
 });
 
-// Login schema
 export const loginSchema = z.object({
 	email: z.string().email("Invalid email format"),
 	password: z.string().min(8, "Password is required"),
 });
 
-// Update user schema
 export const updateUserSchema = z.object({
 	email: z.string().email("Invalid email format").optional(),
 	username: z
@@ -38,7 +35,6 @@ export const updateUserSchema = z.object({
 	role: userRoleSchema.optional(),
 });
 
-// Change password schema
 export const changePasswordSchema = z.object({
 	currentPassword: z.string().min(1, "Current password is required"),
 	newPassword: z
@@ -47,15 +43,40 @@ export const changePasswordSchema = z.object({
 		.max(100, "New password must be at most 100 characters"),
 });
 
-// Refresh token schema
 export const refreshTokenSchema = z.object({
 	refreshToken: z.string().min(1, "Refresh token is required"),
 });
 
-// Types
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
-export type UserRole = z.infer<typeof userRoleSchema>;
+
+export interface UserCreateData {
+	email: string;
+	userName: string;
+	password: string;
+	fullName?: string;
+}
+
+export interface LoginResponse {
+	accessToken: string;
+	refreshToken: string;
+	user: {
+		id: string;
+		email: string;
+		userName: string;
+		role: UserRole;
+	};
+}
+
+export interface RefreshResponse {
+	accessToken: string;
+	user: {
+		id: string;
+		email: string;
+		userName: string;
+		role: UserRole;
+	};
+}

@@ -4,21 +4,40 @@ import {
 	validate,
 	validateQuery,
 } from "../../middlewares/validation.middleware";
-import { createAppSchema, updateAppSchema, getAppsQuerySchema } from "./app.schema";
+import authMiddleware from "../../middlewares/auth.middleware";
+import {
+	createAppSchema,
+	updateAppSchema,
+	getAppsQuerySchema,
+} from "./apps.types";
+import { requireRole } from "../../middlewares/role.middleware";
 
 const router = Router();
 
-// Public routes
 router.get("/", validateQuery(getAppsQuerySchema), appsController.getApps);
-// router.get("/featured", appsController.getFeaturedApps);
-// router.get("/popular", appsController.getPopularApps);
 router.get("/slug/:slug", appsController.getAppBySlug);
 router.get("/:id", appsController.getAppById);
 router.post("/:id/download", appsController.downloadApp);
 
-// Admin routes (TODO: add auth middleware)
-router.post("/", validate(createAppSchema), appsController.createApp);
-router.put("/:id", validate(updateAppSchema), appsController.updateApp);
-router.delete("/:id", appsController.deleteApp);
+router.post(
+	"/",
+	authMiddleware,
+	requireRole("ADMIN"),
+	validate(createAppSchema),
+	appsController.createApp,
+);
+router.put(
+	"/:id",
+	authMiddleware,
+	requireRole("ADMIN"),
+	validate(updateAppSchema),
+	appsController.updateApp,
+);
+router.delete(
+	"/:id",
+	authMiddleware,
+	requireRole("ADMIN"),
+	appsController.deleteApp,
+);
 
 export default router;

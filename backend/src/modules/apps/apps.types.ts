@@ -1,10 +1,9 @@
 import { z } from "zod";
+import { AppStatus, Platform, SortParams } from "../../types";
 
-// Enum schemas
 export const appStatusSchema = z.enum(["BETA", "RELEASE"]);
 export const platformSchema = z.enum(["WINDOWS", "MAC", "LINUX", "ANDROID", "IOS"]);
 
-// Create app schema
 export const createAppSchema = z.object({
 	name: z
 		.string()
@@ -15,7 +14,7 @@ export const createAppSchema = z.object({
 		.min(3, "Slug must be at least 3 characters")
 		.max(100, "Slug must be at most 100 characters")
 		.regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers and hyphens")
-		.optional(), // Slug is auto-generated from name if not provided
+		.optional(),
 	shortDesc: z
 		.string()
 		.min(10, "Short description must be at least 10 characters")
@@ -43,10 +42,8 @@ export const createAppSchema = z.object({
 	sourceUrl: z.string().url("Invalid source URL").optional(),
 	documentationUrl: z.string().url("Invalid documentation URL").optional(),
 	status: appStatusSchema.default("BETA"),
-	featured: z.boolean().default(false),
 });
 
-// Update app schema
 export const updateAppSchema = z.object({
 	name: z
 		.string()
@@ -90,25 +87,53 @@ export const updateAppSchema = z.object({
 	sourceUrl: z.string().url("Invalid source URL").optional(),
 	documentationUrl: z.string().url("Invalid documentation URL").optional(),
 	status: appStatusSchema.optional(),
-	featured: z.boolean().optional(),
 });
 
-// Query params schema
 export const getAppsQuerySchema = z.object({
 	page: z.coerce.number().int().positive().default(1),
 	limit: z.coerce.number().int().positive().max(100).default(20),
 	search: z.string().optional(),
 	categoryId: z.string().uuid().optional(),
 	status: appStatusSchema.optional(),
-	featured: z.coerce.boolean().optional(),
 	platform: platformSchema.optional(),
 	sortBy: z.enum(["createdAt", "updatedAt", "downloadCount", "rating", "name"]).default("createdAt"),
 	order: z.enum(["asc", "desc"]).default("desc"),
 });
 
-// Types
 export type CreateAppInput = z.infer<typeof createAppSchema>;
 export type UpdateAppInput = z.infer<typeof updateAppSchema>;
 export type GetAppsQuery = z.infer<typeof getAppsQuerySchema>;
-export type AppStatus = z.infer<typeof appStatusSchema>;
-export type Platform = z.infer<typeof platformSchema>;
+
+export interface AppWithRelations {
+	id: string;
+	name: string;
+	slug: string;
+	shortDesc: string;
+	description: string;
+	version: string;
+	iconUrl: string;
+	coverUrl?: string | null;
+	rating: number;
+	downloadCount: number;
+	viewCount: number;
+	category: {
+		id: string;
+		name: string;
+		slug: string;
+	};
+	_count: {
+		reviews: number;
+		downloads: number;
+	};
+}
+
+export interface AppFilters {
+	search?: string;
+	categoryId?: string;
+	status?: AppStatus;
+	platform?: Platform;
+}
+
+export interface AppSortOptions extends SortParams {
+	sortBy: "createdAt" | "updatedAt" | "downloadCount" | "rating" | "name";
+}

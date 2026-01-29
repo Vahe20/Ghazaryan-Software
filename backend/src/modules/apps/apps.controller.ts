@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as appsService from "./apps.service";
+import { DownloadMetadata } from "../../types";
 
 export async function getApps(req: Request, res: Response) {
 	try {
@@ -15,13 +16,15 @@ export async function getAppById(req: Request, res: Response) {
 	try {
 		const id = req.params.id;
 		if (Array.isArray(id)) {
-			return res.status(400).json({ error: "Invalid ID parameter" });
+			res.status(400).json({ error: "Invalid ID parameter" });
+			return;
 		}
 
 		const app = await appsService.getAppById(id);
 
 		if (!app) {
-			return res.status(404).json({ error: "App not found" });
+			res.status(404).json({ error: "App not found" });
+			return;
 		}
 
 		await appsService.incrementViewCount(id);
@@ -37,13 +40,15 @@ export async function getAppBySlug(req: Request, res: Response) {
 	try {
 		const slug = req.params.slug;
 		if (Array.isArray(slug)) {
-			return res.status(400).json({ error: "Invalid slug parameter" });
+			res.status(400).json({ error: "Invalid slug parameter" });
+			return;
 		}
 
 		const app = await appsService.getAppBySlug(slug);
 
 		if (!app) {
-			return res.status(404).json({ error: "App not found" });
+			res.status(404).json({ error: "App not found" });
+			return;
 		}
 
 		await appsService.incrementViewCount(app.id);
@@ -71,7 +76,8 @@ export async function updateApp(req: Request, res: Response) {
 	try {
 		const id = req.params.id;
 		if (Array.isArray(id)) {
-			return res.status(400).json({ error: "Invalid ID parameter" });
+			res.status(400).json({ error: "Invalid ID parameter" });
+			return;
 		}
 
 		const app = await appsService.updateAppById(id, req.body);
@@ -88,7 +94,8 @@ export async function deleteApp(req: Request, res: Response) {
 	try {
 		const id = req.params.id;
 		if (Array.isArray(id)) {
-			return res.status(400).json({ error: "Invalid ID parameter" });
+			res.status(400).json({ error: "Invalid ID parameter" });
+			return;
 		}
 
 		const app = await appsService.deleteAppById(id);
@@ -105,17 +112,16 @@ export async function downloadApp(req: Request, res: Response) {
 	try {
 		const id = req.params.id;
 		if (Array.isArray(id)) {
-			return res.status(400).json({ error: "Invalid ID parameter" });
+			res.status(400).json({ error: "Invalid ID parameter" });
+			return;
 		}
 
-		// Get user ID from auth middleware if available (TODO: implement auth middleware)
-		const userId = undefined; // req.user?.id
+		const userId = undefined;
 
-		// Get metadata from request
-		const metadata = {
+		const metadata: DownloadMetadata = {
 			version: req.body.version,
 			platform: req.body.platform,
-			ipAddress: req.ip,
+			ipAddress: req.ip as string | undefined,
 			userAgent: req.get("user-agent"),
 			country: req.body.country,
 		};
@@ -130,21 +136,6 @@ export async function downloadApp(req: Request, res: Response) {
 				? error.message
 				: "Failed to record download";
 		res.status(400).json({ error: message });
-	}
-}
-
-export async function getFeaturedApps(req: Request, res: Response) {
-	try {
-		const limitParam = req.query.limit as string;
-		const limit =
-			limitParam && !Array.isArray(limitParam)
-				? parseInt(limitParam)
-				: undefined;
-		const apps = await appsService.getFeaturedApps(limit);
-		res.json(apps);
-	} catch (error) {
-		console.error("Error fetching featured apps:", error);
-		res.status(500).json({ error: "Failed to fetch featured apps" });
 	}
 }
 

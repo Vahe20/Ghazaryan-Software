@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Create category schema (slug is auto-generated)
 export const createCategorySchema = z.object({
 	name: z
 		.string()
@@ -17,12 +16,12 @@ export const createCategorySchema = z.object({
 		.default(0),
 });
 
-// Update category schema
 export const updateCategorySchema = z.object({
 	name: z
 		.string()
 		.min(2, "Category name must be at least 2 characters")
-		.max(50, "Category name must be at most 50 characters"),
+		.max(50, "Category name must be at most 50 characters")
+		.optional(),
 	slug: z
 		.string()
 		.min(2, "Slug must be at least 2 characters")
@@ -43,7 +42,6 @@ export const updateCategorySchema = z.object({
 		.optional(),
 });
 
-// Query params schema
 export const getCategoriesQuerySchema = z.object({
 	page: z.coerce.number().int().positive().default(1),
 	limit: z.coerce.number().int().positive().max(100).default(20),
@@ -52,7 +50,16 @@ export const getCategoriesQuerySchema = z.object({
 	order: z.enum(["asc", "desc"]).default("asc"),
 });
 
-// Types
 export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
 export type UpdateCategoryInput = z.infer<typeof updateCategorySchema>;
 export type GetCategoriesQuery = z.infer<typeof getCategoriesQuerySchema>;
+
+export interface Category {
+	id: string;
+	name: string;
+	slug: string;
+	description: string | null;
+	order: number;
+	createdAt: Date;
+	updatedAt: Date;
+}

@@ -30,6 +30,7 @@ model Users {
   downloads     Downloads[]
   refreshTokens RefreshToken[]
   purchases     Purchases[]
+  authoredApps  Apps[]        @relation("AuthoredApps")
   @@map("users")
 }
 
@@ -67,6 +68,9 @@ model Apps {
   status   AppStatus @default(BETA)
   featured Boolean   @default(false)
 
+  author   Users?   @relation("AuthoredApps", fields: [authorId], references: [id])
+  authorId String?
+
   publishedAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime?  @updatedAt
@@ -82,7 +86,6 @@ model Apps {
   @@index([slug])
   @@index([categoryId])
   @@index([status])
-  @@index([featured])
   @@map("apps")
 }
 

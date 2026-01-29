@@ -4,9 +4,9 @@
 		"outDir": "./dist",
 
 		"target": "es2020",
-		"module": "nodenext",
+		"module": "node16",
 		"lib": ["ES2017", "ESNext.AsyncIterable"],
-		"moduleResolution": "nodenext",
+		"moduleResolution": "node16",
 		"esModuleInterop": true,
 		"strict": true,
 		"types": ["node"],

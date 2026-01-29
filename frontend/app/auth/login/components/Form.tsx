@@ -66,7 +66,7 @@ export const Form = () => {
 
             <div className={style.form__submit}>
                 <button type="submit" disabled={isLoading}>
-                    {isLoading ? "sign ing..." : "login to your Account"}
+                    {isLoading ? "signing in..." : "login to your Account"}
                 </button>
             </div>
 

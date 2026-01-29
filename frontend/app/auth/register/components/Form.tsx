@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import style from "../style.module.scss";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Axios } from "@/src/config/Axios";
 import { AuthService } from "@/src/services/auth.service";
 
 interface FormData {
@@ -31,8 +30,8 @@ export const Form = () => {
         setErrors({});
 
         try {
-            delete form.confirmPassword
-            const data = AuthService.register(form);
+            const { confirmPassword, ...formData } = form;
+            const data = await AuthService.register(formData);
             console.log(data);
         } catch {
             setErrors({ userName: "Registration failed. Please try again." });

@@ -1,72 +1,20 @@
-/*
-  Warnings:
+-- CreateEnum
+CREATE TYPE "PurchaseStatus" AS ENUM ('PENDING', 'COMPLETED', 'FAILED', 'REFUNDED');
 
-  - You are about to drop the `App` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `AppCategory` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `AppVersion` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Download` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Purchase` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `RefreshToken` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Review` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `User` table. If the table is not empty, all the data it contains will be lost.
+-- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('USER', 'DEVELOPER', 'ADMIN');
 
-*/
--- DropForeignKey
-ALTER TABLE "App" DROP CONSTRAINT "App_categoryId_fkey";
+-- CreateEnum
+CREATE TYPE "AppStatus" AS ENUM ('BETA', 'RELEASE');
 
--- DropForeignKey
-ALTER TABLE "AppVersion" DROP CONSTRAINT "AppVersion_appId_fkey";
-
--- DropForeignKey
-ALTER TABLE "Download" DROP CONSTRAINT "Download_appId_fkey";
-
--- DropForeignKey
-ALTER TABLE "Download" DROP CONSTRAINT "Download_userId_fkey";
-
--- DropForeignKey
-ALTER TABLE "Purchase" DROP CONSTRAINT "Purchase_appId_fkey";
-
--- DropForeignKey
-ALTER TABLE "Purchase" DROP CONSTRAINT "Purchase_userId_fkey";
-
--- DropForeignKey
-ALTER TABLE "RefreshToken" DROP CONSTRAINT "RefreshToken_userId_fkey";
-
--- DropForeignKey
-ALTER TABLE "Review" DROP CONSTRAINT "Review_appId_fkey";
-
--- DropForeignKey
-ALTER TABLE "Review" DROP CONSTRAINT "Review_userId_fkey";
-
--- DropTable
-DROP TABLE "App";
-
--- DropTable
-DROP TABLE "AppCategory";
-
--- DropTable
-DROP TABLE "AppVersion";
-
--- DropTable
-DROP TABLE "Download";
-
--- DropTable
-DROP TABLE "Purchase";
-
--- DropTable
-DROP TABLE "RefreshToken";
-
--- DropTable
-DROP TABLE "Review";
-
--- DropTable
-DROP TABLE "User";
+-- CreateEnum
+CREATE TYPE "Platform" AS ENUM ('WINDOWS', 'MAC', 'LINUX', 'ANDROID', 'IOS');
 
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "username" TEXT NOT NULL,
+    "userName" TEXT NOT NULL,
     "fullName" TEXT,
     "role" "UserRole" NOT NULL DEFAULT 'USER',
     "passwordHash" TEXT NOT NULL,
@@ -104,7 +52,6 @@ CREATE TABLE "apps" (
     "rating" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "reviewCount" INTEGER NOT NULL DEFAULT 0,
     "status" "AppStatus" NOT NULL DEFAULT 'BETA',
-    "featured" BOOLEAN NOT NULL DEFAULT false,
     "publishedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
@@ -200,7 +147,7 @@ CREATE TABLE "purchases" (
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
+CREATE UNIQUE INDEX "users_userName_key" ON "users"("userName");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "apps_slug_key" ON "apps"("slug");
@@ -213,9 +160,6 @@ CREATE INDEX "apps_categoryId_idx" ON "apps"("categoryId");
 
 -- CreateIndex
 CREATE INDEX "apps_status_idx" ON "apps"("status");
-
--- CreateIndex
-CREATE INDEX "apps_featured_idx" ON "apps"("featured");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "appscategory_name_key" ON "appscategory"("name");

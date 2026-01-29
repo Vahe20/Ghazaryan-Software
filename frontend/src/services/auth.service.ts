@@ -1,5 +1,5 @@
 import { Axios } from "../config/Axios";
-import { User } from "../types/entities";
+import { User } from "../types/Entities";
 
 interface regRequest {
 	email: string;

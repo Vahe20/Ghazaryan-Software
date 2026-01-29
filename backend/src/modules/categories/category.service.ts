@@ -1,6 +1,9 @@
 import { prisma } from "../../config/prisma";
 import { slugGenerator } from "../../utils/slugGenerator";
-import { CreateCategoryInput, UpdateCategoryInput } from "./category.schema";
+import {
+	CreateCategoryInput,
+	UpdateCategoryInput,
+} from "./category.types";
 
 export async function getAllCategories() {
 	return await prisma.appsCategory.findMany();
@@ -39,7 +42,6 @@ export async function updateCategoryById(
 	id: string,
 	data: UpdateCategoryInput,
 ) {
-	// Check if category exists
 	const category = await prisma.appsCategory.findUnique({
 		where: { id },
 	});
@@ -48,7 +50,6 @@ export async function updateCategoryById(
 		throw new Error("Category not found");
 	}
 
-	// Check if new name already exists (but not for the same category)
 	if (data.name) {
 		const existsByName = await prisma.appsCategory.findUnique({
 			where: { name: data.name },

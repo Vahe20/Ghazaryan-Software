@@ -1,6 +1,7 @@
 import { prisma } from "../../config/prisma";
-import { CreateAppInput, UpdateAppInput, GetAppsQuery } from "./app.schema";
+import { CreateAppInput, UpdateAppInput, GetAppsQuery } from "./apps.types";
 import { slugGenerator } from "../../utils/slugGenerator";
+import { DownloadMetadata, Platform } from "../../types";
 
 export async function getAllApps(query: GetAppsQuery) {
 	const {
@@ -9,8 +10,6 @@ export async function getAllApps(query: GetAppsQuery) {
 		search,
 		categoryId,
 		status,
-		featured,
-		platform,
 		sortBy = "createdAt",
 		order = "desc",
 	} = query;
@@ -34,14 +33,6 @@ export async function getAllApps(query: GetAppsQuery) {
 
 	if (status) {
 		where.status = status;
-	}
-
-	if (featured !== undefined) {
-		where.featured = featured;
-	}
-
-	if (platform) {
-		where.platform = { has: platform };
 	}
 
 	const total = await prisma.apps.count({ where });
@@ -89,7 +80,7 @@ export async function getAppById(id: string) {
 					user: {
 						select: {
 							id: true,
-							username: true,
+							userName: true,
 							avatarUrl: true,
 						},
 					},
@@ -121,7 +112,7 @@ export async function getAppBySlug(slug: string) {
 					user: {
 						select: {
 							id: true,
-							username: true,
+							userName: true,
 							avatarUrl: true,
 						},
 					},
@@ -220,14 +211,8 @@ export async function deleteAppById(id: string) {
 export async function recordDownload(
 	appId: string,
 	userId?: string,
-	metadata?: {
-		version: string;
-		platform: string;
-		ipAddress?: string;
-		userAgent?: string;
-		country?: string;
-	},
-) {
+	metadata?: DownloadMetadata,
+): Promise<void> {
 	const app = await prisma.apps.findUnique({
 		where: { id: appId },
 	});
@@ -241,7 +226,7 @@ export async function recordDownload(
 			appId,
 			userId,
 			version: metadata?.version || app.version,
-			platform: metadata?.platform as any,
+			platform: metadata?.platform as Platform,
 			ipAddress: metadata?.ipAddress,
 			userAgent: metadata?.userAgent,
 			country: metadata?.country,
@@ -258,27 +243,7 @@ export async function recordDownload(
 	});
 }
 
-export async function getFeaturedApps(limit: number = 10) {
-	return await prisma.apps.findMany({
-		where: {
-			featured: true,
-			status: "RELEASE",
-		},
-		take: limit,
-		orderBy: [{ downloadCount: "desc" }, { rating: "desc" }],
-		include: {
-			category: true,
-			_count: {
-				select: {
-					reviews: true,
-					downloads: true,
-				},
-			},
-		},
-	});
-}
-
-export async function getPopularApps(limit: number = 10) {
+export async function getPopularApps(limit: number = 10): Promise<any[]> {
 	return await prisma.apps.findMany({
 		where: {
 			status: "RELEASE",
@@ -297,7 +262,7 @@ export async function getPopularApps(limit: number = 10) {
 	});
 }
 
-export async function incrementViewCount(appId: string) {
+export async function incrementViewCount(appId: string): Promise<void> {
 	await prisma.apps.update({
 		where: { id: appId },
 		data: {
