@@ -11,7 +11,7 @@ export async function recalcAppRating(appId: string) {
 		where: { id: appId },
 		data: {
 			rating: result._avg.rating ?? 0,
-			ratingCount: result._count.rating,
+			reviewCount: result._count.rating,
 		},
 	});
 }

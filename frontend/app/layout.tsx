@@ -1,10 +1,6 @@
-import type { Metadata } from "next";
 import "../src/styles/main.scss";
-
-export const metadata: Metadata = {
-  title: "Ghazaryan SoftWare",
-  description: "my application",
-};
+import { Header } from "@/src/components/layout/Header";
+import { AuthInitializer } from "@/src/components/providers/AuthInitializer";
 
 export default function RootLayout({
   children,
@@ -13,9 +9,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        {children}
-      </body>
+      <head>
+        <title>Ghazaryan SoftWare</title>
+        <meta name="description" content="my application" />
+      </head>
+      <AuthInitializer>
+        <body className="container">
+          <Header />
+          <main>
+            {children}
+          </main>
+        </body>
+      </AuthInitializer>
     </html>
   );
 }

@@ -2,7 +2,32 @@ import bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import { prisma } from "../../config/prisma";
 import { jwtConfig } from "../../config/jwt";
-import { UserCreateData, LoginResponse, RefreshResponse } from "./auth.types";
+import { UserCreateData, LoginInput } from "./auth.types";
+
+export async function getUserById(id: string) {
+	const user = await prisma.users.findUnique({
+		where: { id },
+		select: {
+			id: true,
+			email: true,
+			userName: true,
+			role: true,
+			balance: true,
+			avatarUrl: true,
+			reviews: true,
+			downloads: true,
+			purchases: true,
+			authoredApps: true,
+			refreshTokens: true,
+		},
+	});
+
+	if (!user) {
+		throw new Error("User not require");
+	}
+
+	return user;
+}
 
 export async function registerUser(data: UserCreateData) {
 	const existing = await prisma.users.findFirst({
@@ -21,7 +46,6 @@ export async function registerUser(data: UserCreateData) {
 		data: {
 			email: data.email,
 			userName: data.userName,
-			fullName: data.fullName,
 			passwordHash,
 		},
 	});
@@ -29,10 +53,9 @@ export async function registerUser(data: UserCreateData) {
 	return user;
 }
 
-export async function loginUser(
-	email: string,
-	password: string,
-): Promise<LoginResponse> {
+export async function loginUser(data: LoginInput) {
+	const { email, password } = data;
+
 	const user = await prisma.users.findUnique({
 		where: { email },
 	});
@@ -77,9 +100,7 @@ export async function loginUser(
 	return { accessToken, refreshToken, user };
 }
 
-export async function refreshAccessToken(
-	refreshToken: string,
-): Promise<RefreshResponse> {
+export async function refreshAccessToken(refreshToken: string) {
 	let decoded;
 	try {
 		decoded = jwt.verify(refreshToken, jwtConfig.refreshSecret) as {

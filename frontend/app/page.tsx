@@ -1,7 +1,12 @@
-export default function Home() {
+import { HeroSection } from "@/src/components/home/HeroSection";
+import { PopularAppsSection } from "@/src/components/home/PopularAppsSection";
+import style from "./page.module.scss";
+
+export default function HomePage() {
   return (
-    <div>
-      <h1>Welcome to Ghazaryan Software</h1>
+    <div className={style.home}>
+      <HeroSection />
+      <PopularAppsSection />
     </div>
   );
 }

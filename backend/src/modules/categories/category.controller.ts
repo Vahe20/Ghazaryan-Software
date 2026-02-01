@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as categoryService from "./category.service";
 
-export async function getCategories(req: Request, res: Response): Promise<void> {
+export async function getCategories(req: Request, res: Response) {
 	try {
 		const categories = await categoryService.getAllCategories();
 		res.json(categories);
@@ -11,7 +11,7 @@ export async function getCategories(req: Request, res: Response): Promise<void> 
 	}
 }
 
-export async function getCategoryById(req: Request, res: Response): Promise<void> {
+export async function getCategoryById(req: Request, res: Response) {
 	try {
 		const id = req.params.id;
 		if (Array.isArray(id)) {
@@ -33,7 +33,7 @@ export async function getCategoryById(req: Request, res: Response): Promise<void
 	}
 }
 
-export async function getCategoryBySlug(req: Request, res: Response): Promise<void> {
+export async function getCategoryBySlug(req: Request, res: Response) {
 	try {
 		const slug = req.params.slug;
 		if (Array.isArray(slug)) {
@@ -55,7 +55,7 @@ export async function getCategoryBySlug(req: Request, res: Response): Promise<vo
 	}
 }
 
-export async function createCategory(req: Request, res: Response): Promise<void> {
+export async function createCategory(req: Request, res: Response) {
 	try {
 		const category = await categoryService.addCategory(req.body);
 		res.status(201).json(category);
@@ -66,7 +66,7 @@ export async function createCategory(req: Request, res: Response): Promise<void>
 	}
 }
 
-export async function updateCategory(req: Request, res: Response): Promise<void> {
+export async function updateCategory(req: Request, res: Response) {
 	try {
 		const id = req.params.id;
 		if (Array.isArray(id)) {
@@ -83,7 +83,7 @@ export async function updateCategory(req: Request, res: Response): Promise<void>
 	}
 }
 
-export async function deleteCategory(req: Request, res: Response): Promise<void> {
+export async function deleteCategory(req: Request, res: Response) {
 	try {
 		const id = req.params.id;
 		if (Array.isArray(id)) {

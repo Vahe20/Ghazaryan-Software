@@ -1,0 +1,458 @@
+@use "../../src/styles/helpers/" as *;
+
+.authPage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: rem(24);
+    position: relative;
+    overflow: hidden;
+
+    &::before,
+    &::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(100px);
+        opacity: 0.15;
+        animation: float 20s infinite ease-in-out;
+    }
+
+    &::before {
+        width: rem(500);
+        height: rem(500);
+        background: linear-gradient(135deg, $primary 0%, $accent 100%);
+        top: -10%;
+        left: -10%;
+        animation-delay: 0s;
+    }
+
+    &::after {
+        width: rem(400);
+        height: rem(400);
+        background: linear-gradient(135deg, $accent 0%, $primary 100%);
+        bottom: -10%;
+        right: -10%;
+        animation-delay: 10s;
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(rem(30), rem(-30)) scale(1.1);
+    }
+    66% {
+        transform: translate(rem(-20), rem(20)) scale(0.9);
+    }
+}
+
+.authContainer {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: rem(480);
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(rem(30));
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.authCard {
+    background: $background-card;
+    backdrop-filter: blur(20px);
+    border: 1px solid $border-color;
+    border-radius: $radius-xl;
+    padding: rem(48) rem(40);
+    box-shadow: $shadow-xl;
+    transition: all $transition;
+
+    @media (max-width: 640px) {
+        padding: rem(32) rem(24);
+    }
+
+    &:hover {
+        border-color: $border-color-medium;
+        box-shadow: 
+            $shadow-xl,
+            0 0 rem(40) rgba(0, 132, 255, 0.1);
+    }
+}
+
+.cardHeader {
+    text-align: center;
+    margin-bottom: rem(36);
+}
+
+.errorAlert {
+    display: flex;
+    align-items: center;
+    gap: rem(12);
+    padding: rem(14) rem(16);
+    background: rgba(240, 40, 73, 0.1);
+    border: 1px solid rgba(240, 40, 73, 0.3);
+    border-radius: $radius-md;
+    color: $error;
+    font-size: rem(14);
+    font-weight: 500;
+    margin-bottom: rem(24);
+    animation: slideDown 0.3s ease;
+
+    svg {
+        flex-shrink: 0;
+    }
+}
+
+.logo {
+    font-size: rem(24);
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0 0 rem(32) 0;
+    letter-spacing: rem(-0.5);
+}
+
+.logoAccent {
+    background: linear-gradient(135deg, $primary 0%, $accent 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.title {
+    font-size: rem(32);
+    font-weight: 800;
+    color: $text-primary;
+    margin: 0 0 rem(12) 0;
+    letter-spacing: rem(-1);
+
+    @media (max-width: 640px) {
+        font-size: rem(28);
+    }
+}
+
+.subtitle {
+    font-size: rem(15);
+    color: $text-secondary;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.form {
+    margin-bottom: rem(28);
+}
+
+.inputGroup {
+    margin-bottom: rem(20);
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+
+    @for $i from 1 through 4 {
+        &:nth-child(#{$i}) {
+            animation-delay: #{$i * 0.05}s;
+        }
+    }
+}
+
+.error {
+    display: block;
+    color: $error;
+    font-size: rem(13);
+    font-weight: 500;
+    margin-top: rem(6);
+    animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(rem(-10));
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.label {
+    display: block;
+    font-size: rem(14);
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: rem(8);
+    letter-spacing: rem(-0.2);
+}
+
+.input {
+    width: 100%;
+    padding: rem(14) rem(16);
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    font-size: rem(15);
+    font-weight: 500;
+    color: $text-primary;
+    transition: all $transition;
+    background: $background-tertiary;
+    font-family: inherit;
+
+    &::placeholder {
+        color: $text-tertiary;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: $primary;
+        background: rgba(26, 31, 46, 0.8);
+        box-shadow: 0 0 0 rem(3) $primary-light;
+    }
+
+    &:hover:not(:focus) {
+        border-color: $border-color-medium;
+    }
+}
+
+.inputGroup:has(.error) .input {
+    border-color: $error;
+
+    &:focus {
+        border-color: $error;
+        box-shadow: 0 0 0 rem(3) rgba(240, 40, 73, 0.15);
+    }
+}
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: rem(24);
+    font-size: rem(14);
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    cursor: pointer;
+    font-weight: 500;
+    color: $text-secondary;
+    transition: color $transition;
+
+    &:hover {
+        color: $text-primary;
+    }
+
+    input[type="checkbox"] {
+        width: rem(18);
+        height: rem(18);
+        cursor: pointer;
+        accent-color: $primary;
+        border-radius: rem(4);
+    }
+}
+
+.checkboxTerms {
+    display: flex;
+    align-items: flex-start;
+    gap: rem(8);
+    cursor: pointer;
+    font-size: rem(14);
+    font-weight: 500;
+    color: $text-secondary;
+    margin-bottom: rem(24);
+    line-height: 1.5;
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+    transition: color $transition;
+
+    &:hover {
+        color: $text-primary;
+    }
+
+    input[type="checkbox"] {
+        width: rem(18);
+        height: rem(18);
+        cursor: pointer;
+        accent-color: $primary;
+        border-radius: rem(4);
+        margin-top: rem(2);
+        flex-shrink: 0;
+    }
+
+    a {
+        color: $primary;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color $transition;
+
+        &:hover {
+            color: $primary-hover;
+            text-decoration: underline;
+        }
+    }
+}
+
+.forgotLink {
+    color: $primary;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all $transition;
+
+    &:hover {
+        color: $primary-hover;
+        text-decoration: underline;
+    }
+}
+
+.submitBtn {
+    width: 100%;
+    padding: rem(16) rem(24);
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+    color: white;
+    border: none;
+    border-radius: $radius-md;
+    font-size: rem(16);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all $transition;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: rem(8);
+    box-shadow: $shadow-glow;
+    font-family: inherit;
+    letter-spacing: rem(0.2);
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+
+    svg {
+        transition: transform $transition;
+    }
+
+    &:hover:not(:disabled) {
+        transform: translateY(rem(-2));
+        box-shadow: $shadow-glow-strong;
+        background: linear-gradient(135deg, $primary-hover 0%, $primary 100%);
+
+        svg {
+            transform: translateX(rem(4));
+        }
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.divider {
+    position: relative;
+    text-align: center;
+    margin: rem(32) 0 rem(24) 0;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            $border-color 15%, 
+            $border-color 85%, 
+            transparent 100%);
+    }
+
+    span {
+        position: relative;
+        background: $background-card;
+        padding: 0 rem(16);
+        color: $text-tertiary;
+        font-size: rem(13);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: rem(1);
+    }
+}
+
+.socialButtons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: rem(12);
+    margin-bottom: rem(28);
+
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.socialBtn {
+    padding: rem(12) rem(16);
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    background: $background-tertiary;
+    color: $text-primary;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all $transition;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: rem(8);
+    font-family: inherit;
+
+    &:hover {
+        border-color: $border-color-medium;
+        background: rgba(26, 31, 46, 0.8);
+        transform: translateY(rem(-1));
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+.switchMode {
+    text-align: center;
+    padding-top: rem(24);
+    border-top: 1px solid $border-color;
+
+    p {
+        font-size: rem(14);
+        color: $text-secondary;
+        font-weight: 500;
+        margin: 0;
+    }
+}
+
+.switchBtn {
+    background: none;
+    border: none;
+    color: $primary;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: rem(14);
+    margin-left: rem(4);
+    transition: color $transition;
+    font-family: inherit;
+    padding: 0;
+
+    &:hover {
+        color: $primary-hover;
+        text-decoration: underline;
+        transform: none;
+    }
+}

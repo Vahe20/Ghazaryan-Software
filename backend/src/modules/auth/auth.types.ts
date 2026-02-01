@@ -14,12 +14,11 @@ export const registerSchema = z.object({
 		.string()
 		.min(8, "Password must be at least 8 characters")
 		.max(100, "Password must be at most 100 characters"),
-	fullName: z.string().max(100, "Full name must be at most 100 characters").optional(),
 });
 
 export const loginSchema = z.object({
-	email: z.string().email("Invalid email format"),
-	password: z.string().min(8, "Password is required"),
+	email: z.string().email("Invalid email format").max(100, "Email must be at most 100 characters"),
+	password: z.string().min(8, "Password is required").max(100, "Password must be at most 100 characters")
 });
 
 export const updateUserSchema = z.object({
@@ -30,7 +29,6 @@ export const updateUserSchema = z.object({
 		.max(50, "Username must be at most 50 characters")
 		.regex(/^[a-zA-Z0-9_-]+$/, "Username can only contain letters, numbers, underscores and hyphens")
 		.optional(),
-	fullName: z.string().max(100, "Full name must be at most 100 characters").optional(),
 	avatarUrl: z.string().url("Invalid avatar URL").optional(),
 	role: userRoleSchema.optional(),
 });

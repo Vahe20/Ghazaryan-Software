@@ -1,114 +1,164 @@
-@use "helpers"as *;
+@use "helpers" as *;
 
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
 }
 
 html {
-    scroll-behavior: smooth;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+	scroll-behavior: smooth;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 body {
-    @include fluid-text(18, 16);
-
-    background: var(--background_dark);
-    background-image: 
-        radial-gradient(at 0% 0%, rgba(0, 132, 255, 0.08) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(255, 0, 110, 0.08) 0px, transparent 50%),
-        radial-gradient(at 0% 100%, rgba(0, 212, 255, 0.08) 0px, transparent 50%);
-    background-attachment: fixed;
-    color: var(--text-color);
-    overflow-x: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-    line-height: 1.6;
+	@include fluid-text(18, 16);
+	font-family:
+		-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+		"Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+		sans-serif;
+	background: linear-gradient(135deg,
+			$background-primary 0%,
+			$background-secondary 100%);
+	background-attachment: fixed;
+	color: $text-primary;
+	min-height: 100vh;
+	line-height: 1.6;
 }
 
 .container {
-    @include min-max(320px, 100%);
+	@include min-max(320px, 100%);
 }
 
 .wrap {
-    @include min-max(296px, 1280px);
-    margin: 0 auto;
-    padding: 0 rem(20);
+	@include min-max(296px, 1280px);
+	margin: 0 auto;
+	padding: 0 rem(20);
 }
 
 .error {
-    color: var(--error);
-    padding: rem(12) rem(16);
-    border: 1px solid var(--error);
-    border-radius: var(--radius-md);
-    background: rgba(240, 40, 73, 0.1);
-    backdrop-filter: blur(10px);
-    font-size: rem(14);
-    display: flex;
-    align-items: center;
-    gap: rem(8);
-    animation: slideDown 0.3s ease;
+	color: $error;
+	padding: rem(12) rem(16);
+	border: 1px solid $error;
+	border-radius: $radius-md;
+	background: rgba(240, 40, 73, 0.1);
+	backdrop-filter: blur(10px);
+	font-size: rem(14);
+	display: flex;
+	align-items: center;
+	gap: rem(8);
+	animation: slideDown 0.3s ease;
+	box-shadow: $shadow-md;
 
-    &::before {
-        content: '⚠️';
-        font-size: rem(18);
-    }
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+	&::before {
+		content: "⚠️";
+		font-size: rem(18);
+	}
 }
 
 a {
-    color: var(--primary);
-    text-decoration: none;
-    transition: var(--transition);
-    position: relative;
+	color: $link-color;
+	text-decoration: none;
+	transition: $transition;
+	position: relative;
 
-    &:hover {
-        color: var(--primary-hover);
-    }
+	&:hover {
+		color: $link-hover;
+	}
 
-    &:active {
-        transform: scale(0.98);
-    }
+	&:active {
+		transform: scale(0.98);
+	}
 }
 
-input, textarea, select {
-    box-sizing: border-box;
-    font-family: inherit;
+input,
+textarea,
+select {
+	box-sizing: border-box;
+	font-family: inherit;
+	background-color: $background-tertiary;
+	border: 1px solid $border-color;
+	border-radius: $radius-md;
+	color: $text-primary;
+	padding: rem(12) rem(16);
+	transition: all $transition;
+
+	&:focus {
+		outline: none;
+		border-color: $primary;
+		box-shadow: 0 0 0 3px $primary-light;
+	}
+
+	&:hover:not(:focus) {
+		border-color: $border-color-medium;
+	}
 }
 
-input, textarea {
-    &::placeholder {
-        color: var(--text-muted);
-    }
+input,
+textarea {
+	&::placeholder {
+		color: $text-tertiary;
+	}
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color: $text-color;
 }
 
 img {
-    max-width: 100%;
-    height: auto;
-    display: block;
+	max-width: 100%;
+	height: auto;
+	display: block;
 }
 
 button {
-    font-family: inherit;
-    cursor: pointer;
-    border: none;
-    background: none;
-    outline: none;
+	font-family: inherit;
+	cursor: pointer;
+	border: none;
+	background: none;
+	outline: none;
+	transition: all $transition;
+	font-weight: 500;
+
+	&:hover {
+		transform: translateY(-1px);
+	}
+
+	&:active {
+		transform: translateY(0);
+	}
 }
 
-ul, ol {
-    list-style: none;
+ul,
+ol {
+	list-style: none;
+}
+
+main {
+	min-height: calc(100vh - 80px);
+	padding: rem(32) 0;
+}
+
+// Scrollbar styling
+::-webkit-scrollbar {
+	width: 10px;
+}
+
+::-webkit-scrollbar-track {
+	background: $background-secondary;
+}
+
+::-webkit-scrollbar-thumb {
+	background: $background-tertiary;
+	border-radius: $radius-full;
+
+	&:hover {
+		background: rgba(255, 255, 255, 0.2);
+	}
 }

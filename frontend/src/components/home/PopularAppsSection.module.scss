@@ -1,0 +1,64 @@
+@use "../../styles/helpers/" as *;
+
+.section {
+  padding: rem(48) rem(24);
+  margin-bottom: rem(32);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: rem(32);
+  }
+
+  &__title {
+    font-size: rem(32);
+    font-weight: 700;
+    color: $text-primary;
+    letter-spacing: -0.5px;
+  }
+
+  &__link {
+    color: $primary;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all $transition;
+
+    &:hover {
+      color: $primary-hover;
+      transform: translateX(4px);
+    }
+  }
+}
+
+.appsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: rem(24);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: rem(20);
+  }
+}
+
+.loading,
+.empty {
+  text-align: center;
+  padding: rem(48);
+  color: $text-secondary;
+  font-size: rem(18);
+}
+
+.loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

@@ -1,0 +1,145 @@
+@use "../../styles/helpers/" as *;
+
+.hero {
+  position: relative;
+  padding: rem(80) rem(24) rem(60);
+  text-align: center;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 132, 255, 0.1) 0%,
+    rgba(255, 0, 110, 0.1) 100%
+  );
+  border-radius: $radius-xl;
+  margin: rem(32) rem(24);
+  overflow: hidden;
+  animation: slideDown 0.5s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+      radial-gradient(
+        circle at 30% 50%,
+        rgba(0, 132, 255, 0.15) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 70% 50%,
+        rgba(255, 0, 110, 0.15) 0%,
+        transparent 50%
+      );
+    pointer-events: none;
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  &__title {
+    font-size: rem(56);
+    font-weight: 800;
+    color: $text-primary;
+    margin-bottom: rem(20);
+    line-height: 1.2;
+    letter-spacing: -1.5px;
+
+    @media (max-width: 768px) {
+      font-size: rem(36);
+    }
+  }
+
+  &__titleAccent {
+    background: linear-gradient(135deg, $primary 0%, $accent 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  &__subtitle {
+    font-size: rem(20);
+    color: $text-secondary;
+    margin-bottom: rem(32);
+    line-height: 1.6;
+
+    @media (max-width: 768px) {
+      font-size: rem(16);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: rem(16);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  &__button {
+    padding: rem(14) rem(32);
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+    color: $text-primary;
+    border-radius: $radius-md;
+    font-weight: 600;
+    font-size: rem(16);
+    text-decoration: none;
+    box-shadow: $shadow-glow;
+    transition: all $transition;
+    display: inline-block;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $shadow-glow-strong;
+      background: linear-gradient(
+        135deg,
+        $primary-hover 0%,
+        $primary 100%
+      );
+      color: white;
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &__buttonSecondary {
+    padding: rem(14) rem(32);
+    background: $background-card;
+    backdrop-filter: blur(10px);
+    color: $text-primary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    font-weight: 600;
+    font-size: rem(16);
+    text-decoration: none;
+    transition: all $transition;
+    display: inline-block;
+
+    &:hover {
+      background: $background-hover;
+      border-color: $border-color-medium;
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

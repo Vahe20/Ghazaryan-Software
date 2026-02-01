@@ -14,7 +14,10 @@ export async function getAllApps(query: GetAppsQuery) {
 		order = "desc",
 	} = query;
 
-	const skip = (page - 1) * limit;
+	const limitNum = typeof limit === "number" ? limit : Number(limit);
+	const pageNum = typeof page === "number" ? page : Number(page);
+
+	const skip = (pageNum - 1) * limitNum;
 
 	const where: any = {};
 
@@ -40,7 +43,7 @@ export async function getAllApps(query: GetAppsQuery) {
 	const apps = await prisma.apps.findMany({
 		where,
 		skip,
-		take: limit,
+		take: limitNum,
 		orderBy: { [sortBy]: order },
 		include: {
 			category: true,
@@ -56,10 +59,10 @@ export async function getAllApps(query: GetAppsQuery) {
 	return {
 		apps,
 		pagination: {
-			page,
-			limit,
+			page: pageNum,
+			limit: limitNum,
 			total,
-			totalPages: Math.ceil(total / limit),
+			totalPages: Math.ceil(total / limitNum),
 		},
 	};
 }

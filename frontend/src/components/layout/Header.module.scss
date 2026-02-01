@@ -1,0 +1,65 @@
+@use "../../styles/helpers" as *;
+
+.header {
+  background: $background-card;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid $border-color;
+  padding-block: rem(16);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: $shadow-md;
+}
+
+.navbar {
+  padding-inline: rem(24);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: rem(32);
+  max-width: 1400px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    gap: rem(16);
+    padding-inline: rem(16);
+  }
+}
+
+.navbar__logo {
+  cursor: pointer;
+  transition: transform $transition;
+  flex-shrink: 0;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+
+  h1 {
+    font-size: rem(24);
+    font-weight: 700;
+    background: linear-gradient(135deg, $primary 0%, $accent 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-decoration: none;
+    transition: all $transition;
+    letter-spacing: -0.5px;
+    margin: 0;
+
+    &:hover {
+      filter: brightness(1.2);
+    }
+
+    @media (max-width: 768px) {
+      font-size: rem(20);
+    }
+  }
+}
+
+.navbar__auth {
+  display: flex;
+  align-items: center;
+  gap: rem(12);
+  flex-shrink: 0;
+}

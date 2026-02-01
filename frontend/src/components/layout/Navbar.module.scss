@@ -1,0 +1,85 @@
+@use "../../styles/helpers" as *;
+
+.navbar__links {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.navbar__links_list {
+  display: flex;
+  gap: rem(8);
+  justify-content: center;
+  align-items: center;
+}
+
+.navbar__links_item {
+  position: relative;
+
+  a {
+    display: block;
+    padding: rem(10) rem(20);
+    color: $text-secondary;
+    font-weight: 500;
+    border-radius: $radius-md;
+    transition: all $transition;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: $background-hover;
+      opacity: 0;
+      transition: $transition;
+      border-radius: $radius-md;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      transition: $transition;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, $primary, transparent);
+      border-radius: $radius-full;
+    }
+
+    &:hover {
+      color: $text-primary;
+      transform: translateY(-2px);
+
+      &::before {
+        opacity: 1;
+      }
+
+      &::after {
+        width: 60%;
+      }
+    }
+
+    &.active {
+      color: $primary;
+      font-weight: 600;
+      background: $primary-light;
+
+      &::before {
+        opacity: 1;
+        background: $primary-light;
+      }
+
+      &::after {
+        width: 80%;
+      }
+    }
+  }
+}
