@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link";
-import { Navbar } from "./Navbar";
-import { AuthMenu } from "./AuthMenu";
+import { Navbar } from "../navbar/Navbar";
+import { AuthMenu } from "../authMenu/AuthMenu";
 import style from "./Header.module.scss";
 
 export function Header() {

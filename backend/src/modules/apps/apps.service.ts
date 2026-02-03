@@ -14,6 +14,7 @@ export async function getAllApps(query: GetAppsQuery) {
 		order = "desc",
 	} = query;
 
+	// Ensure limit is a number
 	const limitNum = typeof limit === "number" ? limit : Number(limit);
 	const pageNum = typeof page === "number" ? page : Number(page);
 

@@ -28,7 +28,6 @@ async function main() {
 		data: {
 			email: "admin@ghazaryan.dev",
 			userName: "ghazaryan",
-			fullName: "Ghazaryan Developer",
 			passwordHash,
 			role: "ADMIN",
 		},
@@ -82,11 +81,13 @@ async function main() {
 					"Code Editor Pro is a modern, fast, and feature-rich code editor designed for professional developers. It supports multiple programming languages, has built-in Git integration, and offers intelligent code completion.",
 				version: "1.0.0",
 				changelog: "Initial release with core features",
-				iconUrl: "https://example.com/icons/code-editor.png",
-				coverUrl: "https://example.com/covers/code-editor.jpg",
+				iconUrl:
+					"https://as2.ftcdn.net/jpg/02/89/59/55/1000_F_289595573_wCKO1nxxx7HGk69z5szjvSOqPnZVTfTG.jpg",
+				coverUrl:
+					"https://images.unsplash.com/photo-1515879218367-8466d910aaa4",
 				screenshots: [
-					"https://example.com/screenshots/code-editor-1.jpg",
-					"https://example.com/screenshots/code-editor-2.jpg",
+					"https://images.unsplash.com/photo-1555066931-4365d14bab8c",
+					"https://images.unsplash.com/photo-1517430816045-df4b7de11d1d",
 				],
 				categoryId: categories[0].id,
 				tags: ["editor", "code", "development", "ide"],

@@ -1,0 +1,168 @@
+@use "../../../styles/helpers/" as *;
+
+.form {
+    margin-bottom: rem(28);
+}
+
+.errorAlert {
+    display: flex;
+    align-items: center;
+    gap: rem(12);
+    padding: rem(14) rem(16);
+    background: rgba(240, 40, 73, 0.1);
+    border: 1px solid rgba(240, 40, 73, 0.3);
+    border-radius: $radius-md;
+    color: $error;
+    font-size: rem(14);
+    font-weight: 500;
+    margin-bottom: rem(24);
+    animation: slideDown 0.3s ease;
+
+    svg {
+        flex-shrink: 0;
+    }
+}
+
+.inputGroup {
+    margin-bottom: rem(20);
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+
+    @for $i from 1 through 4 {
+        &:nth-child(#{$i + 1}) {
+            animation-delay: #{$i * 0.05}s;
+        }
+    }
+}
+
+.label {
+    display: block;
+    font-size: rem(14);
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: rem(8);
+    letter-spacing: rem(-0.2);
+}
+
+.input {
+    width: 100%;
+    padding: rem(14) rem(16);
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    font-size: rem(15);
+    font-weight: 500;
+    color: $text-primary;
+    transition: all $transition;
+    background: $background-tertiary;
+    font-family: inherit;
+
+    &::placeholder {
+        color: $text-tertiary;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: $primary;
+        background: rgba(26, 31, 46, 0.8);
+        box-shadow: 0 0 0 rem(3) $primary-light;
+    }
+
+    &:hover:not(:focus) {
+        border-color: $border-color-medium;
+    }
+}
+
+.error {
+    display: block;
+    color: $error;
+    font-size: rem(13);
+    font-weight: 500;
+    margin-top: rem(6);
+    animation: slideDown 0.2s ease;
+}
+
+.inputGroup:has(.error) .input {
+    border-color: $error;
+
+    &:focus {
+        border-color: $error;
+        box-shadow: 0 0 0 rem(3) rgba(240, 40, 73, 0.15);
+    }
+}
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: rem(24);
+    font-size: rem(14);
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+.forgotLink {
+    color: $primary;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all $transition;
+
+    &:hover {
+        color: $primary-hover;
+        text-decoration: underline;
+    }
+}
+
+.submitBtn {
+    width: 100%;
+    padding: rem(16) rem(24);
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+    color: white;
+    border: none;
+    border-radius: $radius-md;
+    font-size: rem(16);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all $transition;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: rem(8);
+    box-shadow: $shadow-glow;
+    font-family: inherit;
+    letter-spacing: rem(0.2);
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+
+    svg {
+        transition: transform $transition;
+    }
+
+    &:hover:not(:disabled) {
+        transform: translateY(rem(-2));
+        box-shadow: $shadow-glow-strong;
+        background: linear-gradient(135deg, $primary-hover 0%, $primary 100%);
+
+        svg {
+            transform: translateX(rem(4));
+        }
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(rem(-10));
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,28 +1,14 @@
 "use client"
 
-import { useQuery } from "@/src/hooks/useQuery";
-import { App } from "@/src/types/Entities";
 import Link from "next/link";
+import { useApps } from "@/src/hooks/queries/useApps";
 import { AppCard } from "@/src/components/appCard/AppCard";
 import style from "./PopularAppsSection.module.scss";
 
-interface AppsResponse {
-  apps: App[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
-
 export function PopularAppsSection() {
-  const { data: appsData, loading: appsLoading } = useQuery<AppsResponse>(
-    "/apps?limit=20&sortBy=downloadCount",
-    { silent: true }
-  );
+  const { data, isLoading } = useApps({ limit: 6, sortBy: "downloadCount" });
 
-  const popularApps = appsData?.apps.slice(0, 6) || [];
+  const popularApps = data?.apps.slice(0, 6) || [];
 
   return (
     <section className={style.section}>
@@ -32,7 +18,7 @@ export function PopularAppsSection() {
           View All →
         </Link>
       </div>
-      {appsLoading ? (
+      {isLoading ? (
         <div className={style.loading}>Loading apps...</div>
       ) : popularApps.length > 0 ? (
         <div className={style.appsGrid}>

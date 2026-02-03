@@ -1,0 +1,98 @@
+@use "../../../styles/helpers/" as *;
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(rem(300), 1fr));
+  gap: rem(24);
+  margin-bottom: rem(40);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: rem(20);
+  }
+}
+
+.loading,
+.error,
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: rem(80) rem(24);
+  text-align: center;
+  color: $text-secondary;
+
+  svg {
+    margin-bottom: rem(24);
+    color: $text-tertiary;
+  }
+
+  h3 {
+    font-size: rem(24);
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0 0 rem(12) 0;
+  }
+
+  p {
+    font-size: rem(16);
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+.loading {
+  .spinner {
+    animation: spin 1s linear infinite;
+
+    svg {
+      color: $primary;
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error {
+  svg {
+    color: $error;
+  }
+}
+
+.retryButton {
+  margin-top: rem(24);
+  padding: rem(12) rem(32);
+  background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+  color: white;
+  border: none;
+  border-radius: $radius-md;
+  font-size: rem(15);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all $transition;
+  font-family: inherit;
+
+  &:hover {
+    transform: translateY(rem(-2));
+    box-shadow: $shadow-glow;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.empty {
+  svg {
+    color: $text-tertiary;
+    opacity: 0.5;
+  }
+}

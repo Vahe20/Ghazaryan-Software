@@ -18,9 +18,11 @@ body {
 		-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
 		"Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
 		sans-serif;
-	background: linear-gradient(135deg,
-			$background-primary 0%,
-			$background-secondary 100%);
+	background: linear-gradient(
+		135deg,
+		$background-primary 0%,
+		$background-secondary 100%
+	);
 	background-attachment: fixed;
 	color: $text-primary;
 	min-height: 100vh;

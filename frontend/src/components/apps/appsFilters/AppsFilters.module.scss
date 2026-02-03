@@ -1,0 +1,136 @@
+@use "../../../styles/helpers/" as *;
+
+.filters {
+  display: flex;
+  gap: rem(16);
+  margin-bottom: rem(32);
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+.searchBox {
+  position: relative;
+  flex: 1;
+  min-width: rem(300);
+
+  @media (max-width: 768px) {
+    min-width: 100%;
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  left: rem(16);
+  top: 50%;
+  transform: translateY(-50%);
+  color: $text-tertiary;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: rem(14) rem(48) rem(14) rem(48);
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  font-size: rem(15);
+  font-weight: 500;
+  color: $text-primary;
+  background: $background-tertiary;
+  transition: all $transition;
+  font-family: inherit;
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    background: rgba(26, 31, 46, 0.8);
+    box-shadow: 0 0 0 rem(3) $primary-light;
+  }
+
+  &:hover:not(:focus) {
+    border-color: $border-color-medium;
+  }
+}
+
+.clearButton {
+  position: absolute;
+  right: rem(12);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: rem(6);
+  background: transparent;
+  border: none;
+  color: $text-tertiary;
+  cursor: pointer;
+  border-radius: $radius-sm;
+  transition: all $transition;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: $text-primary;
+  }
+}
+
+.sortBox {
+  display: flex;
+  align-items: center;
+  gap: rem(12);
+  padding: rem(14) rem(20);
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  background: $background-tertiary;
+  transition: all $transition;
+
+  &:hover {
+    border-color: $border-color-medium;
+  }
+}
+
+.sortLabel {
+  display: flex;
+  align-items: center;
+  gap: rem(8);
+  font-size: rem(14);
+  font-weight: 600;
+  color: $text-secondary;
+  white-space: nowrap;
+
+  svg {
+    color: $text-tertiary;
+  }
+}
+
+.sortSelect {
+  border: none;
+  background: transparent;
+  color: $text-primary;
+  font-size: rem(14);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  outline: none;
+  appearance: none;
+  padding-right: rem(20);
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+
+  &:hover {
+    color: $primary;
+  }
+
+  option {
+    background: $background-card;
+    color: $text-primary;
+  }
+}

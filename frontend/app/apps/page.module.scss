@@ -1,0 +1,49 @@
+@use "../../src/styles/helpers/" as *;
+
+.appsPage {
+  max-width: rem(1400);
+  margin: 0 auto;
+  padding: rem(40) rem(24);
+
+  @media (max-width: 768px) {
+    padding: rem(24) rem(16);
+  }
+}
+
+.header {
+  text-align: center;
+  margin-bottom: rem(48);
+
+  @media (max-width: 768px) {
+    margin-bottom: rem(32);
+  }
+}
+
+.title {
+  font-size: rem(48);
+  font-weight: 800;
+  color: $text-primary;
+  margin: 0 0 rem(16) 0;
+  letter-spacing: rem(-1.5);
+
+  @media (max-width: 768px) {
+    font-size: rem(32);
+  }
+}
+
+.titleAccent {
+  background: linear-gradient(135deg, $primary 0%, $accent 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  font-size: rem(18);
+  color: $text-secondary;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: rem(16);
+  }
+}

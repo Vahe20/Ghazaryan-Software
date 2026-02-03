@@ -41,36 +41,20 @@ export const changePasswordSchema = z.object({
 		.max(100, "New password must be at most 100 characters"),
 });
 
-export const refreshTokenSchema = z.object({
-	refreshToken: z.string().min(1, "Refresh token is required"),
-});
-
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
-export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
 
 export interface UserCreateData {
 	email: string;
 	userName: string;
 	password: string;
-	fullName?: string;
 }
 
 export interface LoginResponse {
 	accessToken: string;
 	refreshToken: string;
-	user: {
-		id: string;
-		email: string;
-		userName: string;
-		role: UserRole;
-	};
-}
-
-export interface RefreshResponse {
-	accessToken: string;
 	user: {
 		id: string;
 		email: string;

@@ -27,7 +27,6 @@ model Users {
 
   reviews       Reviews[]
   downloads     Downloads[]
-  refreshTokens RefreshToken[]
   purchases     Purchases[]
   authoredApps  Apps[]        @relation("AuthoredApps")
   @@map("users")
@@ -161,20 +160,6 @@ model Downloads {
   @@index([userId])
   @@index([downloadedAt])
   @@map("downloads")
-}
-
-model RefreshToken {
-  id     String @id @default(uuid())
-  token  String @unique
-  user   Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  revoked   Boolean  @default(false)
-
-  @@index([userId])
-  @@map("refreshtoken")
 }
 
 model Purchases {
