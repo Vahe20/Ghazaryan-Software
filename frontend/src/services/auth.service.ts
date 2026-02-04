@@ -18,32 +18,22 @@ interface LoginRequest {
 
 interface LoginResponse {
 	accessToken: string;
-	refreshToken: string;
 	user: User;
 }
 
 export const AuthService = {
-	register: async (form: RegRequest): Promise<RegResponse> => {
-		const response = await Axios.post<RegResponse>("/auth/register", form);
-		return response.data;
+	register(form: RegRequest) {
+		return Axios.post<RegResponse>("/auth/register", form)
+			.then(res => res.data);
 	},
 
-	login: async (form: LoginRequest): Promise<LoginResponse> => {
-		const response = await Axios.post<LoginResponse>("/auth/login", form);
-
-		if (response.data.accessToken) {
-			localStorage.setItem("token", response.data.accessToken);
-		}
-
-		return response.data;
+	login(form: LoginRequest) {
+		return Axios.post<LoginResponse>("/auth/login", form)
+			.then(res => res.data);
 	},
 
-	me: async (): Promise<User> => {
-		const response = await Axios.get<User>("/auth/me");
-		return response.data;
-	},
-
-	logout: async (): Promise<void> => {
-		localStorage.removeItem("token");
-	},
+	me() {
+		return Axios.get<User>("/auth/me")
+			.then(res => res.data);
+	}
 };

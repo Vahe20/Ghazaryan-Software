@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { User } from "../types/Entities";
-import { Axios } from "../config/Axios";
+import { AuthService } from "../services/auth.service";
 
 interface AuthState {
 	user: User | null;
@@ -33,8 +33,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				return;
 			}
 
-			const response = await Axios.get<User>("/auth/me");
-			set({ user: response.data });
+			const user = await AuthService.me();
+			set({ user });
 		} catch (error) {
 			console.error("Failed to fetch user:", error);
 			set({ user: null });

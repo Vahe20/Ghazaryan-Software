@@ -13,6 +13,8 @@ export async function getUserById(id: string) {
 			userName: true,
 			role: true,
 			balance: true,
+			blockedTime: true,
+			attempt: true,
 			avatarUrl: true,
 			reviews: true,
 			downloads: true,
@@ -52,6 +54,9 @@ export async function registerUser(data: UserCreateData) {
 	return user;
 }
 
+const MAX_ATTEMPTS = 5;
+const BLOCK_TIME_MS = 15 * 60 * 1000;
+
 export async function loginUser(data: LoginInput) {
 	const { email, password } = data;
 
@@ -63,15 +68,38 @@ export async function loginUser(data: LoginInput) {
 		throw new Error("Invalid credentials");
 	}
 
+	const now = new Date();
+
+	if (user.blockedTime && user.blockedTime > now) {
+		throw new Error("Account temporarily blocked");
+	}
+
 	const isValid = await bcrypt.compare(password, user.passwordHash);
 
 	if (!isValid) {
+		const attempts = user.attempt + 1;
+
+		await prisma.users.update({
+			where: { id: user.id },
+			data: {
+				attempt: attempts,
+				blockedTime:
+					attempts >= MAX_ATTEMPTS
+						? new Date(now.getTime() + BLOCK_TIME_MS)
+						: null,
+			},
+		});
+
 		throw new Error("Invalid credentials");
 	}
 
 	await prisma.users.update({
 		where: { id: user.id },
-		data: { lastLoginAt: new Date() },
+		data: {
+			attempt: 0,
+			blockedTime: null,
+			lastLoginAt: new Date(),
+		},
 	});
 
 	const accessToken = jwt.sign(
@@ -80,5 +108,12 @@ export async function loginUser(data: LoginInput) {
 		{ expiresIn: jwtConfig.accessExpiresIn },
 	);
 
-	return { accessToken, user };
+	return {
+		accessToken,
+		user: {
+			id: user.id,
+			email: user.email,
+			role: user.role,
+		},
+	};
 }

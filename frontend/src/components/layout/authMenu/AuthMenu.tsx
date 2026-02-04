@@ -8,14 +8,13 @@ import style from "./AuthMenu.module.scss";
 
 export function AuthMenu() {
   const router = useRouter();
-  const { user, loading, fetchUser } = useAuthStore();
+  const { user, loading, logout } = useAuthStore();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
-      await AuthService.logout();
-      await fetchUser();
+      await logout();
       router.push("/");
     } catch (error) {
       console.error("Logout error:", error);

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import style from "./SignIn.module.scss";
+import axios from "axios";
 
 interface SignInFormData {
     email: string;
@@ -26,24 +27,34 @@ export const SignIn = () => {
     });
 
     const onSignIn = async (data: SignInFormData) => {
+        if (isLoading) return;
         try {
             setIsLoading(true);
             setErrorMessage(null);
 
-            await AuthService.login({
+            const res = await AuthService.login({
                 email: data.email,
                 password: data.password,
             });
 
+
+            if (res.accessToken) {
+                localStorage.setItem("token", res.accessToken);
+            }
+
             await fetchUser();
             router.replace("/");
-        } catch (error: any) {
-            console.error("Login error:", error);
-            setErrorMessage(
-                error?.response?.data?.message || 
-                error?.message || 
-                "Failed to sign in. Please try again."
-            );
+        } catch (error) {
+            let message = "Failed to sign in. Please try again.";
+
+            if (axios.isAxiosError(error)) {
+                message =
+                    error.response?.data?.error ||
+                    error.response?.statusText ||
+                    message;
+            }
+
+            setErrorMessage(message);
         } finally {
             setIsLoading(false);
         }
