@@ -40,26 +40,30 @@ export default function AppsPage() {
         </p>
       </div>
 
-      <AppsFilters
-        searchQuery={searchQuery}
-        sortBy={sortBy}
-        onSearchChange={handleSearchChange}
-        onSortChange={handleSortChange}
-      />
+      <div className={style.contentWrapper}>
+        <div className={style.mainContent}>
+          <AppsGrid
+            apps={data?.apps || []}
+            loading={isLoading}
+            error={error?.message || null}
+          />
 
-      <AppsGrid
-        apps={data?.apps || []}
-        loading={isLoading}
-        error={error?.message || null}
-      />
+          {data?.pagination && (
+            <AppsPagination
+              pagination={data.pagination}
+              currentPage={page}
+              onPageChange={setPage}
+            />
+          )}
+        </div>
 
-      {data?.pagination && (
-        <AppsPagination
-          pagination={data.pagination}
-          currentPage={page}
-          onPageChange={setPage}
+        <AppsFilters
+          searchQuery={searchQuery}
+          sortBy={sortBy}
+          onSearchChange={handleSearchChange}
+          onSortChange={handleSortChange}
         />
-      )}
+      </div>
     </div>
   );
 }

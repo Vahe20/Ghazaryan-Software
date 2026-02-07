@@ -47,3 +47,18 @@
     font-size: rem(16);
   }
 }
+
+.contentWrapper {
+  display: grid;
+  grid-template-columns: 1fr rem(300);
+  gap: rem(32);
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mainContent {
+  min-width: 0;
+}

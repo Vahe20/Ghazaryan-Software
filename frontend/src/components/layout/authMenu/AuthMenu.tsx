@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/src/store/authStore";
-import { AuthService } from "@/src/services/auth.service";
 import { useState } from "react";
 import style from "./AuthMenu.module.scss";
 

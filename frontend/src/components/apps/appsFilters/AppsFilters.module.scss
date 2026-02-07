@@ -1,24 +1,26 @@
 @use "../../../styles/helpers/" as *;
 
-.filters {
+.filtersPanel {
+  position: sticky;
+  top: rem(80);
+  padding: rem(24);
+  background: $background-card;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  height: fit-content;
   display: flex;
-  gap: rem(16);
-  margin-bottom: rem(32);
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: rem(24);
 
-  @media (max-width: 768px) {
-    flex-direction: column;
+  @media (max-width: 1024px) {
+    position: static;
+    margin-bottom: rem(24);
   }
 }
 
 .searchBox {
   position: relative;
-  flex: 1;
-  min-width: rem(300);
-
-  @media (max-width: 768px) {
-    min-width: 100%;
-  }
+  width: 100%;
 }
 
 .searchIcon {
@@ -32,10 +34,10 @@
 
 .searchInput {
   width: 100%;
-  padding: rem(14) rem(48) rem(14) rem(48);
+  padding: rem(12) rem(48) rem(12) rem(48);
   border: 1px solid $border-color;
   border-radius: $radius-md;
-  font-size: rem(15);
+  font-size: rem(14);
   font-weight: 500;
   color: $text-primary;
   background: $background-tertiary;
@@ -80,57 +82,213 @@
   }
 }
 
-.sortBox {
+.filterSection {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: rem(12);
-  padding: rem(14) rem(20);
-  border: 1px solid $border-color;
-  border-radius: $radius-md;
-  background: $background-tertiary;
-  transition: all $transition;
+  padding-top: rem(16);
+  border-top: 1px solid $border-color;
 
-  &:hover {
-    border-color: $border-color-medium;
+  &:first-of-type {
+    border-top: none;
+    padding-top: 0;
   }
 }
 
-.sortLabel {
+.filterTitle {
+  font-size: rem(14);
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: rem(0.5);
+}
+
+.checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: rem(10);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  padding: rem(8);
+  border-radius: $radius-sm;
+  transition: background $transition;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+}
+
+.checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+
+  &:checked ~ .checkmark {
+    background: $primary;
+    border-color: $primary;
+
+    &::after {
+      display: block;
+    }
+  }
+}
+
+.checkmark {
+  position: relative;
+  height: rem(20);
+  width: rem(20);
+  background: transparent;
+  border: 2px solid $border-color-medium;
+  border-radius: rem(4);
+  transition: all $transition;
+  flex-shrink: 0;
+
+  &::after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: rem(5);
+    top: rem(2);
+    width: rem(5);
+    height: rem(10);
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .checkboxLabel:hover & {
+    border-color: $primary;
+  }
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: rem(10);
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  padding: rem(8);
+  border-radius: $radius-sm;
+  transition: background $transition;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+}
+
+.radio {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+
+  &:checked ~ .radioMark {
+    background: $primary;
+    border-color: $primary;
+
+    &::after {
+      display: block;
+    }
+  }
+}
+
+.radioMark {
+  position: relative;
+  height: rem(20);
+  width: rem(20);
+  background: transparent;
+  border: 2px solid $border-color-medium;
+  border-radius: 50%;
+  transition: all $transition;
+  flex-shrink: 0;
+
+  &::after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: rem(8);
+    height: rem(8);
+    border-radius: 50%;
+    background: white;
+  }
+
+  .radioLabel:hover & {
+    border-color: $primary;
+  }
+}
+
+.labelText {
+  margin-left: rem(12);
+  font-size: rem(14);
+  font-weight: 500;
+  color: $text-secondary;
+  transition: color $transition;
+
+  .checkboxLabel:hover &,
+  .radioLabel:hover & {
+    color: $text-primary;
+  }
+
+  .checkbox:checked ~ .checkmark ~ &,
+  .radio:checked ~ .radioMark ~ & {
+    color: $text-primary;
+  }
+}
+
+.sortGroup {
+  display: flex;
+  flex-direction: column;
+  gap: rem(12);
+}
+
+.sortOrderButton {
   display: flex;
   align-items: center;
   gap: rem(8);
-  font-size: rem(14);
-  font-weight: 600;
+  padding: rem(10) rem(16);
+  background: $background-tertiary;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
   color: $text-secondary;
-  white-space: nowrap;
-
-  svg {
-    color: $text-tertiary;
-  }
-}
-
-.sortSelect {
-  border: none;
-  background: transparent;
-  color: $text-primary;
   font-size: rem(14);
   font-weight: 600;
   cursor: pointer;
-  padding: 0;
+  transition: all $transition;
   font-family: inherit;
-  outline: none;
-  appearance: none;
-  padding-right: rem(20);
-  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right center;
+  justify-content: center;
 
-  &:hover {
+  svg {
+    width: rem(18);
+    height: rem(18);
     color: $primary;
   }
 
-  option {
-    background: $background-card;
+  &:hover {
+    background: $background-hover;
+    border-color: $primary;
     color: $text-primary;
+  }
+
+  &:active {
+    transform: translateY(1px);
   }
 }
