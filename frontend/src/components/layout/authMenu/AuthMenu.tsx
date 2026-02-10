@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/src/store/authStore";
+import { useAuthStore } from "@/src/store/AuthStore";
 import { useState } from "react";
 import style from "./AuthMenu.module.scss";
 

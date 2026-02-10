@@ -9,6 +9,11 @@ export interface User {
     role: Role;
     balance: number;
     avatarUrl: string;
+    reviews: Review[];
+    downloads: Download[];
+    purchases: Purchase[];
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface App {
@@ -31,4 +36,33 @@ export interface App {
     sourceUrl: string;
     documentationUrl: string;
     
+}
+
+export interface Review {
+    id: UUID;
+    userId: UUID;
+    appId: string;
+    rating: number;
+    comment: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface Download {
+    id: UUID;
+    userId: UUID;
+    appId: string;
+    version: string;
+    platform: string;
+    downloadedAt: Date;
+}
+
+export interface Purchase {
+    id: UUID;
+    user: User;
+    app: App;
+    price: number;
+    status: "pending" | "completed" | "failed";
+    paymentMethod: string;
+    purchasedAt: Date;
 }

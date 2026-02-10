@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuthStore } from "@/src/store/authStore";
+import { useAuthStore } from "@/src/store/AuthStore";
 import { Role } from "@/src/types/Role";
 import style from "./Navbar.module.scss";
 
@@ -31,9 +31,9 @@ export function Navbar() {
         {user && (
           <li className={style.navbar__links_item}>
             <Link
-              href="/profile"
-              className={pathname === "/profile" ? style.active : ""}>
-              Profile
+              href="/library"
+              className={pathname === "/library" ? style.active : ""}>
+              Library
             </Link>
           </li>
         )}
