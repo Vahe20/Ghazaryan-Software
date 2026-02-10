@@ -1,7 +1,7 @@
 "use client"
 
 import { AuthService } from "@/src/services/auth.service";
-import { useAuthStore } from "@/src/store/authStore";
+import { useAuthStore } from "@/src/store/AuthStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";

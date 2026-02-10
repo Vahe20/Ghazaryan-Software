@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link";
-import { useAuthStore } from "@/src/store/authStore";
+import { useAuthStore } from "@/src/store/AuthStore";
 import style from "./HeroSection.module.scss";
 
 export function HeroSection() {
