@@ -27,7 +27,7 @@ export interface App {
     iconUrl: string;
     coverUrl: string;
     screenshots: string[];
-    category: string;
+    category: Category;
     categoryId: string;
     tags: string[];
     size: number;
@@ -35,7 +35,21 @@ export interface App {
     downloadUrl: string;
     sourceUrl: string;
     documentationUrl: string;
-    
+    rating: number;
+    reviewCount: number;
+    downloadCount: number;
+    price: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+export interface Category {
+    id: string;
+    name: string;
+    slug: string;
+    description: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface Review {

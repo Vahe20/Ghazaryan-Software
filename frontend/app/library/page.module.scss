@@ -1,0 +1,74 @@
+@use "../../src/styles/helpers/" as *;
+
+.library {
+    min-height: calc(100vh - 80px);
+    padding: rem(32) rem(24);
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: rem(24);
+    max-width: 1600px;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease;
+
+    @media (max-width: 1200px) {
+        grid-template-columns: 350px 1fr;
+        gap: rem(20);
+    }
+
+    @media (max-width: 992px) {
+        grid-template-columns: 1fr;
+        padding: rem(24) rem(16);
+    }
+}
+
+.apps {
+    height: calc(100vh - 144px);
+    position: sticky;
+    top: rem(80);
+
+    @media (max-width: 992px) {
+        position: relative;
+        top: 0;
+        height: auto;
+        max-height: 60vh;
+    }
+}
+
+.appInfo {
+    height: calc(100vh - 144px);
+    overflow-y: auto;
+    padding-right: rem(4);
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: $background-tertiary;
+        border-radius: $radius-sm;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $border-color-medium;
+        border-radius: $radius-sm;
+
+        &:hover {
+            background: $border-color-strong;
+        }
+    }
+
+    @media (max-width: 992px) {
+        height: auto;
+        overflow-y: visible;
+        padding-right: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

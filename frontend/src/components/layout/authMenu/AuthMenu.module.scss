@@ -1,4 +1,4 @@
-@use "../../../styles/helpers" as *;
+@use "../../../styles/helpers"as *;
 
 .navbar__auth {
   display: flex;
@@ -23,6 +23,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -140,6 +141,10 @@
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 
+  &:hover {
+    scale: 1.1;
+  }
+
   @media (max-width: 640px) {
     width: rem(32);
     height: rem(32);
@@ -170,6 +175,11 @@
   font-weight: 600;
   color: $text-primary;
   line-height: 1;
+  transition: all $transition;
+
+  &:hover {
+    translate: 0 -3px;
+  }
 }
 
 .userBalance {
@@ -183,6 +193,10 @@
   background: rgba(0, 186, 136, 0.1);
   border-radius: $radius-sm;
   transition: all $transition;
+
+  &:hover {
+    translate: 4px;
+  }
 
   svg {
     flex-shrink: 0;
@@ -260,9 +274,12 @@
 }
 
 @keyframes slideOut {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateX(0);
   }
+
   50% {
     transform: translateX(4px);
   }

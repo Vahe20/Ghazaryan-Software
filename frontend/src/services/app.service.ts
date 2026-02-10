@@ -57,4 +57,9 @@ export const AppService = {
 	deleteApp: async (appId: string): Promise<void> => {
 		await Axios.delete(`/apps/${appId}`);
 	},
+
+	getUserLibrary: async (): Promise<AppsResponse> => {
+		const response = await Axios.get<AppsResponse>("/apps/library");
+		return response.data;
+	},
 };

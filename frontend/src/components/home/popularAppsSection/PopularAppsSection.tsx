@@ -6,7 +6,7 @@ import { AppCard } from "@/src/components/appCard/AppCard";
 import style from "./PopularAppsSection.module.scss";
 
 export function PopularAppsSection() {
-  const { data, isLoading } = useApps({ limit: 6, sortBy: "downloadCount" });
+  const { data, isLoading } = useApps({ limit: 4, sortBy: "downloadCount" });
 
   const popularApps = data?.apps.slice(0, 6) || [];
 

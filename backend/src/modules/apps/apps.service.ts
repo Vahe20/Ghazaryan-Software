@@ -276,3 +276,132 @@ export async function incrementViewCount(appId: string): Promise<void> {
 		},
 	});
 }
+
+export async function getUserLibrary(userId: string, query: GetAppsQuery) {
+	const {
+		page = 1,
+		limit = 20,
+		search,
+		sortBy = "purchasedAt",
+		order = "desc",
+	} = query;
+
+	const limitNum = typeof limit === "number" ? limit : Number(limit);
+	const pageNum = typeof page === "number" ? page : Number(page);
+	const skip = (pageNum - 1) * limitNum;
+
+	// Получаем ID купленных приложений
+	const purchases = await prisma.purchases.findMany({
+		where: {
+			userId,
+			status: "COMPLETED",
+		},
+		select: {
+			appId: true,
+			purchasedAt: true,
+		},
+	});
+
+	const appIds = purchases.map(p => p.appId);
+
+	if (appIds.length === 0) {
+		return {
+			apps: [],
+			pagination: {
+				page: pageNum,
+				limit: limitNum,
+				total: 0,
+				totalPages: 0,
+			},
+		};
+	}
+
+	const where: any = {
+		id: { in: appIds },
+	};
+
+	if (search) {
+		where.OR = [
+			{ name: { contains: search, mode: "insensitive" } },
+			{ shortDesc: { contains: search, mode: "insensitive" } },
+			{ description: { contains: search, mode: "insensitive" } },
+			{ tags: { hasSome: [search] } },
+		];
+	}
+
+	const total = await prisma.apps.count({ where });
+
+	// Определяем сортировку
+	let orderBy: any;
+	if (sortBy === "purchasedAt") {
+		// Для сортировки по дате покупки нужен особый подход
+		const apps = await prisma.apps.findMany({
+			where,
+			include: {
+				category: true,
+				purchases: {
+					where: { userId },
+					select: { purchasedAt: true },
+				},
+				_count: {
+					select: {
+						reviews: true,
+						downloads: true,
+					},
+				},
+			},
+		});
+
+		// Сортируем в памяти по дате покупки
+		const sortedApps = apps.sort((a, b) => {
+			const dateA = a.purchases[0]?.purchasedAt || new Date(0);
+			const dateB = b.purchases[0]?.purchasedAt || new Date(0);
+			return order === "desc"
+				? dateB.getTime() - dateA.getTime()
+				: dateA.getTime() - dateB.getTime();
+		});
+
+		const paginatedApps = sortedApps.slice(skip, skip + limitNum);
+
+		return {
+			apps: paginatedApps,
+			pagination: {
+				page: pageNum,
+				limit: limitNum,
+				total,
+				totalPages: Math.ceil(total / limitNum),
+			},
+		};
+	} else {
+		orderBy = { [sortBy]: order };
+		const apps = await prisma.apps.findMany({
+			where,
+			skip,
+			take: limitNum,
+			orderBy,
+			include: {
+				category: true,
+				purchases: {
+					where: { userId },
+					select: { purchasedAt: true },
+				},
+				_count: {
+					select: {
+						reviews: true,
+						downloads: true,
+					},
+				},
+			},
+		});
+
+		return {
+			apps,
+			pagination: {
+				page: pageNum,
+				limit: limitNum,
+				total,
+				totalPages: Math.ceil(total / limitNum),
+			},
+		};
+	}
+}

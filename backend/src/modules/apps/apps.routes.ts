@@ -15,6 +15,7 @@ import { requireRole } from "../../middlewares/role.middleware";
 const router = Router();
 
 router.get("/", validateQuery(getAppsQuerySchema), appsController.getApps);
+router.get("/library", authMiddleware, validateQuery(getAppsQuerySchema), appsController.getUserLibrary);
 router.get("/slug/:slug", appsController.getAppBySlug);
 router.get("/:id", appsController.getAppById);
 router.post("/:id/download", appsController.downloadApp);

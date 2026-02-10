@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import * as appsService from "./apps.service";
-import { DownloadMetadata } from "../../types";
+import { AuthRequest, DownloadMetadata } from "../../types";
 
 export async function getApps(req: Request, res: Response) {
 	try {
@@ -151,5 +151,25 @@ export async function getPopularApps(req: Request, res: Response) {
 	} catch (error) {
 		console.error("Error fetching popular apps:", error);
 		res.status(500).json({ error: "Failed to fetch popular apps" });
+	}
+}
+
+export async function getUserLibrary(req: AuthRequest, res: Response) {
+	try {
+		const user = req.user;
+
+		if (!user) {
+			res.status(401).json({ error: "Unauthorized" });
+			return;
+		}
+
+		const result = await appsService.getUserLibrary(
+			user.userId,
+			req.query as any,
+		);
+		res.json(result);
+	} catch (error) {
+		console.error("Error fetching user library:", error);
+		res.status(500).json({ error: "Failed to fetch user library" });
 	}
 }

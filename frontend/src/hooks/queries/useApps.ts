@@ -15,6 +15,7 @@ export const appsKeys = {
   list: (params: GetAppsParams) => [...appsKeys.lists(), params] as const,
   details: () => [...appsKeys.all, "detail"] as const,
   detail: (id: string) => [...appsKeys.details(), id] as const,
+  library: () => [...appsKeys.all, "library"] as const,
 };
 
 export function useApps(params: GetAppsParams = {}) {
@@ -72,5 +73,12 @@ export function useDeleteApp() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: appsKeys.lists() });
     },
+  });
+}
+
+export function useUserLibrary() {
+  return useQuery({
+    queryKey: appsKeys.library(),
+    queryFn: () => AppService.getUserLibrary(),
   });
 }
