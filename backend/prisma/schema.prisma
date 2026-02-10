@@ -78,7 +78,7 @@ model Apps {
   versions  AppsVersion[]
   purchases Purchases[]
   
-  price       Float?
+  price       Float
   isFree      Boolean @default(true)
 
   @@index([slug])

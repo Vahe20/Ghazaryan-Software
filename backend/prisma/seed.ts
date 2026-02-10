@@ -65,6 +65,7 @@ async function main() {
 
 	await prisma.downloads.deleteMany();
 	await prisma.reviews.deleteMany();
+	await prisma.purchases.deleteMany();
 	await prisma.appsVersion.deleteMany();
 	await prisma.apps.deleteMany();
 	await prisma.appsCategory.deleteMany();
@@ -178,6 +179,29 @@ This application provides a set of professional tools designed for daily use. It
 					isStable: true,
 				},
 			],
+		});
+	}
+
+	/* ---------- PURCHASES ---------- */
+	// Get some paid apps for the admin to purchase
+	const paidApps = await prisma.apps.findMany({
+		where: {
+			price: {
+				gt: 0,
+			},
+		},
+		take: 3,
+	});
+
+	// Create purchases for admin
+	for (const app of paidApps) {
+		await prisma.purchases.create({
+			data: {
+				userId: user.id,
+				appId: app.id,
+				price: app.price,
+				status: "COMPLETED",
+			},
 		});
 	}
 

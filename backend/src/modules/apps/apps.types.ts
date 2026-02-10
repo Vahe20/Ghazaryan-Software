@@ -42,6 +42,8 @@ export const createAppSchema = z.object({
 	sourceUrl: z.string().url("Invalid source URL").optional(),
 	documentationUrl: z.string().url("Invalid documentation URL").optional(),
 	status: appStatusSchema.default("BETA"),
+	price: z.number().min(0, "Price must be 0 or greater").default(0),
+	isFree: z.boolean().default(true),
 });
 
 export const updateAppSchema = z.object({
@@ -87,6 +89,8 @@ export const updateAppSchema = z.object({
 	sourceUrl: z.string().url("Invalid source URL").optional(),
 	documentationUrl: z.string().url("Invalid documentation URL").optional(),
 	status: appStatusSchema.optional(),
+	price: z.number().min(0, "Price must be 0 or greater").optional(),
+	isFree: z.boolean().optional(),
 });
 
 export const getAppsQuerySchema = z.object({
