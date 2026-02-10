@@ -1,4 +1,4 @@
-@use "../../../styles/helpers/" as *;
+@use "../../../styles/helpers/"as *;
 
 .appsList {
     height: 100%;
@@ -153,11 +153,9 @@
     }
 
     &_active {
-        background: linear-gradient(
-            135deg,
-            rgba(0, 132, 255, 0.15) 0%,
-            rgba(255, 0, 110, 0.1) 100%
-        );
+        background: linear-gradient(135deg,
+                rgba(0, 132, 255, 0.15) 0%,
+                rgba(255, 0, 110, 0.1) 100%);
         border-color: $primary;
         box-shadow: 0 0 20px rgba(0, 132, 255, 0.2);
     }
@@ -168,6 +166,11 @@
         border-radius: $radius-md;
         object-fit: cover;
         flex-shrink: 0;
+        transition: $transition;
+
+        &:hover {
+            transform: scale(1.05);
+        }
     }
 
     &__content {
@@ -183,17 +186,34 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        transition: $transition;
+
+        &:hover {
+            transform: translateY(-3px);
+        }
     }
 
     &__version {
         font-size: rem(13);
         color: $text-tertiary;
+        transition: $transition;
+
+        &:hover {
+            transform: translateX(3px);
+            color: $primary;
+        }
     }
 
     &__size {
         font-size: rem(13);
         color: $text-secondary;
         font-weight: 500;
+        transition: $transition;
+
+        &:hover {
+            transform: scale(1.05) translateY(-3px);
+            color: $primary;
+        }
     }
 }
 
@@ -258,10 +278,12 @@
 }
 
 @keyframes pulse {
+
     0%,
     100% {
         opacity: 1;
     }
+
     50% {
         opacity: 0.5;
     }
