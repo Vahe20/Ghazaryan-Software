@@ -1,0 +1,429 @@
+@use "../../src/styles/helpers/"as *;
+
+.loadingContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+}
+
+.loader {
+    width: 48px;
+    height: 48px;
+    border: 4px solid $border-color;
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.errorContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+
+    p {
+        color: $error;
+        font-size: rem(18);
+    }
+}
+
+.profileContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: rem(40) rem(20);
+    animation: slideUp 0.4s ease-out;
+}
+
+.profileHeader {
+    display: flex;
+    align-items: center;
+    gap: rem(32);
+    padding: rem(40);
+    background: $background-card;
+    backdrop-filter: blur(20px);
+    border: 1px solid $border-color;
+    border-radius: $radius-xl;
+    margin-bottom: rem(32);
+    box-shadow: $shadow-lg;
+    transition: $transition;
+
+    &:hover {
+        border-color: $border-color-medium;
+        box-shadow: $shadow-xl;
+    }
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        text-align: center;
+        padding: rem(32) rem(24);
+        gap: rem(24);
+    }
+}
+
+.avatarSection {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.avatarCircle {
+    width: rem(120);
+    height: rem(120);
+    border-radius: 50%;
+    background: linear-gradient(135deg, $primary 0%, $accent 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: $shadow-glow;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 3px;
+        background: $background-tertiary;
+        border-radius: 50%;
+    }
+}
+
+.avatarInitial {
+    font-size: rem(48);
+    font-weight: 700;
+    color: $text-primary;
+    position: relative;
+    z-index: 1;
+    text-transform: uppercase;
+}
+
+.changeAvatarBtn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: rem(40);
+    height: rem(40);
+    border-radius: 50%;
+    background: $primary;
+    border: 3px solid $background-tertiary;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: $transition;
+    box-shadow: $shadow-md;
+
+    &:hover {
+        background: $primary-hover;
+        transform: scale(1.1);
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+}
+
+.userInfo {
+    flex: 1;
+}
+
+.userName {
+    font-size: rem(32);
+    font-weight: 700;
+    color: $text-primary;
+    margin-bottom: rem(8);
+    background: linear-gradient(135deg, $text-primary 0%, $primary 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    @media (max-width: 768px) {
+        font-size: rem(28);
+    }
+}
+
+.userEmail {
+    font-size: rem(16);
+    color: $text-secondary;
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+
+    @media (max-width: 768px) {
+        justify-content: center;
+    }
+}
+
+.profileContent {
+    display: flex;
+    flex-direction: column;
+    gap: rem(32);
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: rem(24);
+}
+
+.statCard {
+    background: $background-card;
+    backdrop-filter: blur(20px);
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: rem(24);
+    display: flex;
+    align-items: center;
+    gap: rem(20);
+    transition: $transition;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, $primary 0%, $accent 100%);
+        opacity: 0;
+        transition: $transition;
+    }
+
+    &:hover {
+        border-color: $border-color-medium;
+        transform: translateY(-2px);
+        box-shadow: $shadow-lg;
+
+        &::before {
+            opacity: 1;
+        }
+
+        .statIcon {
+            background: $primary;
+            color: white;
+            transform: scale(1.1);
+        }
+    }
+}
+
+.statIcon {
+    width: rem(56);
+    height: rem(56);
+    border-radius: $radius-md;
+    background: $background-tertiary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary;
+    flex-shrink: 0;
+    transition: $transition;
+}
+
+.statInfo {
+    flex: 1;
+}
+
+.statLabel {
+    font-size: rem(14);
+    color: $text-secondary;
+    margin-bottom: rem(4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+.statValue {
+    font-size: rem(28);
+    font-weight: 700;
+    color: $text-primary;
+    line-height: 1;
+}
+
+.sectionGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: rem(24);
+}
+
+.section {
+    background: $background-card;
+    backdrop-filter: blur(20px);
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: rem(28);
+    transition: $transition;
+
+    &:hover {
+        border-color: $border-color-medium;
+        box-shadow: $shadow-md;
+    }
+}
+
+.sectionTitle {
+    font-size: rem(18);
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: rem(20);
+    display: flex;
+    align-items: center;
+    gap: rem(10);
+    padding-bottom: rem(16);
+    border-bottom: 1px solid $border-color-light;
+
+    svg {
+        color: $primary;
+    }
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: rem(40) rem(20);
+    text-align: center;
+
+    svg {
+        color: $text-tertiary;
+        margin-bottom: rem(16);
+        opacity: 0.5;
+    }
+
+    p {
+        color: $text-secondary;
+        font-size: rem(15);
+    }
+}
+
+.actionButtons {
+    display: flex;
+    flex-direction: column;
+    gap: rem(12);
+}
+
+.actionBtn {
+    display: flex;
+    align-items: center;
+    gap: rem(12);
+    padding: rem(14) rem(18);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-primary;
+    font-size: rem(15);
+    font-weight: 500;
+    cursor: pointer;
+    transition: $transition;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, $primary 0%, $accent 100%);
+        opacity: 0;
+        transition: $transition;
+    }
+
+    svg {
+        position: relative;
+        z-index: 1;
+        transition: $transition;
+    }
+
+    span {
+        position: relative;
+        z-index: 1;
+    }
+
+    &:hover {
+        border-color: $primary;
+        transform: translateX(4px);
+
+        &::before {
+            opacity: 0.1;
+        }
+
+        svg {
+            color: $primary;
+            transform: scale(1.1);
+        }
+    }
+
+    &:active {
+        transform: translateX(2px);
+    }
+}
+
+.dangerZone {
+    background: $background-card;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba($error, 0.2);
+    border-radius: $radius-lg;
+    padding: rem(28);
+    transition: $transition;
+
+    &:hover {
+        border-color: rgba($error, 0.3);
+        box-shadow: 0 0 20px rgba($error, 0.1);
+    }
+}
+
+.logoutBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: rem(12);
+    width: 100%;
+    padding: rem(14) rem(24);
+    background: rgba($error, 0.1);
+    border: 1px solid rgba($error, 0.3);
+    border-radius: $radius-md;
+    color: $error;
+    font-size: rem(15);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    margin-top: rem(16);
+
+    svg {
+        transition: $transition;
+    }
+
+    &:hover {
+        background: $error;
+        color: white;
+        border-color: $error;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba($error, 0.3);
+
+        svg {
+            transform: translateX(4px);
+        }
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

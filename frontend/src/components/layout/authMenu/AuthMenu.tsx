@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/src/store/AuthStore";
 import { useState } from "react";
 import style from "./AuthMenu.module.scss";
+import Link from 'next/link';
 
 export function AuthMenu() {
   const router = useRouter();
@@ -48,24 +49,26 @@ export function AuthMenu() {
 
   return (
     <div className={style.userMenu}>
-      <div className={style.userInfo}>
-        <div className={style.userAvatar}>
-          {user.avatarUrl ? (
-            <img src={user.avatarUrl} alt={user.userName} />
-          ) : (
-            <span>{user.userName[0].toUpperCase()}</span>
-          )}
+      <Link href="/profile" className={style.userLink}>
+        <div className={style.userInfo}>
+          <div className={style.userAvatar}>
+            {user.avatarUrl ? (
+              <img src={user.avatarUrl} alt={user.userName} />
+            ) : (
+              <span>{user.userName[0].toUpperCase()}</span>
+            )}
+          </div>
+          <div className={style.userDetails}>
+            <span className={style.userName}>{user.userName}</span>
+            <span className={style.userBalance}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 1V15M13 6C13 4.34315 10.7614 3 8 3C5.23858 3 3 4.34315 3 6C3 7.65685 5.23858 9 8 9C10.7614 9 13 10.3431 13 12C13 13.6569 10.7614 15 8 15C5.23858 15 3 13.6569 3 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              {Number(user.balance).toFixed(2)}
+            </span>
+          </div>
         </div>
-        <div className={style.userDetails}>
-          <span className={style.userName}>{user.userName}</span>
-          <span className={style.userBalance}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 1V15M13 6C13 4.34315 10.7614 3 8 3C5.23858 3 3 4.34315 3 6C3 7.65685 5.23858 9 8 9C10.7614 9 13 10.3431 13 12C13 13.6569 10.7614 15 8 15C5.23858 15 3 13.6569 3 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            {Number(user.balance).toFixed(2)}
-          </span>
-        </div>
-      </div>
+      </Link>
       <button
         onClick={handleLogout}
         className={style.logoutButton}

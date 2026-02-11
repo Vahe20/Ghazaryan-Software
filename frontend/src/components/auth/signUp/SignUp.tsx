@@ -47,7 +47,6 @@ export const SignUp = () => {
                 password: data.password,
             });
 
-            // Сохраняем токен после успешного login
             if (loginRes.accessToken) {
                 localStorage.setItem("token", loginRes.accessToken);
             }
@@ -56,10 +55,9 @@ export const SignUp = () => {
             router.push("/");
         } catch (error: any) {
             console.error("Register error:", error);
-            // Backend возвращает { error: "message" }
             setErrorMessage(
-                error?.response?.data?.error || 
-                error?.message || 
+                error?.response?.data?.error ||
+                error?.message ||
                 "Failed to create account. Please try again."
             );
         } finally {

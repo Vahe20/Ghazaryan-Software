@@ -19,16 +19,17 @@ model Users {
   avatarUrl String?
 
   blockedTime DateTime?
-  attempt Int @default(0)
+  attempt     Int       @default(0)
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   lastLoginAt DateTime?
 
-  reviews       Reviews[]
-  downloads     Downloads[]
-  purchases     Purchases[]
-  authoredApps  Apps[]        @relation("AuthoredApps")
+  reviews      Reviews[]
+  downloads    Downloads[]
+  purchases    Purchases[]
+  authoredApps Apps[]      @relation("AuthoredApps")
+
   @@map("users")
 }
 
@@ -66,20 +67,19 @@ model Apps {
   status   AppStatus @default(BETA)
   featured Boolean   @default(false)
 
-  author   Users?   @relation("AuthoredApps", fields: [authorId], references: [id])
+  author   Users?  @relation("AuthoredApps", fields: [authorId], references: [id])
   authorId String?
 
   publishedAt DateTime?
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime?  @updatedAt
+  updatedAt   DateTime? @updatedAt
 
   reviews   Reviews[]
   downloads Downloads[]
   versions  AppsVersion[]
   purchases Purchases[]
-  
-  price       Float
-  isFree      Boolean @default(true)
+
+  price Decimal @default(0) @db.Decimal(10, 2)
 
   @@index([slug])
   @@index([categoryId])
@@ -88,11 +88,9 @@ model Apps {
 }
 
 model AppsCategory {
-  id          String  @id @default(uuid())
-  name        String  @unique
-  slug        String  @unique
-  description String?
-  order       Int     @default(0)
+  id   String @id @default(uuid())
+  name String @unique
+  slug String @unique
 
   apps Apps[]
 
@@ -102,7 +100,7 @@ model AppsCategory {
 
 model AppsVersion {
   id    String @id @default(uuid())
-  app   Apps    @relation(fields: [appId], references: [id], onDelete: Cascade)
+  app   Apps   @relation(fields: [appId], references: [id], onDelete: Cascade)
   appId String
 
   version     String
@@ -120,9 +118,9 @@ model AppsVersion {
 
 model Reviews {
   id     String @id @default(uuid())
-  app    Apps    @relation(fields: [appId], references: [id], onDelete: Cascade)
+  app    Apps   @relation(fields: [appId], references: [id], onDelete: Cascade)
   appId  String
-  user   Users   @relation(fields: [userId], references: [id])
+  user   Users  @relation(fields: [userId], references: [id])
   userId String
 
   rating  Int
@@ -142,9 +140,9 @@ model Reviews {
 
 model Downloads {
   id     String  @id @default(uuid())
-  app    Apps     @relation(fields: [appId], references: [id], onDelete: Cascade)
+  app    Apps    @relation(fields: [appId], references: [id], onDelete: Cascade)
   appId  String
-  user   Users?   @relation(fields: [userId], references: [id])
+  user   Users?  @relation(fields: [userId], references: [id])
   userId String?
 
   version  String
@@ -164,19 +162,19 @@ model Downloads {
 
 model Purchases {
   id     String @id @default(uuid())
-  user   Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
-  app    Apps    @relation(fields: [appId], references: [id], onDelete: Cascade)
+  app    Apps   @relation(fields: [appId], references: [id], onDelete: Cascade)
   appId  String
 
   price         Float
   paymentMethod String?
-  transactionId String?  @unique
-  
-  status        PurchaseStatus @default(COMPLETED)
-  
-  purchasedAt   DateTime @default(now())
-  expiresAt     DateTime? // Для подписок или временного доступа
+  transactionId String? @unique
+
+  status PurchaseStatus @default(COMPLETED)
+
+  purchasedAt DateTime  @default(now())
+  expiresAt   DateTime? // Для подписок или временного доступа
 
   @@unique([userId, appId]) // Один пользователь не может купить одно приложение дважды
   @@index([userId])

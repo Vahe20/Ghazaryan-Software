@@ -1,15 +1,13 @@
 "use client"
 
 import { useAuthStore } from "@/src/store/AuthStore";
-
 import { AppsList } from "@/src/components/library/appsList/AppsList";
 import { AppInfo } from "@/src/components/library/appInfo/AppInfo";
 
 import style from "./page.module.scss";
 
-export default function library() {
+export default function Library() {
     const { user, loading } = useAuthStore();
-    console.log(user);
 
     if (loading) {
         return <div>Loading...</div>;
