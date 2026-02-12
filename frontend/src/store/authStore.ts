@@ -1,59 +1,123 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { User } from "../types/Entities";
 import { AuthService } from "../services/auth.service";
 
 interface AuthState {
 	user: User | null;
 	loading: boolean;
+	error: string | null;
 	isInitialized: boolean;
+
 	setUser: (user: User | null) => void;
-	setLoading: (loading: boolean) => void;
+	setError: (error: string | null) => void;
 	fetchUser: () => Promise<void>;
-	logout: () => void;
+	login: (email: string, password: string) => Promise<void>;
+	logout: () => Promise<void>;
 	initialize: () => Promise<void>;
+	clearError: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
-	user: null,
-	loading: false,
-	isInitialized: false,
+export const useAuthStore = create<AuthState>()(
+	persist(
+		(set, get) => ({
+			user: null,
+			loading: false,
+			error: null,
+			isInitialized: false,
 
-	setUser: user => set({ user }),
+			setUser: user => set({ user, error: null }),
 
-	setLoading: loading => set({ loading }),
+			setError: error => set({ error }),
 
-	fetchUser: async () => {
-		try {
-			set({ loading: true });
+			clearError: () => set({ error: null }),
 
-			const token = localStorage.getItem("token");
+			fetchUser: async () => {
+				const { user } = get();
 
-			if (!token) {
-				set({ user: null, loading: false });
-				return;
-			}
+				if (user) return;
 
-			const user = await AuthService.me();
-			set({ user });
-		} catch (error) {
-			console.error("Failed to fetch user:", error);
-			set({ user: null });
+				try {
+					set({ loading: true, error: null });
 
-			localStorage.removeItem("token");
-		} finally {
-			set({ loading: false });
-		}
-	},
+					const token = localStorage.getItem("token");
 
-	logout: async () => {
-		set({ user: null });
-		await localStorage.removeItem("token");
-	},
+					if (!token) {
+						set({ user: null, loading: false });
+						return;
+					}
 
-	initialize: async () => {
-		if (get().isInitialized) return;
+					const userData = await AuthService.me();
+					set({ user: userData, error: null });
+				} catch (error: any) {
+					const errorMessage =
+						error.response?.data?.message || "Failed to fetch user";
 
-		set({ isInitialized: true });
-		await get().fetchUser();
-	},
-}));
+					if (error.response?.status === 401) {
+						localStorage.removeItem("token");
+						set({
+							user: null,
+							error: "Session expired. Please login again.",
+						});
+					} else {
+						set({ error: errorMessage });
+						console.error("Failed to fetch user:", error);
+					}
+				} finally {
+					set({ loading: false });
+				}
+			},
+
+			login: async (email: string, password: string) => {
+				try {
+					set({ loading: true, error: null });
+
+					const { accessToken, user } = await AuthService.login({
+						email,
+						password,
+					});
+
+					localStorage.setItem("token", accessToken);
+					set({ user, error: null });
+				} catch (error: any) {
+					const errorMessage =
+						error.response?.data?.message || "Login failed";
+					set({ error: errorMessage });
+					throw error;
+				} finally {
+					set({ loading: false });
+				}
+			},
+
+			logout: async () => {
+				try {
+					set({ loading: true, error: null });
+
+					localStorage.removeItem("token");
+					set({ user: null, error: null });
+				} catch (error: any) {
+					console.error("Logout error:", error);
+					localStorage.removeItem("token");
+					set({ user: null });
+				} finally {
+					set({ loading: false });
+				}
+			},
+
+			initialize: async () => {
+				const { isInitialized, fetchUser } = get();
+
+				if (isInitialized) return;
+
+				set({ isInitialized: true });
+				await fetchUser();
+			},
+		}),
+		{
+			name: "auth-storage",
+			partialize: state => ({
+				user: state.user,
+			}),
+		},
+	),
+);

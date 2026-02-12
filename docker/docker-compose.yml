@@ -6,15 +6,15 @@ services:
     container_name: postgres_db_dev
     restart: always
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: Vah.gh2005
-      POSTGRES_DB: Ghazaryan_DB
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d Ghazaryan_DB"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -26,15 +26,18 @@ services:
     container_name: backend_dev
     restart: always
     ports:
-      - "4000:4000"
+      - "${BACKEND_PORT:-4000}:4000"
       - "5555:5555"
     depends_on:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: "postgresql://admin:Vah.gh2005@postgres:5432/Ghazaryan_DB?schema=public"
-      NODE_ENV: development
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?schema=public
+      NODE_ENV: ${NODE_ENV:-development}
       PORT: 4000
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
     volumes:
       - ../backend/src:/app/src
       - ../backend/prisma:/app/prisma
@@ -49,12 +52,12 @@ services:
     container_name: frontend_dev
     restart: always
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT:-3000}:3000"
     depends_on:
       - backend
     environment:
-      NODE_ENV: development
-      NEXT_PUBLIC_API_URL: http://localhost:4000
+      NODE_ENV: ${NODE_ENV:-development}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000}
     volumes:
       - ../frontend:/app
       - /app/node_modules
