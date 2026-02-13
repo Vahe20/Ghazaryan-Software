@@ -89,26 +89,18 @@ async function main() {
 			{
 				name: "Development Tools",
 				slug: "development-tools",
-				description: "Tools for developers",
-				order: 1,
 			},
 			{
 				name: "Productivity",
 				slug: "productivity",
-				description: "Productivity apps",
-				order: 2,
 			},
 			{
 				name: "Utilities",
 				slug: "utilities",
-				description: "System utilities",
-				order: 3,
 			},
 			{
 				name: "Business",
 				slug: "business",
-				description: "Business software",
-				order: 4,
 			},
 		],
 	});

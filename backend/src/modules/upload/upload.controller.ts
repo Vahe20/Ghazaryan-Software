@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
+import { asyncHandler } from "../../middlewares/error.middleware";
+import { ValidationError } from "../../utils/errors";
 
-export function uploadFile(req: Request, res: Response): void {
+export const uploadFile = asyncHandler(async (req: Request, res: Response) => {
 	if (!req.file) {
-		res.status(400).json({ message: "No file uploaded" });
-		return;
+		throw new ValidationError("No file uploaded");
 	}
 
 	const fileUrl = `/uploads/${req.params.type}/${req.file.filename}`;
@@ -13,4 +14,4 @@ export function uploadFile(req: Request, res: Response): void {
 		filename: req.file.filename,
 		size: req.file.size,
 	});
-}
+});

@@ -3,6 +3,7 @@
 import { useAuthStore } from '@/src/store/AuthStore'
 import style from './page.module.scss'
 import { useForm } from 'react-hook-form';
+import { useState } from 'react';
 
 interface submitTypes {
     currentPassword: string;
@@ -17,6 +18,15 @@ const onSubmit = (data: submitTypes) => {
 export default function Profile() {
     const { user, loading, logout } = useAuthStore();
     const { register, handleSubmit } = useForm<submitTypes>();
+    const [showTopUpModal, setShowTopUpModal] = useState(false);
+    const [topUpAmount, setTopUpAmount] = useState('');
+
+    const handleTopUp = () => {
+        // TODO: Implement top-up logic
+        console.log('Top up amount:', topUpAmount);
+        setShowTopUpModal(false);
+        setTopUpAmount('');
+    };
 
     if (loading) {
         return (
@@ -69,6 +79,15 @@ export default function Profile() {
                             <p className={style.statLabel}>Balance</p>
                             <p className={style.statValue}>${user.balance || '0.00'}</p>
                         </div>
+                        <button 
+                            className={style.topUpBtn}
+                            onClick={() => setShowTopUpModal(true)}
+                            title="Top up balance"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            </svg>
+                        </button>
                     </div>
 
                     <div className={style.statCard}>
@@ -166,6 +185,68 @@ export default function Profile() {
                     </button>
                 </div>
             </div>
+
+            {/* Top-up Modal */}
+            {showTopUpModal && (
+                <div className={style.modalOverlay} onClick={() => setShowTopUpModal(false)}>
+                    <div className={style.modal} onClick={(e) => e.stopPropagation()}>
+                        <div className={style.modalHeader}>
+                            <h2>Top Up Balance</h2>
+                            <button 
+                                className={style.closeBtn}
+                                onClick={() => setShowTopUpModal(false)}
+                            >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className={style.modalBody}>
+                            <div className={style.currentBalance}>
+                                <span>Current Balance:</span>
+                                <strong>${user.balance || '0.00'}</strong>
+                            </div>
+                            <div className={style.inputGroup}>
+                                <label htmlFor="topUpAmount">Amount (USD)</label>
+                                <input
+                                    id="topUpAmount"
+                                    type="number"
+                                    min="1"
+                                    step="0.01"
+                                    placeholder="Enter amount"
+                                    value={topUpAmount}
+                                    onChange={(e) => setTopUpAmount(e.target.value)}
+                                    className={style.amountInput}
+                                />
+                            </div>
+                            <div className={style.quickAmounts}>
+                                <button onClick={() => setTopUpAmount('10')}>$10</button>
+                                <button onClick={() => setTopUpAmount('25')}>$25</button>
+                                <button onClick={() => setTopUpAmount('50')}>$50</button>
+                                <button onClick={() => setTopUpAmount('100')}>$100</button>
+                            </div>
+                        </div>
+                        <div className={style.modalFooter}>
+                            <button 
+                                className={style.cancelBtn}
+                                onClick={() => setShowTopUpModal(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                className={style.confirmBtn}
+                                onClick={handleTopUp}
+                                disabled={!topUpAmount || parseFloat(topUpAmount) <= 0}
+                            >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                Confirm Payment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

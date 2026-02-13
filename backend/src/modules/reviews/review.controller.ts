@@ -2,12 +2,14 @@ import { Response } from "express";
 import { AuthRequest } from "../../types";
 import { createReviewSchema } from "./review.types";
 import * as reviewService from "./review.service";
+import { asyncHandler } from "../../middlewares/error.middleware";
+import { ApiError } from "../../utils/errors";
 
-export async function createReview(req: AuthRequest, res: Response) {
+export const createReview = asyncHandler(async (req: AuthRequest, res: Response) => {
 	if (!req.user) {
-		res.status(401).json({ error: "Unauthorized" });
-		return;
+		throw ApiError.unauthorized("Authentication required");
 	}
+
 	const userId = req.user.userId;
 	const appId = req.params.appId as string;
 
@@ -16,4 +18,4 @@ export async function createReview(req: AuthRequest, res: Response) {
 	const review = await reviewService.createReview(userId, appId, data);
 
 	res.status(201).json(review);
-}
+});

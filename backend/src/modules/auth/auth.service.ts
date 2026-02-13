@@ -3,117 +3,157 @@ import * as jwt from "jsonwebtoken";
 import { prisma } from "../../config/prisma";
 import { jwtConfig } from "../../config/jwt";
 import { UserCreateData, LoginInput } from "./auth.types";
+import {
+	NotFoundError,
+	ConflictError,
+	AuthenticationError,
+	DatabaseError,
+} from "../../utils/errors";
 
 export async function getUserById(id: string) {
-	const user = await prisma.users.findUnique({
-		where: { id },
-		select: {
-			id: true,
-			email: true,
-			userName: true,
-			role: true,
-			balance: true,
-			blockedTime: true,
-			attempt: true,
-			avatarUrl: true,
-			reviews: true,
-			downloads: true,
-			purchases: true,
-			authoredApps: true,
-		},
-	});
+	try {
+		const user = await prisma.users.findUnique({
+			where: { id },
+			select: {
+				id: true,
+				email: true,
+				userName: true,
+				role: true,
+				balance: true,
+				blockedTime: true,
+				attempt: true,
+				avatarUrl: true,
+				reviews: true,
+				downloads: true,
+				purchases: true,
+				authoredApps: true,
+			},
+		});
 
-	if (!user) {
-		throw new Error("User not require");
+		if (!user) {
+			throw new NotFoundError("User", id);
+		}
+
+		return user;
+	} catch (error) {
+		if (error instanceof NotFoundError) {
+			throw error;
+		}
+		throw new DatabaseError("Failed to fetch user", error);
 	}
-
-	return user;
 }
 
 export async function registerUser(data: UserCreateData) {
-	const existing = await prisma.users.findFirst({
-		where: {
-			OR: [{ email: data.email }, { userName: data.userName }],
-		},
-	});
+	try {
+		const existing = await prisma.users.findFirst({
+			where: {
+				OR: [{ email: data.email }, { userName: data.userName }],
+			},
+		});
 
-	if (existing) {
-		throw new Error("User already exists");
+		if (existing) {
+			const field =
+				existing.email === data.email ? "email" : "username";
+			throw new ConflictError(`User with this ${field} already exists`);
+		}
+
+		const passwordHash = await bcrypt.hash(data.password, 10);
+
+		const user = await prisma.users.create({
+			data: {
+				email: data.email,
+				userName: data.userName,
+				passwordHash,
+			},
+		});
+
+		return user;
+	} catch (error) {
+		if (error instanceof ConflictError) {
+			throw error;
+		}
+		throw new DatabaseError("Failed to register user", error);
 	}
-
-	const passwordHash = await bcrypt.hash(data.password, 10);
-
-	const user = await prisma.users.create({
-		data: {
-			email: data.email,
-			userName: data.userName,
-			passwordHash,
-		},
-	});
-
-	return user;
 }
 
 const MAX_ATTEMPTS = 5;
 const BLOCK_TIME_MS = 15 * 60 * 1000;
 
 export async function loginUser(data: LoginInput) {
-	const { email, password } = data;
+	try {
+		const { email, password } = data;
 
-	const user = await prisma.users.findUnique({
-		where: { email },
-	});
+		const user = await prisma.users.findUnique({
+			where: { email },
+		});
 
-	if (!user) {
-		throw new Error("Invalid credentials");
-	}
+		if (!user) {
+			throw new AuthenticationError("Invalid credentials");
+		}
 
-	const now = new Date();
+		const now = new Date();
 
-	if (user.blockedTime && user.blockedTime > now) {
-		throw new Error("Account temporarily blocked");
-	}
+		if (user.blockedTime && user.blockedTime > now) {
+			const remainingTime = Math.ceil(
+				(user.blockedTime.getTime() - now.getTime()) / 60000,
+			);
+			throw new AuthenticationError(
+				`Account temporarily blocked. Try again in ${remainingTime} minutes`,
+			);
+		}
 
-	const isValid = await bcrypt.compare(password, user.passwordHash);
+		const isValid = await bcrypt.compare(password, user.passwordHash);
 
-	if (!isValid) {
-		const attempts = user.attempt + 1;
+		if (!isValid) {
+			const attempts = user.attempt + 1;
+
+			await prisma.users.update({
+				where: { id: user.id },
+				data: {
+					attempt: attempts,
+					blockedTime:
+						attempts >= MAX_ATTEMPTS
+							? new Date(now.getTime() + BLOCK_TIME_MS)
+							: null,
+				},
+			});
+
+			if (attempts >= MAX_ATTEMPTS) {
+				throw new AuthenticationError(
+					"Too many failed attempts. Account blocked for 15 minutes",
+				);
+			}
+
+			throw new AuthenticationError("Invalid credentials");
+		}
 
 		await prisma.users.update({
 			where: { id: user.id },
 			data: {
-				attempt: attempts,
-				blockedTime:
-					attempts >= MAX_ATTEMPTS
-						? new Date(now.getTime() + BLOCK_TIME_MS)
-						: null,
+				attempt: 0,
+				blockedTime: null,
+				lastLoginAt: new Date(),
 			},
 		});
 
-		throw new Error("Invalid credentials");
+		const accessToken = jwt.sign(
+			{ userId: user.id, role: user.role },
+			jwtConfig.accessSecret,
+			{ expiresIn: jwtConfig.accessExpiresIn },
+		);
+
+		return {
+			accessToken,
+			user: {
+				id: user.id,
+				email: user.email,
+				role: user.role,
+			},
+		};
+	} catch (error) {
+		if (error instanceof AuthenticationError) {
+			throw error;
+		}
+		throw new DatabaseError("Failed to login", error);
 	}
-
-	await prisma.users.update({
-		where: { id: user.id },
-		data: {
-			attempt: 0,
-			blockedTime: null,
-			lastLoginAt: new Date(),
-		},
-	});
-
-	const accessToken = jwt.sign(
-		{ userId: user.id, role: user.role },
-		jwtConfig.accessSecret,
-		{ expiresIn: jwtConfig.accessExpiresIn },
-	);
-
-	return {
-		accessToken,
-		user: {
-			id: user.id,
-			email: user.email,
-			role: user.role,
-		},
-	};
 }

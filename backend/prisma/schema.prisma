@@ -167,7 +167,7 @@ model Purchases {
   app    Apps   @relation(fields: [appId], references: [id], onDelete: Cascade)
   appId  String
 
-  price         Float
+  price         Decimal @db.Decimal(10, 2)
   paymentMethod String?
   transactionId String? @unique
 

@@ -1,88 +1,123 @@
 import { prisma } from "../../config/prisma";
 import { slugGenerator } from "../../utils/slugGenerator";
+import { CreateCategoryInput, UpdateCategoryInput } from "./category.types";
 import {
-	CreateCategoryInput,
-	UpdateCategoryInput,
-} from "./category.types";
+	NotFoundError,
+	ConflictError,
+	DatabaseError,
+} from "../../utils/errors";
 
 export async function getAllCategories() {
-	return await prisma.appsCategory.findMany();
+	try {
+		return await prisma.appsCategory.findMany();
+	} catch (error) {
+		throw new DatabaseError("Failed to fetch categories", error);
+	}
 }
 
 export async function getCategoryById(id: string) {
-	return await prisma.appsCategory.findUnique({ where: { id } });
+	try {
+		return await prisma.appsCategory.findUnique({ where: { id } });
+	} catch (error) {
+		throw new DatabaseError("Failed to fetch category", error);
+	}
 }
 
 export async function getCategoryBySlug(slug: string) {
-	return await prisma.appsCategory.findUnique({ where: { slug } });
+	try {
+		return await prisma.appsCategory.findUnique({ where: { slug } });
+	} catch (error) {
+		throw new DatabaseError("Failed to fetch category", error);
+	}
 }
 
 export async function addCategory(data: CreateCategoryInput) {
-	const existsByName = await prisma.appsCategory.findUnique({
-		where: { name: data.name },
-	});
+	try {
+		const existsByName = await prisma.appsCategory.findUnique({
+			where: { name: data.name },
+		});
 
-	if (existsByName) {
-		throw new Error("Category with this name already exists");
+		if (existsByName) {
+			throw new ConflictError("Category with this name already exists");
+		}
+
+		const slug = slugGenerator(data.name);
+
+		const newCategory = await prisma.appsCategory.create({
+			data: {
+				name: data.name,
+				slug,
+			},
+		});
+
+		return newCategory;
+	} catch (error) {
+		if (error instanceof ConflictError) {
+			throw error;
+		}
+		throw new DatabaseError("Failed to create category", error);
 	}
-
-	const slug = slugGenerator(data.name);
-
-	const newCategory = await prisma.appsCategory.create({
-		data: {
-			name: data.name,
-			slug,
-		},
-	});
-
-	return newCategory;
 }
 
 export async function updateCategoryById(
 	id: string,
 	data: UpdateCategoryInput,
 ) {
-	const category = await prisma.appsCategory.findUnique({
-		where: { id },
-	});
-
-	if (!category) {
-		throw new Error("Category not found");
-	}
-
-	if (data.name) {
-		const existsByName = await prisma.appsCategory.findUnique({
-			where: { name: data.name },
+	try {
+		const category = await prisma.appsCategory.findUnique({
+			where: { id },
 		});
 
-		if (existsByName && existsByName.id !== id) {
-			throw new Error("Category with this name already exists");
+		if (!category) {
+			throw new NotFoundError("Category", id);
 		}
+
+		if (data.name) {
+			const existsByName = await prisma.appsCategory.findUnique({
+				where: { name: data.name },
+			});
+
+			if (existsByName && existsByName.id !== id) {
+				throw new ConflictError("Category with this name already exists");
+			}
+		}
+
+		const updateData: any = {};
+
+		if (data.name) {
+			updateData.name = data.name;
+			updateData.slug = slugGenerator(data.name);
+		}
+
+		if (data.description !== undefined) {
+			updateData.description = data.description;
+		}
+
+		if (data.order !== undefined) {
+			updateData.order = data.order;
+		}
+
+		const updatedCategory = await prisma.appsCategory.update({
+			where: { id },
+			data: updateData,
+		});
+
+		return updatedCategory;
+	} catch (error) {
+		if (
+			error instanceof NotFoundError ||
+			error instanceof ConflictError
+		) {
+			throw error;
+		}
+		throw new DatabaseError("Failed to update category", error);
 	}
-
-	const updateData: any = {};
-
-	if (data.name) {
-		updateData.name = data.name;
-		updateData.slug = slugGenerator(data.name);
-	}
-
-	if (data.description !== undefined) {
-		updateData.description = data.description;
-	}
-
-	if (data.order !== undefined) {
-		updateData.order = data.order;
-	}
-
-	const updatedCategory = await prisma.appsCategory.update({
-		where: { id },
-		data: updateData,
-	});
-
-	return updatedCategory;
 }
 
 export async function deleteCategoryById(id: string) {
-	return await prisma.appsCategory.delete({ where: { id } });
+	try {
+		return await prisma.appsCategory.delete({ where: { id } });
+	} catch (error) {
+		throw new DatabaseError("Failed to delete category", error);
+	}
 }

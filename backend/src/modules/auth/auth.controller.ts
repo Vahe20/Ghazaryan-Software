@@ -2,49 +2,29 @@ import { Request, Response } from "express";
 import * as authService from "./auth.service";
 import { AuthRequest } from "../../types";
 import { LoginInput } from "./auth.types";
+import { asyncHandler } from "../../middlewares/error.middleware";
+import { ApiError } from "../../utils/errors";
 
-export async function getMe(req: AuthRequest, res: Response) {
-	try {
-		const user = req.user;
-
-		if (!user) {
-			return res.status(401).json({ error: "unauthorized" });
-		}
-
-		const data = await authService.getUserById(user.userId);
-
-		return res.status(200).json(data);
-	} catch {
-		return res.status(500).json("error");
+export const getMe = asyncHandler(async (req: AuthRequest, res: Response) => {
+	if (!req.user) {
+		throw ApiError.unauthorized("Authentication required");
 	}
-}
 
-export async function register(req: Request, res: Response) {
-	try {
-		const user = await authService.registerUser(req.body);
+	const data = await authService.getUserById(req.user.userId);
+	return res.json(data);
+});
 
-		return res.status(201).json({
-			id: user.id,
-			email: user.email,
-			username: user.userName,
-		});
-	} catch (error) {
-		const message =
-			error instanceof Error ? error.message : "Failed to register user";
+export const register = asyncHandler(async (req: Request, res: Response) => {
+	const user = await authService.registerUser(req.body);
 
-		return res.status(400).json({ error: message });
-	}
-}
+	return res.status(201).json({
+		id: user.id,
+		email: user.email,
+		username: user.userName,
+	});
+});
 
-export async function login(req: Request, res: Response) {
-	try {
-		const result = await authService.loginUser(req.body as LoginInput);
-
-		return res.json(result);
-	} catch (error) {
-		const message =
-			error instanceof Error ? error.message : "Failed to login";
-
-		return res.status(401).json({ error: message });
-	}
-}
+export const login = asyncHandler(async (req: Request, res: Response) => {
+	const result = await authService.loginUser(req.body as LoginInput);
+	return res.json(result);
+});

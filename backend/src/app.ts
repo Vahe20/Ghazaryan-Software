@@ -8,8 +8,13 @@ import uploadRoutes from "./modules/upload/upload.routes";
 import appsRoutes from "./modules/apps/apps.routes";
 import categoryRoutes from "./modules/categories/category.routes";
 import appVersionRoutes from "./modules/versions/version.routes";
+import adminRoutes from "./modules/admin/admin.routes";
 
 import { apiLimiter, getCurrentRateLimitConfig } from "./middlewares/rateLimit";
+import {
+	errorHandler,
+	notFoundHandler,
+} from "./middlewares/error.middleware";
 
 export const app = express();
 
@@ -47,8 +52,7 @@ app.use(
 app.use(express.json());
 
 const rateLimitConfig = getCurrentRateLimitConfig();
-if (rateLimitConfig.enabled)
-	app.use("/api/", apiLimiter);
+if (rateLimitConfig.enabled) app.use("/api/", apiLimiter);
 
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
@@ -57,21 +61,7 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/apps", appsRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/apps", appVersionRoutes);
+app.use("/api/admin", adminRoutes);
 
-app.use((req, res) => {
-	res.status(404).json({ error: "Route not found" });
-});
-
-app.use(
-	(
-		err: any,
-		req: express.Request,
-		res: express.Response,
-		next: express.NextFunction,
-	) => {
-		console.error("Error:", err);
-		res.status(err.status || 500).json({
-			error: err.message || "Internal server error",
-		});
-	},
-);
+app.use(notFoundHandler);
+app.use(errorHandler);
