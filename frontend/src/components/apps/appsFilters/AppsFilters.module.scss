@@ -82,6 +82,34 @@
   }
 }
 
+.resetBtn {
+  display: flex;
+  align-items: center;
+  gap: rem(6);
+  padding: rem(8) rem(12);
+  background: rgba($primary, 0.08);
+  border: 1px solid rgba($primary, 0.25);
+  border-radius: $radius-md;
+  color: $primary;
+  font-size: rem(13);
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transition;
+  font-family: inherit;
+  width: 100%;
+  justify-content: center;
+
+  &:hover {
+    background: rgba($primary, 0.15);
+    border-color: $primary;
+  }
+}
+
+.loadingText {
+  font-size: rem(13);
+  color: $text-tertiary;
+}
+
 .filterSection {
   display: flex;
   flex-direction: column;

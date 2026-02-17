@@ -1,7 +1,6 @@
 export class ApiError extends Error {
 	code: string;
 	statusCode: number;
-	message: string;
 	details?: any;
 
 	constructor(code: string, message: string, statusCode: number, details?: any) {
@@ -9,7 +8,6 @@ export class ApiError extends Error {
 		this.name = "ApiError";
 		this.code = code;
 		this.statusCode = statusCode;
-		this.message = message;
 		this.details = details;
 
 		if (Error.captureStackTrace) {

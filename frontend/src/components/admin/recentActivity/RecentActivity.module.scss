@@ -1,0 +1,105 @@
+@use "../../../styles/helpers/" as *;
+
+.card {
+    background: $background-card;
+    backdrop-filter: blur(20px);
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: rem(24);
+    transition: $transition;
+    height: 100%;
+
+    &:hover {
+        border-color: $border-color-medium;
+        box-shadow: $shadow-md;
+    }
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: rem(20);
+    padding-bottom: rem(16);
+    border-bottom: 1px solid $border-color-light;
+}
+
+.cardTitle {
+    font-size: rem(18);
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+}
+
+.viewAllBtn {
+    font-size: rem(14);
+    color: $primary;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: $transition;
+
+    &:hover {
+        color: $primary-hover;
+        text-decoration: underline;
+    }
+}
+
+.activityList {
+    display: flex;
+    flex-direction: column;
+    gap: rem(12);
+}
+
+.noData {
+    text-align: center;
+    color: $text-secondary;
+    padding: rem(40) 0;
+    font-size: rem(14);
+}
+
+.activityItem {
+    display: flex;
+    gap: rem(12);
+    padding: rem(12);
+    background: $background-tertiary;
+    border-radius: $radius-md;
+    transition: $transition;
+
+    &:hover {
+        background: $background-secondary;
+        transform: translateX(4px);
+    }
+}
+
+.activityIcon {
+    width: rem(32);
+    height: rem(32);
+    border-radius: 50%;
+    background: $background-card;
+    border: 1px solid $border-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary;
+    flex-shrink: 0;
+}
+
+.activityContent {
+    flex: 1;
+    min-width: 0;
+}
+
+.activityText {
+    font-size: rem(14);
+    color: $text-primary;
+    margin: 0 0 rem(4) 0;
+    line-height: 1.4;
+}
+
+.activityTime {
+    font-size: rem(12);
+    color: $text-tertiary;
+    margin: 0;
+}

@@ -1,64 +1,157 @@
 @use "../../../styles/helpers/" as *;
 
 .section {
-  padding: rem(48) rem(24);
-  margin-bottom: rem(32);
+    padding: rem(48) rem(24) rem(32);
+}
 
-  &__header {
+// ── Header ────────────────────────────────────────────────────────────────────
+.header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: rem(32);
-  }
+    justify-content: space-between;
+    margin-bottom: rem(28);
+    gap: rem(16);
+}
 
-  &__title {
-    font-size: rem(32);
-    font-weight: 700;
+.title {
+    font-size: rem(28);
+    font-weight: 800;
     color: $text-primary;
     letter-spacing: -0.5px;
-  }
+    margin: 0;
+}
 
-  &__link {
+.controls {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+}
+
+.arrow {
+    width: rem(40);
+    height: rem(40);
+    border-radius: $radius-md;
+    background: $background-card;
+    border: 1px solid $border-color;
+    color: $text-primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: $transition;
+    flex-shrink: 0;
+
+    &:hover:not(:disabled) {
+        background: $primary;
+        border-color: $primary;
+        color: white;
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba($primary, 0.35);
+    }
+
+    &:active:not(:disabled) {
+        transform: scale(0.97);
+    }
+}
+
+.arrowDisabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.viewAll {
     color: $primary;
     text-decoration: none;
     font-weight: 600;
-    transition: all $transition;
+    font-size: rem(14);
+    transition: $transition;
+    white-space: nowrap;
+    margin-left: rem(4);
 
     &:hover {
-      color: $primary-hover;
-      transform: translateX(4px);
+        color: $primary-hover;
+        transform: translateX(3px);
+        display: inline-block;
     }
-  }
 }
 
-.appsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: rem(24);
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: rem(20);
-  }
+// ── Slider ────────────────────────────────────────────────────────────────────
+.sliderWrapper {
+    position: relative;
 }
 
-.loading,
+.track {
+    display: flex;
+    gap: rem(24);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-bottom: rem(4);
+
+    &::-webkit-scrollbar { display: none; }
+}
+
+.cardWrap {
+    flex: 0 0 rem(300);
+    scroll-snap-align: start;
+
+    // Make AppCard fill the slot fully
+    > a { height: 100%; }
+
+    @media (max-width: 480px) {
+        flex: 0 0 85vw;
+    }
+}
+
+// Fade edges
+.fadeLeft,
+.fadeRight {
+    position: absolute;
+    top: 0;
+    bottom: rem(4);
+    width: rem(60);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity $transition;
+    z-index: 1;
+}
+
+.fadeLeft  { left: 0;  background: linear-gradient(to right, $background-primary, transparent); }
+.fadeRight { right: 0; background: linear-gradient(to left,  $background-primary, transparent); }
+
+.fadeVisible { opacity: 1; }
+
+// ── Skeleton ──────────────────────────────────────────────────────────────────
+.skeletonTrack {
+    display: flex;
+    gap: rem(24);
+    overflow: hidden;
+}
+
+.skeleton {
+    flex: 0 0 rem(300);
+    height: rem(340);
+    border-radius: $radius-lg;
+    background: linear-gradient(
+        90deg,
+        $background-tertiary 25%,
+        rgba(255,255,255,0.04) 50%,
+        $background-tertiary 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+
+    @media (max-width: 480px) { flex: 0 0 85vw; }
+}
+
+@keyframes shimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+}
+
 .empty {
-  text-align: center;
-  padding: rem(48);
-  color: $text-secondary;
-  font-size: rem(18);
-}
-
-.loading {
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+    text-align: center;
+    padding: rem(48);
+    color: $text-secondary;
+    font-size: rem(16);
 }

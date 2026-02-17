@@ -1,0 +1,106 @@
+@use "../../../styles/helpers/" as *;
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: rem(24);
+}
+
+.statCard {
+    background: $background-card;
+    backdrop-filter: blur(20px);
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: rem(24);
+    display: flex;
+    align-items: center;
+    gap: rem(20);
+    transition: $transition;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, $primary 0%, $accent 100%);
+        opacity: 0;
+        transition: $transition;
+    }
+
+    &:hover {
+        border-color: $border-color-medium;
+        transform: translateY(-2px);
+        box-shadow: $shadow-lg;
+
+        &::before {
+            opacity: 1;
+        }
+
+        .statIcon {
+            background: $primary;
+            color: white;
+            transform: scale(1.1);
+        }
+    }
+}
+
+.statIcon {
+    width: rem(56);
+    height: rem(56);
+    border-radius: $radius-md;
+    background: $background-tertiary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary;
+    flex-shrink: 0;
+    transition: $transition;
+}
+
+.statInfo {
+    flex: 1;
+}
+
+.statLabel {
+    font-size: rem(14);
+    color: $text-secondary;
+    margin-bottom: rem(4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+.statValue {
+    font-size: rem(28);
+    font-weight: 700;
+    color: $text-primary;
+    line-height: 1;
+}
+
+.topUpBtn {
+    width: rem(36);
+    height: rem(36);
+    border-radius: $radius-md;
+    background: $primary;
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: $transition;
+    flex-shrink: 0;
+
+    &:hover {
+        background: $primary-hover;
+        transform: scale(1.1);
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+}

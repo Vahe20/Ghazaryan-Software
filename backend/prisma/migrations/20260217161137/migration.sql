@@ -15,11 +15,12 @@ CREATE TABLE "users" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "userName" TEXT NOT NULL,
-    "fullName" TEXT,
     "role" "UserRole" NOT NULL DEFAULT 'USER',
     "passwordHash" TEXT NOT NULL,
     "balance" DECIMAL(65,30) NOT NULL DEFAULT 0,
     "avatarUrl" TEXT,
+    "blockedTime" TIMESTAMP(3),
+    "attempt" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "lastLoginAt" TIMESTAMP(3),
@@ -52,11 +53,12 @@ CREATE TABLE "apps" (
     "rating" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "reviewCount" INTEGER NOT NULL DEFAULT 0,
     "status" "AppStatus" NOT NULL DEFAULT 'BETA',
+    "featured" BOOLEAN NOT NULL DEFAULT false,
+    "authorId" TEXT,
     "publishedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
-    "price" DOUBLE PRECISION,
-    "isFree" BOOLEAN NOT NULL DEFAULT true,
+    "price" DECIMAL(10,2) NOT NULL DEFAULT 0,
 
     CONSTRAINT "apps_pkey" PRIMARY KEY ("id")
 );
@@ -66,7 +68,7 @@ CREATE TABLE "appscategory" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
-    "description" TEXT,
+    "description" VARCHAR(500),
     "order" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "appscategory_pkey" PRIMARY KEY ("id")
@@ -117,23 +119,11 @@ CREATE TABLE "downloads" (
 );
 
 -- CreateTable
-CREATE TABLE "refreshtoken" (
-    "id" TEXT NOT NULL,
-    "token" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "expiresAt" TIMESTAMP(3) NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "revoked" BOOLEAN NOT NULL DEFAULT false,
-
-    CONSTRAINT "refreshtoken_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "purchases" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "appId" TEXT NOT NULL,
-    "price" DOUBLE PRECISION NOT NULL,
+    "price" DECIMAL(10,2) NOT NULL,
     "paymentMethod" TEXT,
     "transactionId" TEXT,
     "status" "PurchaseStatus" NOT NULL DEFAULT 'COMPLETED',
@@ -171,6 +161,9 @@ CREATE UNIQUE INDEX "appscategory_slug_key" ON "appscategory"("slug");
 CREATE INDEX "appscategory_slug_idx" ON "appscategory"("slug");
 
 -- CreateIndex
+CREATE INDEX "appscategory_order_idx" ON "appscategory"("order");
+
+-- CreateIndex
 CREATE INDEX "appsversion_appId_idx" ON "appsversion"("appId");
 
 -- CreateIndex
@@ -195,12 +188,6 @@ CREATE INDEX "downloads_userId_idx" ON "downloads"("userId");
 CREATE INDEX "downloads_downloadedAt_idx" ON "downloads"("downloadedAt");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "refreshtoken_token_key" ON "refreshtoken"("token");
-
--- CreateIndex
-CREATE INDEX "refreshtoken_userId_idx" ON "refreshtoken"("userId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "purchases_transactionId_key" ON "purchases"("transactionId");
 
 -- CreateIndex
@@ -219,6 +206,9 @@ CREATE UNIQUE INDEX "purchases_userId_appId_key" ON "purchases"("userId", "appId
 ALTER TABLE "apps" ADD CONSTRAINT "apps_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "appscategory"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "apps" ADD CONSTRAINT "apps_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "appsversion" ADD CONSTRAINT "appsversion_appId_fkey" FOREIGN KEY ("appId") REFERENCES "apps"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -232,9 +222,6 @@ ALTER TABLE "downloads" ADD CONSTRAINT "downloads_appId_fkey" FOREIGN KEY ("appI
 
 -- AddForeignKey
 ALTER TABLE "downloads" ADD CONSTRAINT "downloads_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "refreshtoken" ADD CONSTRAINT "refreshtoken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "purchases" ADD CONSTRAINT "purchases_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

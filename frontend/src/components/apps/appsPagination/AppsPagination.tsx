@@ -2,31 +2,23 @@
 
 import style from "./AppsPagination.module.scss";
 
-interface Pagination {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-}
-
 interface AppsPaginationProps {
-  pagination: Pagination;
+  totalPages: number;
   currentPage: number;
   onPageChange: (page: number) => void;
 }
 
-export function AppsPagination({ pagination, currentPage, onPageChange }: AppsPaginationProps) {
-  const { totalPages } = pagination;
-
+export function AppsPagination({ totalPages, currentPage, onPageChange }: AppsPaginationProps) {
   if (totalPages <= 1) {
     return null;
   }
 
-  const handlePageChange = (newPage: number) => {
-    if (newPage < 1 || newPage > totalPages) return;
-    onPageChange(newPage);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      onPageChange(page);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
 
   const renderPageNumbers = () => {
     const pages = [];
@@ -65,7 +57,7 @@ export function AppsPagination({ pagination, currentPage, onPageChange }: AppsPa
         className={style.navButton}
       >
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M12 16L6 10L12 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M12 16L6 10L12 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         Previous
       </button>
@@ -95,7 +87,7 @@ export function AppsPagination({ pagination, currentPage, onPageChange }: AppsPa
       >
         Next
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M8 4L14 10L8 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M8 4L14 10L8 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
     </div>

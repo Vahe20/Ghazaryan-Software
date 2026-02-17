@@ -1,13 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { AppService } from "@/src/services/app.service";
+import { AppService, GetAppsParams } from "@/src/services/app.service";
 import { App } from "@/src/types/Entities";
-
-interface GetAppsParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-  sortBy?: string;
-}
 
 export const appsKeys = {
   all: ["apps"] as const,
@@ -21,7 +14,7 @@ export const appsKeys = {
 export function useApps(params: GetAppsParams = {}) {
   return useQuery({
     queryKey: appsKeys.list(params),
-    queryFn: () => AppService.getApps(params)
+    queryFn: () => AppService.getApps(params),
   });
 }
 

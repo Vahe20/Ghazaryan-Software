@@ -35,5 +35,18 @@ export const AuthService = {
 	me() {
 		return Axios.get<User>("/auth/me")
 			.then(res => res.data);
-	}
+	},
+
+	changePassword(currentPassword: string, newPassword: string) {
+		return Axios.patch<{ message: string }>("/auth/password", {
+			currentPassword,
+			newPassword,
+		}).then(res => res.data);
+	},
+
+	deleteAccount(password: string) {
+		return Axios.delete<{ message: string }>("/auth/account", {
+			data: { password },
+		}).then(res => res.data);
+	},
 };

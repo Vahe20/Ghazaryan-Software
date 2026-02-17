@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as authController from "./auth.controller";
 import { validate } from "../../middlewares/validation.middleware";
-import { registerSchema, loginSchema } from "./auth.types";
+import { registerSchema, loginSchema, changePasswordSchema } from "./auth.types";
 import authMiddleware from "../../middlewares/auth.middleware";
 import { authLimiter, registerLimiter } from "../../middlewares/rateLimit";
 
@@ -21,6 +21,19 @@ router.post(
 	authLimiter,
 	validate(loginSchema),
 	authController.login,
+);
+
+router.patch(
+	"/password",
+	authMiddleware,
+	validate(changePasswordSchema),
+	authController.changePassword,
+);
+
+router.delete(
+	"/account",
+	authMiddleware,
+	authController.deleteAccount,
 );
 
 export default router;

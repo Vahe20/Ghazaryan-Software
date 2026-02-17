@@ -43,7 +43,6 @@ export const createAppSchema = z.object({
 	documentationUrl: z.string().url("Invalid documentation URL").optional(),
 	status: appStatusSchema.default("BETA"),
 	price: z.number().min(0, "Price must be 0 or greater").default(0),
-	isFree: z.boolean().default(true),
 });
 
 export const updateAppSchema = z.object({
@@ -90,7 +89,6 @@ export const updateAppSchema = z.object({
 	documentationUrl: z.string().url("Invalid documentation URL").optional(),
 	status: appStatusSchema.optional(),
 	price: z.number().min(0, "Price must be 0 or greater").optional(),
-	isFree: z.boolean().optional(),
 });
 
 export const getAppsQuerySchema = z.object({
@@ -100,7 +98,7 @@ export const getAppsQuerySchema = z.object({
 	categoryId: z.string().uuid().optional(),
 	status: appStatusSchema.optional(),
 	platform: platformSchema.optional(),
-	sortBy: z.enum(["createdAt", "updatedAt", "downloadCount", "rating", "name"]).default("createdAt"),
+	sortBy: z.enum(["createdAt", "updatedAt", "downloadCount", "rating", "name", "purchasedAt"]).default("createdAt"),
 	order: z.enum(["asc", "desc"]).default("desc"),
 });
 
@@ -139,5 +137,5 @@ export interface AppFilters {
 }
 
 export interface AppSortOptions extends SortParams {
-	sortBy: "createdAt" | "updatedAt" | "downloadCount" | "rating" | "name";
+	sortBy: "createdAt" | "updatedAt" | "downloadCount" | "rating" | "name" | "purchasedAt";
 }

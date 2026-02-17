@@ -1,5 +1,17 @@
 @use "helpers" as *;
 
+:root {
+    --text-primary: #{$text-primary};
+    --text-secondary: #{$text-secondary};
+    --text-tertiary: #{$text-tertiary};
+    --background-primary: #{$background-primary};
+    --background-tertiary: #{$background-tertiary};
+    --border-color: #{$border-color};
+    --primary: #{$primary};
+    --error: #{$error};
+    --success: #{$success};
+}
+
 * {
 	box-sizing: border-box;
 	margin: 0;

@@ -16,6 +16,7 @@ export async function getAllApps(query: GetAppsQuery) {
 			search,
 			categoryId,
 			status,
+			platform,
 			sortBy = "createdAt",
 			order = "desc",
 		} = query;
@@ -42,6 +43,10 @@ export async function getAllApps(query: GetAppsQuery) {
 
 		if (status) {
 			where.status = status;
+		}
+
+		if (platform) {
+			where.platform = { has: platform };
 		}
 
 		const total = await prisma.apps.count({ where });
@@ -178,10 +183,7 @@ export async function addApp(data: CreateAppInput) {
 			},
 		});
 	} catch (error) {
-		if (
-			error instanceof NotFoundError ||
-			error instanceof ConflictError
-		) {
+		if (error instanceof NotFoundError || error instanceof ConflictError) {
 			throw error;
 		}
 		throw new DatabaseError("Failed to create app", error);
@@ -226,10 +228,7 @@ export async function updateAppById(id: string, data: UpdateAppInput) {
 			},
 		});
 	} catch (error) {
-		if (
-			error instanceof NotFoundError ||
-			error instanceof ConflictError
-		) {
+		if (error instanceof NotFoundError || error instanceof ConflictError) {
 			throw error;
 		}
 		throw new DatabaseError("Failed to update app", error);
@@ -360,7 +359,7 @@ export async function getUserLibrary(userId: string, query: GetAppsQuery) {
 			},
 		});
 
-		const appIds = purchases.map((p) => p.appId);
+		const appIds = purchases.map(p => p.appId);
 
 		if (appIds.length === 0) {
 			return {

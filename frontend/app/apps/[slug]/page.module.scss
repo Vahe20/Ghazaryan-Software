@@ -1,0 +1,886 @@
+@use "../../../src/styles/helpers/" as *;
+
+// ── Page shell ────────────────────────────────────────────────────────────────
+.page {
+    min-height: 100vh;
+    background: $background-primary;
+}
+
+// ── Loading / Error ───────────────────────────────────────────────────────────
+.loadingPage,
+.errorPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: rem(16);
+    min-height: 60vh;
+    color: $text-secondary;
+
+    p, h2 { margin: 0; }
+    h2 { font-size: rem(22); color: $text-primary; }
+}
+
+.loadingSpinner {
+    width: rem(48);
+    height: rem(48);
+    border: 3px solid rgba($primary, 0.2);
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.backBtn {
+    padding: rem(10) rem(24);
+    background: $primary;
+    border: none;
+    border-radius: $radius-md;
+    color: white;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    &:hover { background: $primary-hover; }
+}
+
+// ── HERO ──────────────────────────────────────────────────────────────────────
+.hero {
+    position: relative;
+    overflow: hidden;
+    min-height: rem(340);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.heroBg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            to bottom,
+            rgba($background-primary, 0.3) 0%,
+            rgba($background-primary, 0.75) 60%,
+            $background-primary 100%
+        );
+    }
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: blur(2px) brightness(0.45);
+    }
+}
+
+.heroContent {
+    position: relative;
+    z-index: 1;
+    max-width: rem(1400);
+    margin: 0 auto;
+    width: 100%;
+    padding: rem(32) rem(32) rem(40);
+
+    @media (max-width: 768px) {
+        padding: rem(20) rem(16) rem(32);
+    }
+}
+
+.breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    gap: rem(6);
+    background: rgba(white, 0.07);
+    border: 1px solid $border-color;
+    border-radius: $radius-full;
+    color: $text-secondary;
+    font-size: rem(13);
+    font-weight: 500;
+    padding: rem(6) rem(14);
+    cursor: pointer;
+    transition: $transition;
+    margin-bottom: rem(28);
+
+    &:hover {
+        background: rgba(white, 0.12);
+        color: $text-primary;
+    }
+}
+
+.heroMain {
+    display: grid;
+    grid-template-columns: rem(100) 1fr rem(260);
+    gap: rem(28);
+    align-items: start;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: rem(80) 1fr;
+    }
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.appIcon {
+    width: rem(100);
+    height: rem(100);
+    border-radius: $radius-xl;
+    overflow: hidden;
+    border: 2px solid $border-color-medium;
+    flex-shrink: 0;
+    box-shadow: $shadow-xl;
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+
+    @media (max-width: 640px) {
+        width: rem(72);
+        height: rem(72);
+    }
+}
+
+.heroInfo {
+    min-width: 0;
+}
+
+.heroBadges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: rem(8);
+    margin-bottom: rem(12);
+}
+
+.badge {
+    padding: rem(4) rem(12);
+    border-radius: $radius-full;
+    font-size: rem(12);
+    font-weight: 600;
+    background: rgba(white, 0.1);
+    border: 1px solid $border-color-medium;
+    color: $text-secondary;
+}
+.badgeRelease { background: rgba($success, 0.15); border-color: rgba($success, 0.3); color: $success; }
+.badgeBeta    { background: rgba($warning, 0.15); border-color: rgba($warning, 0.3); color: $warning; }
+.badgeFeatured{ background: rgba(#f59e0b, 0.15); border-color: rgba(#f59e0b, 0.3); color: #f59e0b; }
+
+.appName {
+    font-size: rem(36);
+    font-weight: 800;
+    color: $text-primary;
+    margin: 0 0 rem(8);
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+
+    @media (max-width: 768px) { font-size: rem(26); }
+}
+
+.appShortDesc {
+    font-size: rem(16);
+    color: $text-secondary;
+    margin: 0 0 rem(16);
+    line-height: 1.5;
+}
+
+.heroMeta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: rem(16);
+    margin-bottom: rem(16);
+}
+
+.metaItem {
+    display: flex;
+    align-items: center;
+    gap: rem(6);
+    font-size: rem(14);
+    color: $text-secondary;
+    svg { color: $primary; }
+}
+
+.platforms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: rem(8);
+}
+
+.platformTag {
+    padding: rem(4) rem(12);
+    background: rgba($primary, 0.1);
+    border: 1px solid rgba($primary, 0.2);
+    border-radius: $radius-full;
+    font-size: rem(12);
+    font-weight: 600;
+    color: $primary;
+}
+
+// ── CTA card ──────────────────────────────────────────────────────────────────
+.cta {
+    background: $background-card;
+    border: 1px solid $border-color-medium;
+    border-radius: $radius-xl;
+    padding: rem(24);
+    backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+    gap: rem(16);
+
+    @media (max-width: 1024px) {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+    }
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ctaPrice {
+    display: flex;
+    align-items: baseline;
+    gap: rem(6);
+}
+
+.priceFree {
+    font-size: rem(28);
+    font-weight: 800;
+    color: $success;
+}
+
+.priceAmount {
+    font-size: rem(28);
+    font-weight: 800;
+    color: $text-primary;
+}
+
+.priceCurrency {
+    font-size: rem(14);
+    color: $text-tertiary;
+    font-weight: 600;
+}
+
+.buyBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: rem(8);
+    padding: rem(14) rem(24);
+    background: linear-gradient(135deg, $primary 0%, $primary-hover 100%);
+    border: none;
+    border-radius: $radius-md;
+    color: white;
+    font-size: rem(15);
+    font-weight: 700;
+    cursor: pointer;
+    transition: $transition;
+    box-shadow: 0 4px 16px rgba($primary, 0.35);
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba($primary, 0.45);
+    }
+    &:active:not(:disabled) { transform: translateY(0); }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.ownedBlock {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: rem(8);
+    padding: rem(14);
+    background: rgba($success, 0.12);
+    border: 1px solid rgba($success, 0.3);
+    border-radius: $radius-md;
+    color: $success;
+    font-size: rem(14);
+    font-weight: 700;
+}
+
+.ctaError {
+    font-size: rem(13);
+    color: $error;
+    margin: rem(-8) 0;
+}
+
+.ctaMeta {
+    display: flex;
+    gap: rem(8);
+    font-size: rem(12);
+    color: $text-tertiary;
+    flex-wrap: wrap;
+}
+
+.ctaLinks {
+    display: flex;
+    gap: rem(10);
+}
+
+.ctaLink {
+    display: flex;
+    align-items: center;
+    gap: rem(6);
+    padding: rem(8) rem(14);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-secondary;
+    font-size: rem(13);
+    font-weight: 500;
+    text-decoration: none;
+    transition: $transition;
+
+    &:hover {
+        border-color: $primary;
+        color: $primary;
+    }
+}
+
+// ── Container + Tabs ──────────────────────────────────────────────────────────
+.container {
+    max-width: rem(1400);
+    margin: 0 auto;
+    padding: rem(0) rem(32) rem(80);
+
+    @media (max-width: 768px) { padding: 0 rem(16) rem(60); }
+}
+
+.tabs {
+    display: flex;
+    gap: rem(4);
+    border-bottom: 1px solid $border-color;
+    margin-bottom: rem(40);
+    overflow-x: auto;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+}
+
+.tab {
+    padding: rem(14) rem(20);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: $text-tertiary;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    white-space: nowrap;
+    margin-bottom: rem(-1);
+    text-transform: capitalize;
+
+    &:hover { color: $text-primary; }
+}
+
+.tabActive {
+    color: $primary;
+    border-bottom-color: $primary;
+}
+
+// ── Overview ──────────────────────────────────────────────────────────────────
+.overviewGrid {
+    display: grid;
+    grid-template-columns: 1fr rem(300);
+    gap: rem(32);
+    align-items: start;
+
+    @media (max-width: 1024px) { grid-template-columns: 1fr; }
+}
+
+.descriptionCard {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: rem(32);
+
+    h2 {
+        font-size: rem(20);
+        font-weight: 700;
+        color: $text-primary;
+        margin: 0 0 rem(16);
+    }
+}
+
+.description {
+    font-size: rem(15);
+    color: $text-secondary;
+    line-height: 1.8;
+    margin: 0 0 rem(24);
+    white-space: pre-wrap;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: rem(8);
+    padding-top: rem(20);
+    border-top: 1px solid $border-color;
+}
+
+.tag {
+    padding: rem(4) rem(12);
+    background: rgba($primary, 0.08);
+    border: 1px solid rgba($primary, 0.15);
+    border-radius: $radius-full;
+    font-size: rem(12);
+    font-weight: 600;
+    color: $primary;
+    transition: $transition;
+
+    &:hover { background: rgba($primary, 0.15); }
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: rem(16);
+}
+
+.infoCard {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: rem(24);
+
+    h3 {
+        font-size: rem(16);
+        font-weight: 700;
+        color: $text-primary;
+        margin: 0 0 rem(16);
+        padding-bottom: rem(12);
+        border-bottom: 1px solid $border-color;
+    }
+}
+
+.infoList { margin: 0; }
+
+.infoItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: rem(10) 0;
+    border-bottom: 1px solid $border-color-light;
+
+    &:last-child { border-bottom: none; }
+
+    dt { font-size: rem(13); color: $text-tertiary; font-weight: 500; }
+    dd { font-size: rem(13); color: $text-primary; font-weight: 600; margin: 0; }
+}
+
+.statsCard {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: rem(20);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: rem(1);
+    overflow: hidden;
+}
+
+.statRow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: rem(6);
+    padding: rem(16) rem(8);
+    background: $background-tertiary;
+
+    &:not(:last-child) { border-right: 1px solid $border-color; }
+
+    svg { color: $primary; }
+
+    span {
+        font-size: rem(18);
+        font-weight: 700;
+        color: $text-primary;
+    }
+
+    small {
+        font-size: rem(11);
+        color: $text-tertiary;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+}
+
+// ── Screenshots ───────────────────────────────────────────────────────────────
+.screenshotsSection { display: flex; flex-direction: column; gap: rem(16); }
+
+.screenshotMain {
+    border-radius: $radius-lg;
+    overflow: hidden;
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    max-height: rem(520);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+        width: 100%;
+        height: 100%;
+        max-height: rem(520);
+        object-fit: contain;
+    }
+}
+
+.screenshotThumbs {
+    display: flex;
+    gap: rem(12);
+    overflow-x: auto;
+    padding-bottom: rem(4);
+    scrollbar-width: thin;
+    scrollbar-color: $border-color transparent;
+}
+
+.thumb {
+    flex-shrink: 0;
+    width: rem(120);
+    height: rem(80);
+    border-radius: $radius-md;
+    overflow: hidden;
+    border: 2px solid $border-color;
+    background: $background-tertiary;
+    cursor: pointer;
+    transition: $transition;
+    padding: 0;
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+
+    &:hover { border-color: $primary; }
+}
+
+.thumbActive { border-color: $primary; box-shadow: 0 0 0 2px rgba($primary, 0.3); }
+
+// ── Reviews ───────────────────────────────────────────────────────────────────
+.reviewsSection {
+    display: flex;
+    flex-direction: column;
+    gap: rem(24);
+}
+
+// Summary banner — full width across top
+.reviewsSummary {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: rem(28) rem(36);
+    display: flex;
+    align-items: center;
+    gap: rem(32);
+
+    @media (max-width: 640px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: rem(16);
+        padding: rem(20);
+    }
+}
+
+.ratingBig {
+    font-size: rem(64);
+    font-weight: 800;
+    color: $text-primary;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.summaryRight {
+    display: flex;
+    flex-direction: column;
+    gap: rem(8);
+}
+
+.ratingStars {
+    display: flex;
+    gap: rem(6);
+}
+
+.summaryCount {
+    font-size: rem(14);
+    color: $text-tertiary;
+    margin: 0;
+}
+
+.starFilled { color: #f59e0b; }
+.starEmpty  { color: rgba(white, 0.15); }
+
+// Form
+.reviewForm {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: rem(28) rem(32);
+
+    @media (max-width: 640px) { padding: rem(20); }
+
+    h3 {
+        font-size: rem(16);
+        font-weight: 700;
+        color: $text-primary;
+        margin: 0 0 rem(20);
+        padding-bottom: rem(16);
+        border-bottom: 1px solid $border-color;
+    }
+}
+
+.starPicker {
+    display: flex;
+    gap: rem(4);
+    margin-bottom: rem(20);
+}
+
+.starBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: rem(2);
+    transition: $transition;
+    &:hover { transform: scale(1.15); }
+}
+
+.reviewFormFields {
+    display: flex;
+    flex-direction: column;
+    gap: rem(12);
+}
+
+.reviewInput,
+.reviewTextarea {
+    width: 100%;
+    padding: rem(12) rem(16);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-primary;
+    font-size: rem(14);
+    font-family: inherit;
+    transition: $transition;
+    box-sizing: border-box;
+
+    &::placeholder { color: $text-tertiary; }
+    &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    }
+}
+
+.reviewTextarea {
+    resize: vertical;
+    min-height: rem(110);
+    line-height: 1.6;
+}
+
+.reviewFormFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: rem(16);
+    flex-wrap: wrap;
+
+    @media (max-width: 500px) { flex-direction: column; align-items: stretch; }
+}
+
+.reviewSubmitBtn {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(12) rem(28);
+    background: $primary;
+    border: none;
+    border-radius: $radius-md;
+    color: white;
+    font-size: rem(14);
+    font-weight: 700;
+    cursor: pointer;
+    transition: $transition;
+    white-space: nowrap;
+
+    &:hover:not(:disabled) {
+        background: $primary-hover;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba($primary, 0.35);
+    }
+    &:active:not(:disabled) { transform: translateY(0); }
+    &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+.reviewSuccess {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(10) rem(14);
+    background: rgba($success, 0.1);
+    border: 1px solid rgba($success, 0.3);
+    border-radius: $radius-md;
+    color: $success;
+    font-size: rem(13);
+    font-weight: 600;
+}
+
+.reviewError {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(10) rem(14);
+    background: rgba($error, 0.08);
+    border: 1px solid rgba($error, 0.25);
+    border-radius: $radius-md;
+    color: $error;
+    font-size: rem(13);
+}
+
+// List
+.reviewsListHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: rem(4);
+
+    h3 {
+        font-size: rem(16);
+        font-weight: 700;
+        color: $text-primary;
+        margin: 0;
+    }
+}
+
+.reviewsList { display: flex; flex-direction: column; gap: rem(12); }
+
+.reviewCard {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: rem(20) rem(24);
+    transition: $transition;
+
+    &:hover {
+        border-color: $border-color-medium;
+        box-shadow: $shadow-sm;
+    }
+
+    @media (max-width: 640px) { padding: rem(16); }
+}
+
+.reviewHeader {
+    display: flex;
+    align-items: center;
+    gap: rem(12);
+    margin-bottom: rem(14);
+}
+
+.reviewAvatar {
+    width: rem(44);
+    height: rem(44);
+    border-radius: 50%;
+    overflow: hidden;
+    background: $background-tertiary;
+    border: 2px solid $border-color-medium;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: rem(17);
+    font-weight: 700;
+    color: $primary;
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+.reviewMeta { flex: 1; min-width: 0; }
+.reviewUser  { font-size: rem(14); font-weight: 700; color: $text-primary; margin: 0 0 rem(2); }
+.reviewDate  { font-size: rem(12); color: $text-tertiary; margin: 0; }
+.reviewStars { display: flex; gap: rem(3); flex-shrink: 0; }
+.reviewTitle { font-size: rem(14); font-weight: 700; color: $text-primary; margin: 0 0 rem(8); }
+.reviewComment { font-size: rem(14); color: $text-secondary; line-height: 1.7; margin: 0; }
+
+// ── Changelog ─────────────────────────────────────────────────────────────────
+.changelogSection { display: flex; flex-direction: column; gap: rem(24); }
+
+.changelogCard,
+.versionCard {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: rem(28);
+}
+
+.changelogVersion,
+.versionHeader {
+    display: flex;
+    align-items: center;
+    gap: rem(12);
+    margin-bottom: rem(16);
+    padding-bottom: rem(16);
+    border-bottom: 1px solid $border-color;
+}
+
+.versionBadge {
+    padding: rem(4) rem(12);
+    background: rgba($primary, 0.12);
+    border: 1px solid rgba($primary, 0.25);
+    border-radius: $radius-full;
+    font-size: rem(13);
+    font-weight: 700;
+    color: $primary;
+}
+
+.betaBadge {
+    padding: rem(4) rem(10);
+    background: rgba($warning, 0.12);
+    border: 1px solid rgba($warning, 0.25);
+    border-radius: $radius-full;
+    font-size: rem(12);
+    font-weight: 600;
+    color: $warning;
+}
+
+.changelogDate {
+    font-size: rem(13);
+    color: $text-tertiary;
+}
+
+.changelogText {
+    font-size: rem(14);
+    color: $text-secondary;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    font-family: inherit;
+    margin: 0;
+}
+
+.versionHistory h3 {
+    font-size: rem(18);
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0 0 rem(16);
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+.empty {
+    text-align: center;
+    padding: rem(60) rem(20);
+    color: $text-tertiary;
+    p { margin: 0; font-size: rem(15); }
+}
+
+// ── Spinner ───────────────────────────────────────────────────────────────────
+.btnSpinner {
+    display: inline-block;
+    width: rem(14);
+    height: rem(14);
+    border: 2px solid rgba(white, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}

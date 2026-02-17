@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const createReviewSchema = z.object({
-	appId: z.string().uuid("Invalid app ID"),
 	rating: z.number().int().min(1, "Rating must be at least 1").max(5, "Rating must be at most 5"),
 	title: z.string().min(3, "Title must be at least 3 characters").max(100, "Title must be at most 100 characters").optional(),
 	comment: z.string().min(10, "Comment must be at least 10 characters").max(1000, "Comment must be at most 1000 characters"),

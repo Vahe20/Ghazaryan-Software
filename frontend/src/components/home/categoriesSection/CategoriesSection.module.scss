@@ -1,0 +1,162 @@
+@use "../../../styles/helpers/" as *;
+
+.section {
+    padding: rem(16) rem(24) rem(64);
+}
+
+// ── Header ─────────────────────────────────────────────────────────────────
+.header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: rem(32);
+    gap: rem(16);
+}
+
+.title {
+    font-size: rem(28);
+    font-weight: 800;
+    color: $text-primary;
+    letter-spacing: -0.5px;
+    margin: 0 0 rem(6);
+}
+
+.subtitle {
+    font-size: rem(15);
+    color: $text-tertiary;
+    margin: 0;
+}
+
+.viewAll {
+    color: $primary;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: rem(14);
+    transition: $transition;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &:hover { color: $primary-hover; }
+}
+
+// ── Grid ────────────────────────────────────────────────────────────────────
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: rem(16);
+
+    @media (max-width: 1024px) { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 640px)  { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 360px)  { grid-template-columns: 1fr; }
+}
+
+// ── Card ────────────────────────────────────────────────────────────────────
+.card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: rem(16);
+    padding: rem(20) rem(20);
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    text-decoration: none;
+    transition: $transition;
+    overflow: hidden;
+    cursor: pointer;
+
+    &:hover {
+        border-color: transparent;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+
+        .cardGlow   { opacity: 1; }
+        .iconWrap   { background: linear-gradient(135deg, var(--from), var(--to)); color: white; transform: scale(1.08); }
+        .cardArrow  { opacity: 1; transform: translateX(0); color: var(--from); }
+        .cardName   { color: $text-primary; }
+    }
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: $radius-lg;
+        padding: 1px;
+        background: linear-gradient(135deg, var(--from), var(--to));
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: $transition;
+    }
+
+    &:hover::before { opacity: 1; }
+}
+
+.cardGlow {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(var(--from), 0.06), rgba(var(--to), 0.06));
+    opacity: 0;
+    transition: $transition;
+    pointer-events: none;
+    // Fallback with CSS vars since SCSS can't interpolate custom props in rgba
+    background: linear-gradient(135deg, color-mix(in srgb, var(--from) 8%, transparent), color-mix(in srgb, var(--to) 8%, transparent));
+}
+
+.iconWrap {
+    width: rem(48);
+    height: rem(48);
+    border-radius: $radius-md;
+    background: $background-tertiary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--from);
+    flex-shrink: 0;
+    transition: $transition;
+}
+
+.cardName {
+    flex: 1;
+    font-size: rem(15);
+    font-weight: 700;
+    color: $text-secondary;
+    transition: $transition;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cardArrow {
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: $transition;
+    flex-shrink: 0;
+}
+
+// ── Skeleton ────────────────────────────────────────────────────────────────
+.skeleton {
+    height: rem(88);
+    border-radius: $radius-lg;
+    background: linear-gradient(
+        90deg,
+        $background-tertiary 25%,
+        rgba(255, 255, 255, 0.04) 50%,
+        $background-tertiary 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+}
+
+.empty {
+    text-align: center;
+    padding: rem(40);
+    color: $text-secondary;
+    font-size: rem(15);
+}

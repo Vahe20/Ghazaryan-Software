@@ -1,11 +1,15 @@
 import { Axios } from "../config/Axios";
 import { App } from "../types/Entities";
 
-interface GetAppsParams {
+export interface GetAppsParams {
 	page?: number;
 	limit?: number;
 	search?: string;
+	categoryId?: string;
 	sortBy?: string;
+	order?: "asc" | "desc";
+	platform?: string;
+	status?: string;
 }
 
 interface AppsResponse {
@@ -25,7 +29,11 @@ export const AppService = {
 		if (params?.page) queryParams.append("page", params.page.toString());
 		if (params?.limit) queryParams.append("limit", params.limit.toString());
 		if (params?.search) queryParams.append("search", params.search);
+		if (params?.categoryId) queryParams.append("categoryId", params.categoryId);
 		if (params?.sortBy) queryParams.append("sortBy", params.sortBy);
+		if (params?.order) queryParams.append("order", params.order);
+		if (params?.platform) queryParams.append("platform", params.platform);
+		if (params?.status) queryParams.append("status", params.status);
 
 		const queryString = queryParams.toString();
 		const url = queryString ? `/apps?${queryString}` : "/apps";

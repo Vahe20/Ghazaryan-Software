@@ -9,6 +9,8 @@ import appsRoutes from "./modules/apps/apps.routes";
 import categoryRoutes from "./modules/categories/category.routes";
 import appVersionRoutes from "./modules/versions/version.routes";
 import adminRoutes from "./modules/admin/admin.routes";
+import reviewRoutes from "./modules/reviews/review.routes";
+import paymentRoutes from "./modules/payment/payment.routes";
 
 import { apiLimiter, getCurrentRateLimitConfig } from "./middlewares/rateLimit";
 import {
@@ -59,9 +61,11 @@ app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 app.use("/api/auth", authRouter);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/apps", appsRoutes);
-app.use("/api/categories", categoryRoutes);
 app.use("/api/apps", appVersionRoutes);
+app.use("/api/categories", categoryRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api", reviewRoutes);
+app.use("/api/payment", paymentRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { User } from "../types/Entities";
 import { AuthService } from "../services/auth.service";
+import { PaymentService } from "../services/payment.service";
 
 interface AuthState {
 	user: User | null;
@@ -16,6 +17,7 @@ interface AuthState {
 	logout: () => Promise<void>;
 	initialize: () => Promise<void>;
 	clearError: () => void;
+	topUpBalance: (amount: number) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -31,6 +33,20 @@ export const useAuthStore = create<AuthState>()(
 			setError: error => set({ error }),
 
 			clearError: () => set({ error: null }),
+
+			topUpBalance: async (amount: number) => {
+				const { user } = get();
+				if (!user) return;
+
+				const result = await PaymentService.topUpBalance(amount);
+
+				set({
+					user: {
+						...user,
+						balance: result.balance,
+					},
+				});
+			},
 
 			fetchUser: async () => {
 				const { user } = get();

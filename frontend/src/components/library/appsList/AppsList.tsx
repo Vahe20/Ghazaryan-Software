@@ -4,18 +4,22 @@ import { useState, useMemo } from "react";
 import { useUserLibrary } from "@/src/hooks/queries/useApps";
 import { useLibraryStore } from "@/src/store/LibraryStore";
 import style from "./AppsList.module.scss";
+import { useDebounce } from "@/src/hooks/useDebounce";
+
+type filterType = "name" | "date" | "size";
 
 export const AppsList = () => {
     const [searchQuery, setSearchQuery] = useState("");
-    const [sortBy, setSortBy] = useState<"name" | "date" | "size">("name");
+    const [sortBy, setSortBy] = useState<filterType>("name");
     const { data, isLoading } = useUserLibrary();
     const { selectedAppId, setSelectedApp } = useLibraryStore();
+    const debouncedSearchQuery = useDebounce(searchQuery);
 
     const filteredAndSortedApps = useMemo(() => {
         if (!data?.apps) return [];
 
-        let filtered = data.apps.filter(app =>
-            app.name.toLowerCase().includes(searchQuery.toLowerCase())
+        const filtered = data.apps.filter(app =>
+            app.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
         );
 
         switch (sortBy) {
@@ -30,7 +34,7 @@ export const AppsList = () => {
             default:
                 return filtered;
         }
-    }, [data?.apps, searchQuery, sortBy]);
+    }, [data, debouncedSearchQuery, sortBy]);
 
     if (isLoading) {
         return (
@@ -67,7 +71,7 @@ export const AppsList = () => {
 
                 <select
                     value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as any)}
+                    onChange={(e) => setSortBy(e.target.value as filterType)}
                     className={style.sortSelect}
                 >
                     <option value="name">Name</option>

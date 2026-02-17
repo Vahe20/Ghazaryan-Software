@@ -76,6 +76,67 @@ export async function registerUser(data: UserCreateData) {
 	}
 }
 
+export async function changeUserPassword(
+	userId: string,
+	currentPassword: string,
+	newPassword: string,
+) {
+	try {
+		const user = await prisma.users.findUnique({ where: { id: userId } });
+
+		if (!user) {
+			throw new NotFoundError("User", userId);
+		}
+
+		const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+
+		if (!isValid) {
+			throw new AuthenticationError("Current password is incorrect");
+		}
+
+		const passwordHash = await bcrypt.hash(newPassword, 10);
+
+		await prisma.users.update({
+			where: { id: userId },
+			data: { passwordHash },
+		});
+	} catch (error) {
+		if (
+			error instanceof NotFoundError ||
+			error instanceof AuthenticationError
+		) {
+			throw error;
+		}
+		throw new DatabaseError("Failed to change password", error);
+	}
+}
+
+export async function deleteUserAccount(userId: string, password: string) {
+	try {
+		const user = await prisma.users.findUnique({ where: { id: userId } });
+
+		if (!user) {
+			throw new NotFoundError("User", userId);
+		}
+
+		const isValid = await bcrypt.compare(password, user.passwordHash);
+
+		if (!isValid) {
+			throw new AuthenticationError("Password is incorrect");
+		}
+
+		await prisma.users.delete({ where: { id: userId } });
+	} catch (error) {
+		if (
+			error instanceof NotFoundError ||
+			error instanceof AuthenticationError
+		) {
+			throw error;
+		}
+		throw new DatabaseError("Failed to delete account", error);
+	}
+}
+
 const MAX_ATTEMPTS = 5;
 const BLOCK_TIME_MS = 15 * 60 * 1000;
 
@@ -157,3 +218,4 @@ export async function loginUser(data: LoginInput) {
 		throw new DatabaseError("Failed to login", error);
 	}
 }
+

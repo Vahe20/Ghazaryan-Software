@@ -1,0 +1,60 @@
+@use "../../../styles/helpers/" as *;
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: rem(32);
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: rem(16);
+    }
+}
+
+.title {
+    font-size: rem(32);
+    font-weight: 700;
+    margin-bottom: rem(4);
+    background: linear-gradient(135deg, $text-primary 0%, $primary 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    @media (max-width: 768px) {
+        font-size: rem(24);
+    }
+}
+
+.refreshBtn {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(10) rem(20);
+    background: $primary;
+    color: white;
+    border: none;
+    border-radius: $radius-md;
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover {
+        background: $primary-hover;
+        transform: translateY(-2px);
+        box-shadow: $shadow-md;
+    }
+
+    &:active {
+        transform: translateY(0);
+
+        svg {
+            transform: rotate(180deg);
+        }
+    }
+
+    svg {
+        transition: transform 0.3s ease;
+    }
+}

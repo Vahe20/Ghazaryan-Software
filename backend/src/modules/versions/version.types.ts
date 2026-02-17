@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const createAppVersionSchema = z.object({
-	appId: z.string().uuid("Invalid app ID"),
 	version: z.string().regex(/^\d+\.\d+\.\d+$/, "Version must be in format X.Y.Z (e.g., 1.0.0)"),
 	changelog: z
 		.string()
@@ -41,15 +40,10 @@ export interface AppVersion {
 	size: number;
 	isStable: boolean;
 	releaseDate: Date;
-	createdAt: Date;
-	updatedAt: Date;
 }
 
 export interface CreateVersionData {
-	appId: string;
 	version: string;
 	changelog: string;
 	isStable: boolean;
-	downloadUrl: string;
-	size: number;
 }

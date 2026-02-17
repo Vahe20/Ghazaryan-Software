@@ -54,12 +54,12 @@ const storage = multer.diskStorage({
 	},
 });
 
-const ALLOWED_MIME_TYPES = [
-	"image/png",
-	"image/jpeg",
-	"image/webp",
-	"application/zip",
-];
+const ALLOWED_MIME_TYPES_BY_TYPE: Record<UploadType, string[]> = {
+	avatar: ["image/png", "image/jpeg", "image/webp"],
+	screenshots: ["image/png", "image/jpeg", "image/webp"],
+	mods: ["application/zip"],
+	archives: ["application/zip"],
+};
 
 export const upload = multer({
 	storage,
@@ -72,11 +72,25 @@ export const upload = multer({
 		file: Express.Multer.File,
 		cb: FileFilterCallback,
 	) => {
-		if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+		const type = Array.isArray(req.params.type)
+			? req.params.type[0]
+			: req.params.type;
+
+		if (!type || !isValidUploadType(type)) {
 			return cb(
 				new multer.MulterError(
 					"LIMIT_UNEXPECTED_FILE",
-					`Invalid file type: ${file.mimetype}`,
+					"Invalid upload type",
+				),
+			);
+		}
+
+		const allowed = ALLOWED_MIME_TYPES_BY_TYPE[type];
+		if (!allowed.includes(file.mimetype)) {
+			return cb(
+				new multer.MulterError(
+					"LIMIT_UNEXPECTED_FILE",
+					`Invalid file type "${file.mimetype}" for upload type "${type}". Allowed: ${allowed.join(", ")}`,
 				),
 			);
 		}

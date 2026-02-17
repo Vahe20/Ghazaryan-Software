@@ -70,14 +70,14 @@ export const deleteApp = asyncHandler(async (req: Request, res: Response) => {
 	res.json({ message: "App deleted successfully", app });
 });
 
-export const downloadApp = asyncHandler(async (req: Request, res: Response) => {
+export const downloadApp = asyncHandler(async (req: AuthRequest, res: Response) => {
 	const { id } = req.params;
 	
 	if (Array.isArray(id)) {
 		throw new ValidationError("Invalid ID parameter");
 	}
 
-	const userId = undefined;
+	const userId = req.user?.userId;
 
 	const metadata: DownloadMetadata = {
 		version: req.body.version,

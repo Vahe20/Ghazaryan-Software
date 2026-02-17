@@ -1,156 +1,144 @@
 import { Axios } from "../config/Axios";
+import { App } from "../types/Entities";
 
-// Types
-export interface User {
-	id: string;
-	email: string;
-	userName: string;
-	role: "USER" | "DEVELOPER" | "ADMIN";
-	balance: number;
-	avatarUrl?: string;
-	createdAt: string;
-	lastLoginAt?: string;
-	_count: {
-		purchases: number;
-		downloads: number;
-		reviews: number;
-	};
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export interface AdminUser {
+    id: string;
+    email: string;
+    userName: string;
+    role: "USER" | "DEVELOPER" | "ADMIN";
+    balance: number;
+    avatarUrl?: string;
+    createdAt: string;
+    lastLoginAt?: string;
+    _count: {
+        purchases: number;
+        downloads: number;
+        reviews: number;
+    };
 }
 
 export interface Purchase {
-	id: string;
-	userId: string;
-	appId: string;
-	price: number;
-	paymentMethod?: string;
-	transactionId?: string;
-	status: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
-	purchasedAt: string;
-	expiresAt?: string;
-	user: {
-		id: string;
-		userName: string;
-		email: string;
-		avatarUrl?: string;
-	};
-	app: {
-		id: string;
-		name: string;
-		iconUrl: string;
-		slug: string;
-	};
+    id: string;
+    userId: string;
+    appId: string;
+    price: number;
+    paymentMethod?: string;
+    transactionId?: string;
+    status: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
+    purchasedAt: string;
+    expiresAt?: string;
+    user: { id: string; userName: string; email: string; avatarUrl?: string };
+    app: { id: string; name: string; iconUrl: string; slug: string };
 }
 
 export interface DashboardStats {
-	overview: {
-		totalUsers: number;
-		totalApps: number;
-		totalPurchases: number;
-		totalRevenue: number;
-		recentUsers: number;
-		recentPurchases: number;
-	};
-	changes: {
-		userChange: number;
-		purchaseChange: number;
-		revenueChange: number;
-		appChange: number;
-	};
-	topApps: Array<{
-		id: string;
-		name: string;
-		slug: string;
-		iconUrl: string;
-		downloadCount: number;
-		rating: number;
-		price: number;
-	}>;
+    overview: {
+        totalUsers: number;
+        totalApps: number;
+        totalPurchases: number;
+        totalRevenue: number;
+        recentUsers: number;
+        recentPurchases: number;
+    };
+    changes: {
+        userChange: number;
+        purchaseChange: number;
+        revenueChange: number;
+        appChange: number;
+    };
+    topApps: Array<{
+        id: string;
+        name: string;
+        slug: string;
+        iconUrl: string;
+        downloadCount: number;
+        rating: number;
+        price: number;
+    }>;
 }
 
 export interface Activity {
-	type: "user_registered" | "purchase_completed" | "app_published";
-	timestamp: string;
-	description: string;
-	data: any;
+    type: "user_registered" | "purchase_completed" | "app_published";
+    timestamp: string;
+    description: string;
+    data: any;
 }
 
-interface PaginatedResponse<T> {
-	data: T[];
-	pagination: {
-		page: number;
-		limit: number;
-		total: number;
-		totalPages: number;
-	};
+interface Pagination {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
 }
 
-interface GetUsersParams {
-	page?: number;
-	limit?: number;
-	search?: string;
-	role?: string;
-}
-
-interface GetPurchasesParams {
-	page?: number;
-	limit?: number;
-	userId?: string;
-	appId?: string;
-	status?: string;
-}
 
 export const AdminService = {
-	// Get dashboard statistics
-	getDashboardStats: async (): Promise<DashboardStats> => {
-		const response = await Axios.get<DashboardStats>("/admin/stats");
-		return response.data;
-	},
+    getDashboardStats: () =>
+        Axios.get<DashboardStats>("/admin/stats").then(r => r.data),
 
-	// Get recent activity
-	getRecentActivity: async (): Promise<Activity[]> => {
-		const response = await Axios.get<Activity[]>("/admin/activity");
-		return response.data;
-	},
+    getRecentActivity: () =>
+        Axios.get<Activity[]>("/admin/activity").then(r => r.data),
 
-	// Get users with pagination
-	getUsers: async (
-		params?: GetUsersParams,
-	): Promise<{ users: User[]; pagination: any }> => {
-		const queryParams = new URLSearchParams();
+    getUsers: (params?: { page?: number; limit?: number; search?: string; role?: string }) => {
+        const q = new URLSearchParams();
+        if (params?.page)   q.append("page",   String(params.page));
+        if (params?.limit)  q.append("limit",  String(params.limit));
+        if (params?.search) q.append("search", params.search);
+        if (params?.role)   q.append("role",   params.role);
+        return Axios.get<{ users: AdminUser[]; pagination: Pagination }>(
+            `/admin/users${q.toString() ? "?" + q : ""}`
+        ).then(r => r.data);
+    },
 
-		if (params?.page) queryParams.append("page", params.page.toString());
-		if (params?.limit) queryParams.append("limit", params.limit.toString());
-		if (params?.search) queryParams.append("search", params.search);
-		if (params?.role) queryParams.append("role", params.role);
+    updateUserRole: (userId: string, role: "USER" | "DEVELOPER" | "ADMIN") =>
+        Axios.patch(`/admin/users/${userId}/role`, { role }).then(r => r.data),
 
-		const queryString = queryParams.toString();
-		const url = queryString ? `/admin/users?${queryString}` : "/admin/users";
+    deleteUser: (userId: string) =>
+        Axios.delete(`/admin/users/${userId}`).then(r => r.data),
 
-		const response = await Axios.get<{ users: User[]; pagination: any }>(url);
-		return response.data;
-	},
+    getPurchases: (params?: { page?: number; limit?: number; search?: string; status?: string }) => {
+        const q = new URLSearchParams();
+        if (params?.page)   q.append("page",   String(params.page));
+        if (params?.limit)  q.append("limit",  String(params.limit));
+        if (params?.search) q.append("search", params.search);
+        if (params?.status) q.append("status", params.status);
+        return Axios.get<{ purchases: Purchase[]; pagination: Pagination }>(
+            `/admin/purchases${q.toString() ? "?" + q : ""}`
+        ).then(r => r.data);
+    },
 
-	// Get purchases/orders with pagination
-	getPurchases: async (
-		params?: GetPurchasesParams,
-	): Promise<{ purchases: Purchase[]; pagination: any }> => {
-		const queryParams = new URLSearchParams();
+    getApps: (params?: { page?: number; limit?: number; search?: string; status?: string; categoryId?: string }) => {
+        const q = new URLSearchParams();
+        if (params?.page)       q.append("page",       String(params.page));
+        if (params?.limit)      q.append("limit",      String(params.limit));
+        if (params?.search)     q.append("search",     params.search);
+        if (params?.status)     q.append("status",     params.status);
+        if (params?.categoryId) q.append("categoryId", params.categoryId);
+        return Axios.get<{ apps: App[]; pagination: Pagination }>(
+            `/apps${q.toString() ? "?" + q : ""}`
+        ).then(r => r.data);
+    },
 
-		if (params?.page) queryParams.append("page", params.page.toString());
-		if (params?.limit) queryParams.append("limit", params.limit.toString());
-		if (params?.userId) queryParams.append("userId", params.userId);
-		if (params?.appId) queryParams.append("appId", params.appId);
-		if (params?.status) queryParams.append("status", params.status);
+    createApp: (data: Partial<App>) =>
+        Axios.post<App>("/apps", data).then(r => r.data),
 
-		const queryString = queryParams.toString();
-		const url = queryString
-			? `/admin/purchases?${queryString}`
-			: "/admin/purchases";
+    updateApp: (id: string, data: Partial<App>) =>
+        Axios.put<App>(`/apps/${id}`, data).then(r => r.data),
 
-		const response = await Axios.get<{
-			purchases: Purchase[];
-			pagination: any;
-		}>(url);
-		return response.data;
-	},
+    deleteApp: (id: string) =>
+        Axios.delete(`/apps/${id}`).then(r => r.data),
+
+    getCategories: () =>
+        Axios.get<{ id: string; name: string; slug: string; description?: string; order: number }[]>("/categories").then(r => r.data),
+
+    createCategory: (data: { name: string; description?: string; order?: number }) =>
+        Axios.post("/categories", data).then(r => r.data),
+
+    updateCategory: (id: string, data: { name?: string; description?: string; order?: number }) =>
+        Axios.put(`/categories/${id}`, data).then(r => r.data),
+
+    deleteCategory: (id: string) =>
+        Axios.delete(`/categories/${id}`).then(r => r.data),
 };

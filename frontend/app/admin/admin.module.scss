@@ -1,0 +1,634 @@
+@use "../../src/styles/helpers/" as *;
+
+// ── Общие стили для всех admin страниц ───────────────────────────────────────
+
+.page {
+    max-width: rem(1300);
+    margin: 0 auto;
+    animation: fadeIn 0.3s ease;
+}
+
+// ── Page header ───────────────────────────────────────────────────────────────
+.pageHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: rem(16);
+    margin-bottom: rem(32);
+    flex-wrap: wrap;
+}
+
+.pageTitle {
+    font-size: rem(28);
+    font-weight: 800;
+    color: $text-primary;
+    margin: 0 0 rem(4);
+    letter-spacing: -0.5px;
+}
+
+.pageSubtitle {
+    font-size: rem(14);
+    color: $text-tertiary;
+    margin: 0;
+}
+
+// ── Toolbar (search + filters + actions) ──────────────────────────────────────
+.toolbar {
+    display: flex;
+    gap: rem(12);
+    margin-bottom: rem(24);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.searchBox {
+    position: relative;
+    flex: 1;
+    min-width: rem(200);
+}
+
+.searchIcon {
+    position: absolute;
+    left: rem(14);
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-tertiary;
+    pointer-events: none;
+}
+
+.searchInput {
+    width: 100%;
+    padding: rem(10) rem(16) rem(10) rem(40);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-primary;
+    font-size: rem(14);
+    font-family: inherit;
+    transition: $transition;
+    box-sizing: border-box;
+
+    &::placeholder { color: $text-tertiary; }
+    &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    }
+}
+
+.filterSelect {
+    padding: rem(10) rem(36) rem(10) rem(14);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-secondary;
+    font-size: rem(14);
+    font-family: inherit;
+    cursor: pointer;
+    transition: $transition;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8d91' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right rem(12) center;
+
+    &:focus { outline: none; border-color: $primary; }
+}
+
+// ── Primary / Danger buttons ──────────────────────────────────────────────────
+.btnPrimary {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(10) rem(20);
+    background: $primary;
+    border: none;
+    border-radius: $radius-md;
+    color: white;
+    font-size: rem(14);
+    font-weight: 700;
+    cursor: pointer;
+    transition: $transition;
+    white-space: nowrap;
+
+    &:hover { background: $primary-hover; transform: translateY(-1px); box-shadow: 0 4px 14px rgba($primary, 0.35); }
+    &:active { transform: none; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+}
+
+.btnSecondary {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(10) rem(20);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-secondary;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    white-space: nowrap;
+
+    &:hover { border-color: $primary; color: $primary; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btnDanger {
+    display: flex;
+    align-items: center;
+    gap: rem(6);
+    padding: rem(7) rem(14);
+    background: rgba($error, 0.08);
+    border: 1px solid rgba($error, 0.2);
+    border-radius: $radius-sm;
+    color: $error;
+    font-size: rem(13);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover { background: rgba($error, 0.15); border-color: rgba($error, 0.4); }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.btnEdit {
+    display: flex;
+    align-items: center;
+    gap: rem(6);
+    padding: rem(7) rem(14);
+    background: rgba($primary, 0.08);
+    border: 1px solid rgba($primary, 0.2);
+    border-radius: $radius-sm;
+    color: $primary;
+    font-size: rem(13);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover { background: rgba($primary, 0.15); border-color: rgba($primary, 0.4); }
+}
+
+// ── Table ──────────────────────────────────────────────────────────────────────
+.tableCard {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tableTh {
+    padding: rem(13) rem(16);
+    text-align: left;
+    font-size: rem(12);
+    font-weight: 700;
+    color: $text-tertiary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid $border-color;
+    white-space: nowrap;
+}
+
+.tableTr {
+    border-bottom: 1px solid $border-color-light;
+    transition: $transition;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: rgba(255,255,255,0.02); }
+}
+
+.tableTd {
+    padding: rem(14) rem(16);
+    font-size: rem(14);
+    color: $text-secondary;
+    vertical-align: middle;
+}
+
+// ── Pagination ────────────────────────────────────────────────────────────────
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: rem(16) rem(20);
+    border-top: 1px solid $border-color;
+    gap: rem(12);
+    flex-wrap: wrap;
+}
+
+.paginationInfo {
+    font-size: rem(13);
+    color: $text-tertiary;
+}
+
+.paginationButtons {
+    display: flex;
+    gap: rem(6);
+}
+
+.pageBtn {
+    width: rem(36);
+    height: rem(36);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
+    color: $text-secondary;
+    font-size: rem(13);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover:not(:disabled) { border-color: $primary; color: $primary; }
+    &:disabled { opacity: 0.3; cursor: not-allowed; }
+}
+
+.pageBtnActive {
+    background: $primary;
+    border-color: $primary;
+    color: white;
+    &:hover { background: $primary-hover; }
+}
+
+// ── Modal ──────────────────────────────────────────────────────────────────────
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: rem(20);
+    animation: fadeIn 0.15s ease;
+}
+
+.modal {
+    background: $background-secondary;
+    border: 1px solid $border-color-medium;
+    border-radius: $radius-xl;
+    width: 100%;
+    max-width: rem(640);
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.2s ease;
+    scrollbar-width: thin;
+    scrollbar-color: $border-color transparent;
+}
+
+.modalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: rem(24) rem(28) rem(20);
+    border-bottom: 1px solid $border-color;
+
+    h2 { font-size: rem(18); font-weight: 700; color: $text-primary; margin: 0; }
+}
+
+.modalClose {
+    width: rem(36);
+    height: rem(36);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
+    color: $text-tertiary;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover { background: $background-hover; color: $text-primary; }
+}
+
+.modalBody {
+    padding: rem(24) rem(28);
+}
+
+.modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: rem(10);
+    padding: rem(20) rem(28) rem(24);
+    border-top: 1px solid $border-color;
+}
+
+// ── Form ──────────────────────────────────────────────────────────────────────
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: rem(16);
+
+    @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: rem(6);
+
+    &.span2 { grid-column: 1 / -1; }
+}
+
+.formLabel {
+    font-size: rem(13);
+    font-weight: 600;
+    color: $text-secondary;
+}
+
+.formInput,
+.formTextarea,
+.formSelect {
+    padding: rem(10) rem(14);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-primary;
+    font-size: rem(14);
+    font-family: inherit;
+    transition: $transition;
+
+    &::placeholder { color: $text-tertiary; }
+    &:focus { outline: none; border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.1); }
+}
+
+.formTextarea { resize: vertical; min-height: rem(90); line-height: 1.6; }
+
+.formSelect {
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8d91' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right rem(14) center;
+    padding-right: rem(36);
+}
+
+.formError {
+    font-size: rem(12);
+    color: $error;
+    margin-top: rem(2);
+}
+
+.formHint {
+    font-size: rem(12);
+    color: $text-tertiary;
+}
+
+// ── Status badges ──────────────────────────────────────────────────────────────
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: rem(5);
+    padding: rem(3) rem(10);
+    border-radius: $radius-full;
+    font-size: rem(12);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badgeCompleted { background: rgba($success, 0.12); color: $success; border: 1px solid rgba($success, 0.25); }
+.badgePending   { background: rgba($warning, 0.12); color: $warning; border: 1px solid rgba($warning, 0.25); }
+.badgeFailed    { background: rgba($error,   0.12); color: $error;   border: 1px solid rgba($error,   0.25); }
+.badgeRefunded  { background: rgba($info,    0.12); color: $info;    border: 1px solid rgba($info,    0.25); }
+.badgeAdmin     { background: rgba($accent,  0.12); color: $accent;  border: 1px solid rgba($accent,  0.25); }
+.badgeDev       { background: rgba($primary, 0.12); color: $primary; border: 1px solid rgba($primary, 0.25); }
+.badgeUser      { background: rgba(255,255,255, 0.06); color: $text-tertiary; border: 1px solid $border-color; }
+.badgeBeta      { background: rgba($warning, 0.12); color: $warning; border: 1px solid rgba($warning, 0.25); }
+.badgeRelease   { background: rgba($success, 0.12); color: $success; border: 1px solid rgba($success, 0.25); }
+
+// ── Avatar ────────────────────────────────────────────────────────────────────
+.avatar {
+    width: rem(36);
+    height: rem(36);
+    border-radius: 50%;
+    background: linear-gradient(135deg, $primary, $accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: rem(14);
+    font-weight: 700;
+    color: white;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+.appIcon {
+    width: rem(36);
+    height: rem(36);
+    border-radius: $radius-sm;
+    overflow: hidden;
+    background: $background-tertiary;
+    flex-shrink: 0;
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+// ── Loading / Empty / Error ───────────────────────────────────────────────────
+.loading, .empty, .errorState {
+    text-align: center;
+    padding: rem(60) rem(20);
+    color: $text-tertiary;
+
+    p { margin: rem(8) 0 0; font-size: rem(15); }
+}
+
+.spinner {
+    width: rem(40);
+    height: rem(40);
+    border: 3px solid rgba($primary, 0.2);
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto;
+}
+
+.errorState { color: $error; }
+
+// ── Confirm delete modal ───────────────────────────────────────────────────────
+.confirmModal {
+    background: $background-secondary;
+    border: 1px solid $border-color-medium;
+    border-radius: $radius-xl;
+    padding: rem(32);
+    max-width: rem(420);
+    width: 100%;
+    text-align: center;
+    animation: slideUp 0.2s ease;
+
+    svg { color: $error; margin-bottom: rem(16); }
+    h3 { font-size: rem(18); font-weight: 700; color: $text-primary; margin: 0 0 rem(8); }
+    p  { font-size: rem(14); color: $text-secondary; margin: 0 0 rem(24); line-height: 1.5; }
+}
+
+.confirmButtons {
+    display: flex;
+    gap: rem(10);
+    justify-content: center;
+}
+
+// ── Multiselect checkboxes ────────────────────────────────────────────────────
+.checkboxGroup {
+    display: flex;
+    flex-wrap: wrap;
+    gap: rem(8);
+}
+
+.checkboxChip {
+    display: flex;
+    align-items: center;
+    gap: rem(6);
+    padding: rem(6) rem(12);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-full;
+    font-size: rem(13);
+    font-weight: 600;
+    color: $text-secondary;
+    cursor: pointer;
+    transition: $transition;
+    user-select: none;
+
+    input { display: none; }
+
+    &.checked {
+        background: rgba($primary, 0.12);
+        border-color: rgba($primary, 0.4);
+        color: $primary;
+    }
+}
+
+.screenshotList {
+    display: flex;
+    flex-direction: column;
+    gap: rem(8);
+}
+
+.screenshotRow {
+    display: flex;
+    gap: rem(8);
+    align-items: center;
+}
+
+.screenshotInput { flex: 1; }
+
+.btnIconDanger {
+    width: rem(36);
+    height: rem(36);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba($error, 0.08);
+    border: 1px solid rgba($error, 0.2);
+    border-radius: $radius-sm;
+    color: $error;
+    cursor: pointer;
+    transition: $transition;
+    flex-shrink: 0;
+
+    &:hover { background: rgba($error, 0.16); }
+}
+
+.btnIconAdd {
+    display: flex;
+    align-items: center;
+    gap: rem(6);
+    padding: rem(7) rem(14);
+    background: rgba($primary, 0.07);
+    border: 1px dashed rgba($primary, 0.3);
+    border-radius: $radius-sm;
+    color: $primary;
+    font-size: rem(13);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    margin-top: rem(4);
+
+    &:hover { background: rgba($primary, 0.12); }
+}
+
+.tagsInput {
+    display: flex;
+    flex-wrap: wrap;
+    gap: rem(6);
+    padding: rem(8);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    min-height: rem(44);
+    cursor: text;
+    transition: $transition;
+
+    &:focus-within { border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.1); }
+}
+
+.tag {
+    display: flex;
+    align-items: center;
+    gap: rem(4);
+    padding: rem(3) rem(8);
+    background: rgba($primary, 0.12);
+    border: 1px solid rgba($primary, 0.25);
+    border-radius: $radius-full;
+    font-size: rem(12);
+    font-weight: 600;
+    color: $primary;
+
+    button {
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+        opacity: 0.7;
+        &:hover { opacity: 1; }
+    }
+}
+
+.tagInput {
+    flex: 1;
+    min-width: rem(100);
+    background: none;
+    border: none;
+    color: $text-primary;
+    font-size: rem(14);
+    font-family: inherit;
+    outline: none;
+    &::placeholder { color: $text-tertiary; }
+}
+
+// ── Inline alert ──────────────────────────────────────────────────────────────
+.alertError {
+    padding: rem(10) rem(14);
+    background: rgba($error, 0.08);
+    border: 1px solid rgba($error, 0.25);
+    border-radius: $radius-md;
+    color: $error;
+    font-size: rem(13);
+    margin-bottom: rem(16);
+}
+
+.alertSuccess {
+    padding: rem(10) rem(14);
+    background: rgba($success, 0.08);
+    border: 1px solid rgba($success, 0.25);
+    border-radius: $radius-md;
+    color: $success;
+    font-size: rem(13);
+    margin-bottom: rem(16);
+}
+
+@keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px) } to { opacity: 1; transform: translateY(0) } }
+@keyframes spin    { to { transform: rotate(360deg) } }

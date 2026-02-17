@@ -1,0 +1,106 @@
+@use "../../../styles/helpers/" as *;
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: rem(24);
+    margin-bottom: rem(32);
+}
+
+.statCard {
+    background: $background-card;
+    backdrop-filter: blur(20px);
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: rem(24);
+    transition: $transition;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, $primary 0%, $accent 100%);
+        opacity: 0;
+        transition: $transition;
+    }
+
+    &:hover {
+        border-color: $border-color-medium;
+        transform: translateY(-4px);
+        box-shadow: $shadow-lg;
+
+        &::before {
+            opacity: 1;
+        }
+
+        .statIcon {
+            background: $primary;
+            color: white;
+            transform: scale(1.1) rotate(5deg);
+        }
+    }
+}
+
+.statHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: rem(16);
+}
+
+.statIcon {
+    width: rem(48);
+    height: rem(48);
+    background: $background-tertiary;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary;
+    transition: $transition;
+}
+
+.statChange {
+    font-size: rem(14);
+    font-weight: 600;
+    padding: rem(4) rem(10);
+    border-radius: $radius-sm;
+
+    &.up {
+        background: rgba($success, 0.1);
+        color: $success;
+    }
+
+    &.down {
+        background: rgba($error, 0.1);
+        color: $error;
+    }
+}
+
+.statBody {
+    display: flex;
+    flex-direction: column;
+    gap: rem(4);
+}
+
+.statTitle {
+    font-size: rem(14);
+    color: $text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+    margin: 0;
+}
+
+.statValue {
+    font-size: rem(28);
+    font-weight: 700;
+    color: $text-primary;
+    line-height: 1;
+    margin: 0;
+}

@@ -1,0 +1,333 @@
+@use "../../../styles/helpers/" as *;
+
+.dangerZone {
+    background: $background-card;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba($error, 0.2);
+    border-radius: $radius-lg;
+    padding: rem(28);
+    transition: $transition;
+
+    &:hover {
+        border-color: rgba($error, 0.3);
+        box-shadow: 0 0 20px rgba($error, 0.1);
+    }
+}
+
+.sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: rem(10);
+    font-size: rem(18);
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: rem(20);
+    padding-bottom: rem(16);
+    border-bottom: 1px solid $border-color-light;
+
+    svg { color: $error; }
+}
+
+.settingItem {
+    margin-bottom: rem(24);
+}
+
+.settingLabel {
+    font-size: rem(15);
+    font-weight: 500;
+    color: $text-primary;
+    margin-bottom: rem(12);
+}
+
+// ── Banners ──────────────────────────────────────
+.successBanner,
+.errorBanner {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(10) rem(14);
+    border-radius: $radius-md;
+    font-size: rem(13);
+    font-weight: 500;
+    margin-bottom: rem(12);
+}
+
+.successBanner {
+    background: rgba(#22c55e, 0.1);
+    border: 1px solid rgba(#22c55e, 0.3);
+    color: #22c55e;
+}
+
+.errorBanner {
+    background: rgba($error, 0.1);
+    border: 1px solid rgba($error, 0.3);
+    color: $error;
+}
+
+// ── Form ─────────────────────────────────────────
+.passwordForm,
+.deleteForm {
+    display: flex;
+    flex-direction: column;
+    gap: rem(12);
+}
+
+.inputWrap {
+    display: flex;
+    flex-direction: column;
+    gap: rem(4);
+}
+
+.inputField {
+    width: 100%;
+    padding: rem(12) rem(16);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-primary;
+    font-size: rem(14);
+    transition: $transition;
+
+    &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    }
+
+    &::placeholder { color: $text-tertiary; }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.error {
+    color: $error;
+    font-size: rem(12);
+}
+
+// ── Buttons ───────────────────────────────────────
+.changePasswordBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: rem(8);
+    padding: rem(12) rem(20);
+    background: $primary;
+    border: none;
+    border-radius: $radius-md;
+    color: white;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    margin-top: rem(4);
+
+    &:hover:not(:disabled) {
+        background: $primary-hover;
+        transform: translateY(-2px);
+        box-shadow: $shadow-md;
+    }
+
+    &:active:not(:disabled) { transform: translateY(0); }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.actions {
+    display: flex;
+    gap: rem(12);
+    padding-top: rem(4);
+}
+
+.logoutBtn,
+.deleteBtn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: rem(10);
+    padding: rem(13) rem(20);
+    border-radius: $radius-md;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+
+    svg { transition: $transition; }
+}
+
+.logoutBtn {
+    background: rgba($error, 0.08);
+    border: 1px solid rgba($error, 0.25);
+    color: $error;
+
+    &:hover {
+        background: $error;
+        color: white;
+        border-color: $error;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba($error, 0.3);
+
+        svg { transform: translateX(3px); }
+    }
+
+    &:active { transform: translateY(0); }
+}
+
+.deleteBtn {
+    background: transparent;
+    border: 1px solid $border-color;
+    color: $text-secondary;
+
+    &:hover {
+        background: rgba($error, 0.08);
+        border-color: rgba($error, 0.4);
+        color: $error;
+        transform: translateY(-2px);
+    }
+
+    &:active { transform: translateY(0); }
+}
+
+// ── Delete modal ──────────────────────────────────
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: rem(20);
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.modal {
+    background: $background-card;
+    border: 1px solid rgba($error, 0.3);
+    border-radius: $radius-xl;
+    padding: rem(32) rem(28);
+    max-width: 440px;
+    width: 100%;
+    box-shadow: $shadow-xl;
+    animation: slideUp 0.25s ease-out;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modalIcon {
+    width: rem(60);
+    height: rem(60);
+    border-radius: 50%;
+    background: rgba($error, 0.1);
+    border: 1px solid rgba($error, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $error;
+    margin: 0 auto rem(16);
+}
+
+.modalTitle {
+    font-size: rem(20);
+    font-weight: 700;
+    color: $text-primary;
+    text-align: center;
+    margin: 0 0 rem(8);
+}
+
+.modalDesc {
+    font-size: rem(14);
+    color: $text-secondary;
+    text-align: center;
+    line-height: 1.5;
+    margin: 0 0 rem(20);
+
+    strong { color: $error; }
+}
+
+.deleteForm {
+    margin-top: rem(4);
+}
+
+.modalActions {
+    display: flex;
+    gap: rem(10);
+    margin-top: rem(4);
+}
+
+.cancelBtn {
+    flex: 1;
+    padding: rem(12);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-primary;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover:not(:disabled) { background: $background-secondary; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.confirmDeleteBtn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: rem(8);
+    padding: rem(12);
+    background: $error;
+    border: none;
+    border-radius: $radius-md;
+    color: white;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover:not(:disabled) {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba($error, 0.35);
+    }
+
+    &:active:not(:disabled) { transform: translateY(0); }
+
+    &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+}
+
+// ── Spinner ───────────────────────────────────────
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.spinner {
+    display: inline-block;
+    width: rem(14);
+    height: rem(14);
+    border: 2px solid rgba(white, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}

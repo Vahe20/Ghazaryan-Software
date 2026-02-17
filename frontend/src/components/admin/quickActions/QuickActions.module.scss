@@ -1,0 +1,97 @@
+@use "../../../styles/helpers/" as *;
+
+.card {
+    background: $background-card;
+    backdrop-filter: blur(20px);
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: rem(24);
+    transition: $transition;
+
+    &:hover {
+        border-color: $border-color-medium;
+        box-shadow: $shadow-md;
+    }
+}
+
+.cardHeader {
+    margin-bottom: rem(20);
+    padding-bottom: rem(16);
+    border-bottom: 1px solid $border-color-light;
+}
+
+.cardTitle {
+    font-size: rem(18);
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+}
+
+.quickActions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: rem(12);
+
+    @media (max-width: 500px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.actionBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: rem(10);
+    padding: rem(20) rem(16);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-primary;
+    font-size: rem(14);
+    font-weight: 500;
+    cursor: pointer;
+    transition: $transition;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, $primary 0%, $accent 100%);
+        opacity: 0;
+        transition: $transition;
+    }
+
+    svg {
+        position: relative;
+        z-index: 1;
+        color: $primary;
+        transition: $transition;
+    }
+
+    span {
+        position: relative;
+        z-index: 1;
+        transition: $transition;
+    }
+
+    &:hover {
+        border-color: $primary;
+        transform: translateY(-4px);
+        box-shadow: $shadow-md;
+
+        &::before {
+            opacity: 0.1;
+        }
+
+        svg {
+            transform: scale(1.2);
+        }
+    }
+
+    &:active {
+        transform: translateY(-2px);
+    }
+}

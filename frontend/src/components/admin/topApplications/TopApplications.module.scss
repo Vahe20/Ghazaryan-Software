@@ -1,0 +1,93 @@
+@use "../../../styles/helpers/" as *;
+
+.card {
+    background: $background-card;
+    backdrop-filter: blur(20px);
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: rem(24);
+    transition: $transition;
+    height: 100%;
+
+    &:hover {
+        border-color: $border-color-medium;
+        box-shadow: $shadow-md;
+    }
+}
+
+.cardHeader {
+    margin-bottom: rem(20);
+    padding-bottom: rem(16);
+    border-bottom: 1px solid $border-color-light;
+}
+
+.cardTitle {
+    font-size: rem(18);
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+}
+
+.topAppsList {
+    display: flex;
+    flex-direction: column;
+    gap: rem(12);
+}
+
+.noData {
+    text-align: center;
+    color: $text-secondary;
+    padding: rem(40) 0;
+    font-size: rem(14);
+}
+
+.topAppItem {
+    display: flex;
+    align-items: center;
+    gap: rem(12);
+    padding: rem(12);
+    background: rgba($primary, 0.05);
+    border-radius: $radius-md;
+    transition: $transition;
+
+    &:hover {
+        background: rgba($primary, 0.1);
+        transform: translateX(4px);
+    }
+}
+
+.appIcon {
+    width: rem(44);
+    height: rem(44);
+    border-radius: $radius-md;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.appInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.appName {
+    font-size: rem(14);
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0 0 rem(4) 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.appStats {
+    font-size: rem(13);
+    color: $text-secondary;
+    margin: 0;
+}
+
+.appRating {
+    font-size: rem(14);
+    font-weight: 600;
+    color: $primary;
+    flex-shrink: 0;
+}

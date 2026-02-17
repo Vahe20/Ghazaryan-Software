@@ -16,8 +16,9 @@ export function errorHandler(
 		method: req.method,
 	});
 
-	if (err instanceof ApiError) {
-		return res.status(err.statusCode).json(err.toJSON());
+	if (err instanceof ApiError || err instanceof Error && (err as any).statusCode) {
+		const apiErr = err as ApiError;
+		return res.status(apiErr.statusCode).json(apiErr.toJSON());
 	}
 
 	if (err instanceof Prisma.PrismaClientKnownRequestError) {
