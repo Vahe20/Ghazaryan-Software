@@ -22,15 +22,16 @@ export const AppsList = () => {
             app.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
         );
 
+        // .slice() чтобы не мутировать оригинальный массив из кэша React Query
         switch (sortBy) {
             case "name":
-                return filtered.sort((a, b) => a.name.localeCompare(b.name));
+                return filtered.slice().sort((a, b) => a.name.localeCompare(b.name));
             case "date":
-                return filtered.sort((a, b) =>
+                return filtered.slice().sort((a, b) =>
                     new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
                 );
             case "size":
-                return filtered.sort((a, b) => (b.size || 0) - (a.size || 0));
+                return filtered.slice().sort((a, b) => (b.size || 0) - (a.size || 0));
             default:
                 return filtered;
         }

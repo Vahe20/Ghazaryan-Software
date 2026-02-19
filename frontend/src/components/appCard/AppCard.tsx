@@ -1,19 +1,18 @@
 import Link from "next/link";
 import { App } from "../../types/Entities";
-import style from "./AppCard.module.scss"
-import React from "react";
+import style from "./AppCard.module.scss";
+import React, { memo } from "react";
 
-
-interface props {
+interface Props {
     app: App;
 }
 
-export const AppCard: React.FC<props> = ({ app }) => {
+export const AppCard: React.FC<Props> = memo(({ app }) => {
     return (
         <Link
-            key={app.id}
             href={`/apps/${app.slug}`}
-            className={style.appCard}>
+            className={style.appCard}
+        >
             <div className={style.appCard__image}>
                 {app.coverUrl ? (
                     <img src={app.coverUrl} alt={app.name} />
@@ -32,9 +31,7 @@ export const AppCard: React.FC<props> = ({ app }) => {
                     />
                     <div className={style.appCard__info}>
                         <h3 className={style.appCard__title}>{app.name}</h3>
-                        <p className={style.appCard__category}>
-                            {app.category.name}
-                        </p>
+                        <p className={style.appCard__category}>{app.category.name}</p>
                     </div>
                 </div>
                 <p className={style.appCard__description}>{app.shortDesc}</p>
@@ -51,5 +48,7 @@ export const AppCard: React.FC<props> = ({ app }) => {
                 </div>
             </div>
         </Link>
-    )
-}
+    );
+});
+
+AppCard.displayName = "AppCard";

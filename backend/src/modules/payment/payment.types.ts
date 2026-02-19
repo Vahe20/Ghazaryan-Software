@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const topUpSchema = z.object({
 	amount: z
-		.number({ required_error: "Amount is required" })
+		.number({ error: "Amount is required" })
 		.positive("Amount must be positive")
 		.max(10000, "Amount cannot exceed $10,000 per transaction"),
 });
