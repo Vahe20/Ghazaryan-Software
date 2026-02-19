@@ -42,6 +42,11 @@
     color: $text-primary;
     margin-bottom: rem(8);
     letter-spacing: rem(-0.2);
+    transition: $transition;
+
+    &:hover {
+        transform: translateY(-3px);
+    }
 }
 
 .input {
@@ -65,10 +70,12 @@
         border-color: $primary;
         background: rgba(26, 31, 46, 0.8);
         box-shadow: 0 0 0 rem(3) $primary-light;
+        transform: scale(1.03);
     }
 
     &:hover:not(:focus) {
         border-color: $border-color-medium;
+        transform: scale(1.02);
     }
 }
 
@@ -125,8 +132,7 @@
 
         &:hover {
             color: $primary-hover;
-            text-decoration: underline;
-        }
+            text-decoration: underline;        }
     }
 }
 
@@ -171,17 +177,5 @@
     &:disabled {
         opacity: 0.6;
         cursor: not-allowed;
-    }
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(rem(-10));
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
     }
 }
