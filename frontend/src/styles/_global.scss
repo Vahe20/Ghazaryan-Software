@@ -39,6 +39,7 @@ body {
 	color: $text-primary;
 	min-height: 100vh;
 	line-height: 1.6;
+	background-color: $background-primary;
 }
 
 .container {
@@ -156,7 +157,6 @@ ol {
 
 main {
 	min-height: calc(100vh - 80px);
-	padding: rem(32) 0;
 }
 
 // Scrollbar styling
