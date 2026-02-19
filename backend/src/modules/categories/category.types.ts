@@ -5,15 +5,6 @@ export const createCategorySchema = z.object({
 		.string()
 		.min(2, "Category name must be at least 2 characters")
 		.max(50, "Category name must be at most 50 characters"),
-	description: z
-		.string()
-		.max(500, "Description must be at most 500 characters")
-		.optional(),
-	order: z
-		.number()
-		.int()
-		.nonnegative("Order must be a non-negative number")
-		.default(0),
 });
 
 export const updateCategorySchema = z.object({
@@ -30,15 +21,6 @@ export const updateCategorySchema = z.object({
 			/^[a-z0-9-]+$/,
 			"Slug can only contain lowercase letters, numbers and hyphens",
 		)
-		.optional(),
-	description: z
-		.string()
-		.max(500, "Description must be at most 500 characters")
-		.optional(),
-	order: z
-		.number()
-		.int()
-		.nonnegative("Order must be a non-negative number")
 		.optional(),
 });
 
@@ -58,8 +40,6 @@ export interface Category {
 	id: string;
 	name: string;
 	slug: string;
-	description: string | null;
-	order: number;
 	createdAt: Date;
 	updatedAt: Date;
 }

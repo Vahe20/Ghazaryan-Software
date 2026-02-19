@@ -89,14 +89,6 @@ export async function updateCategoryById(
 			updateData.slug = slugGenerator(data.name);
 		}
 
-		if (data.description !== undefined) {
-			updateData.description = data.description;
-		}
-
-		if (data.order !== undefined) {
-			updateData.order = data.order;
-		}
-
 		const updatedCategory = await prisma.appsCategory.update({
 			where: { id },
 			data: updateData,

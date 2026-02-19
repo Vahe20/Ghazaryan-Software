@@ -1,4 +1,5 @@
 import { CategoryService } from "@/src/services/category.service";
+import { Category } from "@/src/types/Entities";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const categoryKeys = {
@@ -38,39 +39,37 @@ export function useCategoryBySlug(slug: string) {
 }
 
 
-// export function useCreateApp() {
-// 	const queryClient = useQueryClient();
+export function useCreateCategory() {
+	const queryClient = useQueryClient();
 
-// 	return useMutation({
-// 		mutationFn: (newApp: Partial<App>) => AppService.addApp(newApp),
-// 		onSuccess: () => {
-// 			queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
-// 		},
-// 	});
-// }
+	return useMutation({
+		mutationFn: (newCategory: Partial<Category>) => CategoryService.addCategory(newCategory),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
+		},
+	});
+}
 
-// export function useUpdateApp() {
-// 	const queryClient = useQueryClient();
+export function useUpdateCategory() {
+	const queryClient = useQueryClient();
 
-// 	return useMutation({
-// 		mutationFn: ({ id, updates }: { id: string; updates: Partial<App> }) =>
-// 			AppService.updateApp(id, updates),
-// 		onSuccess: (_, variables) => {
-// 			queryClient.invalidateQueries({
-// 				queryKey: categoryKeys.detail(variables.id),
-// 			});
-// 			queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
-// 		},
-// 	});
-// }
+	return useMutation({
+		mutationFn: ({ id, updates }: { id: string; updates: Partial<Category> }) =>
+			CategoryService.updateCategory(id, updates),
+		onSuccess: (_, variables) => {
+			queryClient.invalidateQueries({ queryKey: categoryKeys.detailById(variables.id) });
+			queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
+		},
+	});
+}
 
-// export function useDeleteApp() {
-// 	const queryClient = useQueryClient();
+export function useDeleteCategory() {
+	const queryClient = useQueryClient();
 
-// 	return useMutation({
-// 		mutationFn: (id: string) => AppService.deleteApp(id),
-// 		onSuccess: () => {
-// 			queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
-// 		},
-// 	});
-// }
+	return useMutation({
+		mutationFn: (id: string) => CategoryService.deleteCategory(id),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
+		},
+	});
+}
