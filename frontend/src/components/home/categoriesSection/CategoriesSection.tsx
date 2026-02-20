@@ -16,7 +16,6 @@ const GRADIENTS = [
     ["#9d174d", "#f472b6"],
 ];
 
-// SVG иконки вынесены в константы — создаются один раз, не при каждом рендере
 const ICONS = [
     <svg key="0" width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>,
     <svg key="1" width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" strokeWidth="2" /><path d="M6 12h4M8 10v4M15 11h.01M17 13h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>,
@@ -28,27 +27,21 @@ const ICONS = [
     <svg key="7" width="28" height="28" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3" stroke="currentColor" strokeWidth="2" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" stroke="currentColor" strokeWidth="2" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" stroke="currentColor" strokeWidth="2" /></svg>,
 ];
 
-// Статичные скелетоны
 const SKELETON_ITEMS = Array.from({ length: 8 }, (_, i) => i);
 
 interface Category { id: string; name: string; slug: string; }
 
 export const CategoriesSection = memo(function CategoriesSection() {
     const { data, isLoading } = useCategories();
-    const categories = useMemo(
-        () => (data as Category[]) ?? [],
-        [data]
-    );
+    const categories = useMemo(() => (data as Category[]) ?? [], [data]);
 
-    // Вычисляем массив с градиентами один раз при изменении categories
     const categoriesWithMeta = useMemo(
-        () =>
-            categories.map((cat, i) => ({
-                ...cat,
-                from: GRADIENTS[i % GRADIENTS.length][0],
-                to:   GRADIENTS[i % GRADIENTS.length][1],
-                icon: ICONS[i % ICONS.length],
-            })),
+        () => categories.map((cat, i) => ({
+            ...cat,
+            from: GRADIENTS[i % GRADIENTS.length][0],
+            to:   GRADIENTS[i % GRADIENTS.length][1],
+            icon: ICONS[i % ICONS.length],
+        })),
         [categories]
     );
 
@@ -70,16 +63,13 @@ export const CategoriesSection = memo(function CategoriesSection() {
                 <div className={style.empty}>No categories found.</div>
             ) : (
                 <div className={style.grid}>
-                    {categoriesWithMeta.map(cat => (
-                        <CategoryCard key={cat.id} cat={cat} />
-                    ))}
+                    {categoriesWithMeta.map(cat => <CategoryCard key={cat.id} cat={cat} />)}
                 </div>
             )}
         </section>
     );
 });
 
-// Мемоизированная карточка — не перерендеривается если cat не изменился
 const CategoryCard = memo(function CategoryCard({
     cat,
 }: {

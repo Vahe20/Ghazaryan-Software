@@ -1,0 +1,15 @@
+@use "../../../../styles/helpers/" as *;
+
+// Компонент-специфичные стили для AppModal.
+// Общие стили (modal, form, buttons) — в shared/_modal.module.scss, _form.module.scss, _buttons.module.scss
+
+.sectionTitle {
+    margin: 0 0 rem(12);
+    font-weight: 700;
+    font-size: rem(13);
+    color: $text-tertiary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &:not(:first-child) { margin-top: rem(20); }
+}

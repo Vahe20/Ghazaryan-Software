@@ -37,21 +37,7 @@
     }
 }
 
-@keyframes float {
 
-    0%,
-    100% {
-        transform: translate(0, 0) scale(1);
-    }
-
-    33% {
-        transform: translate(rem(30), rem(-30)) scale(1.1);
-    }
-
-    66% {
-        transform: translate(rem(-20), rem(20)) scale(0.9);
-    }
-}
 
 .authContainer {
     position: relative;
@@ -165,17 +151,7 @@
     animation: slideDown 0.2s ease;
 }
 
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(rem(-10));
-    }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
 .label {
     display: block;

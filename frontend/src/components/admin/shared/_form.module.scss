@@ -1,0 +1,197 @@
+@use "../../../styles/helpers/" as *;
+
+// ── Grid & group ──────────────────────────────────────────────────────────────
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: rem(16);
+
+    @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: rem(6);
+
+    &.span2 { grid-column: 1 / -1; }
+}
+
+.formLabel {
+    font-size: rem(13);
+    font-weight: 600;
+    color: $text-secondary;
+}
+
+// ── Inputs ────────────────────────────────────────────────────────────────────
+
+.formInput,
+.formTextarea,
+.formSelect {
+    padding: rem(10) rem(14);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-primary;
+    font-size: rem(14);
+    font-family: inherit;
+    transition: $transition;
+
+    &::placeholder { color: $text-tertiary; }
+
+    &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    }
+}
+
+.formTextarea {
+    resize: vertical;
+    min-height: rem(90);
+    line-height: 1.6;
+}
+
+.formSelect {
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8d91' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right rem(14) center;
+    padding-right: rem(36);
+}
+
+.formError {
+    font-size: rem(12);
+    color: $error;
+    margin-top: rem(2);
+}
+
+.formHint {
+    font-size: rem(12);
+    color: $text-tertiary;
+}
+
+// ── Tags input ────────────────────────────────────────────────────────────────
+
+.tagsInput {
+    display: flex;
+    flex-wrap: wrap;
+    gap: rem(6);
+    padding: rem(8);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    min-height: rem(44);
+    cursor: text;
+    transition: $transition;
+
+    &:focus-within { border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.1); }
+}
+
+.tag {
+    display: flex;
+    align-items: center;
+    gap: rem(4);
+    padding: rem(3) rem(8);
+    background: rgba($primary, 0.12);
+    border: 1px solid rgba($primary, 0.25);
+    border-radius: $radius-full;
+    font-size: rem(12);
+    font-weight: 600;
+    color: $primary;
+
+    button {
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+        opacity: 0.7;
+        &:hover { opacity: 1; }
+    }
+}
+
+.tagInput {
+    flex: 1;
+    min-width: rem(100);
+    background: none;
+    border: none;
+    color: $text-primary;
+    font-size: rem(14);
+    font-family: inherit;
+    outline: none;
+    &::placeholder { color: $text-tertiary; }
+}
+
+// ── Checkboxes ────────────────────────────────────────────────────────────────
+
+.checkboxGroup {
+    display: flex;
+    flex-wrap: wrap;
+    gap: rem(8);
+}
+
+.checkboxChip {
+    display: flex;
+    align-items: center;
+    gap: rem(6);
+    padding: rem(6) rem(12);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-full;
+    font-size: rem(13);
+    font-weight: 600;
+    color: $text-secondary;
+    cursor: pointer;
+    transition: $transition;
+    user-select: none;
+
+    input { display: none; }
+
+    &.checked {
+        background: rgba($primary, 0.12);
+        border-color: rgba($primary, 0.4);
+        color: $primary;
+    }
+}
+
+// ── Screenshots ───────────────────────────────────────────────────────────────
+
+.screenshotList {
+    display: flex;
+    flex-direction: column;
+    gap: rem(8);
+}
+
+.screenshotRow {
+    display: flex;
+    gap: rem(8);
+    align-items: center;
+}
+
+.screenshotInput { flex: 1; }
+
+// ── Alerts ────────────────────────────────────────────────────────────────────
+
+.alertError {
+    padding: rem(10) rem(14);
+    background: rgba($error, 0.08);
+    border: 1px solid rgba($error, 0.25);
+    border-radius: $radius-md;
+    color: $error;
+    font-size: rem(13);
+    margin-bottom: rem(16);
+}
+
+.alertSuccess {
+    padding: rem(10) rem(14);
+    background: rgba($success, 0.08);
+    border: 1px solid rgba($success, 0.25);
+    border-radius: $radius-md;
+    color: $success;
+    font-size: rem(13);
+    margin-bottom: rem(16);
+}

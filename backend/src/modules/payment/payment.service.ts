@@ -56,7 +56,7 @@ export async function purchaseApp(userId: string, appId: string) {
 			throw ApiError.badRequest("Insufficient balance");
 		}
 
-		const [purchase] = await prisma.$transaction([
+		const [purchase, updatedUser] = await prisma.$transaction([
 			prisma.purchases.create({
 				data: {
 					userId,
@@ -78,15 +78,12 @@ export async function purchaseApp(userId: string, appId: string) {
 			}),
 			prisma.users.update({
 				where: { id: userId },
-				data: {
-					balance: {
-						decrement: price,
-					},
-				},
+				data: { balance: { decrement: price } },
+				select: { id: true, balance: true },
 			}),
 		]);
 
-		return purchase;
+		return { purchase, balance: updatedUser.balance };
 	} catch (error) {
 		if (
 			error instanceof NotFoundError ||

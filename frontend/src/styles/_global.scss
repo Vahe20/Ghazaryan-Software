@@ -1,4 +1,4 @@
-@use "helpers" as *;
+@use "helpers"as *;
 
 :root {
     --text-primary: #{$text-primary};
@@ -13,108 +13,106 @@
 }
 
 * {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 html {
-	scroll-behavior: smooth;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-	@include fluid-text(18, 16);
-	font-family:
-		-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-		"Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-		sans-serif;
-	background: linear-gradient(
-		135deg,
-		$background-primary 0%,
-		$background-secondary 100%
-	);
-	background-attachment: fixed;
-	color: $text-primary;
-	min-height: 100vh;
-	line-height: 1.6;
-	background-color: $background-primary;
+    @include fluid-text(18, 16);
+    font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+        "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+        sans-serif;
+    background: linear-gradient(135deg,
+            $background-primary 0%,
+            $background-secondary 100%);
+    background-attachment: fixed;
+    color: $text-primary;
+    min-height: 100vh;
+    line-height: 1.6;
+    background-color: $background-primary;
 }
 
 .container {
-	@include min-max(320px, 100%);
+    @include min-max(320px, 100%);
 }
 
 .wrap {
-	@include min-max(296px, 1280px);
-	margin: 0 auto;
-	padding: 0 rem(20);
+    @include min-max(296px, 1280px);
+    margin: 0 auto;
+    padding: 0 rem(20);
 }
 
 .error {
-	color: $error;
-	padding: rem(12) rem(16);
-	border: 1px solid $error;
-	border-radius: $radius-md;
-	background: rgba(240, 40, 73, 0.1);
-	backdrop-filter: blur(10px);
-	font-size: rem(14);
-	display: flex;
-	align-items: center;
-	gap: rem(8);
-	animation: slideDown 0.3s ease;
-	box-shadow: $shadow-md;
+    color: $error;
+    padding: rem(12) rem(16);
+    border: 1px solid $error;
+    border-radius: $radius-md;
+    background: rgba(240, 40, 73, 0.1);
+    backdrop-filter: blur(10px);
+    font-size: rem(14);
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    animation: slideDown 0.3s ease;
+    box-shadow: $shadow-md;
 
-	&::before {
-		content: "⚠️";
-		font-size: rem(18);
-	}
+    &::before {
+        content: "⚠️";
+        font-size: rem(18);
+    }
 }
 
 a {
-	color: $link-color;
-	text-decoration: none;
-	transition: $transition;
-	position: relative;
+    color: $link-color;
+    text-decoration: none;
+    transition: $transition;
+    position: relative;
 
-	&:hover {
-		color: $link-hover;
-	}
+    &:hover {
+        color: $link-hover;
+    }
 
-	&:active {
-		transform: scale(0.98);
-	}
+    &:active {
+        transform: scale(0.98);
+    }
 }
 
 input,
 textarea,
 select {
-	box-sizing: border-box;
-	font-family: inherit;
-	background-color: $background-tertiary;
-	border: 1px solid $border-color;
-	border-radius: $radius-md;
-	color: $text-primary;
-	padding: rem(12) rem(16);
-	transition: all $transition;
+    box-sizing: border-box;
+    font-family: inherit;
+    background-color: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-primary;
+    padding: rem(12) rem(16);
+    transition: all $transition;
 
-	&:focus {
-		outline: none;
-		border-color: $primary;
-		box-shadow: 0 0 0 3px $primary-light;
-	}
+    &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 3px $primary-light;
+    }
 
-	&:hover:not(:focus) {
-		border-color: $border-color-medium;
-	}
+    &:hover:not(:focus) {
+        border-color: $border-color-medium;
+    }
 }
 
 input,
 textarea {
-	&::placeholder {
-		color: $text-tertiary;
-	}
+    &::placeholder {
+        color: $text-tertiary;
+    }
 }
 
 h1,
@@ -123,56 +121,55 @@ h3,
 h4,
 h5,
 h6 {
-	color: $text-color;
+    color: $text-color;
 }
 
 img {
-	max-width: 100%;
-	height: auto;
-	display: block;
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
 
 button {
-	font-family: inherit;
-	cursor: pointer;
-	border: none;
-	background: none;
-	outline: none;
-	transition: all $transition;
-	font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+    outline: none;
+    transition: all $transition;
+    font-weight: 500;
 
-	&:hover {
-		transform: translateY(-1px);
-	}
+    &:hover {
+        transform: translateY(-1px);
+    }
 
-	&:active {
-		transform: translateY(0);
-	}
+    &:active {
+        transform: translateY(0);
+    }
 }
 
 ul,
 ol {
-	list-style: none;
+    list-style: none;
 }
 
 main {
-	min-height: calc(100vh - 80px);
+    min-height: calc(100vh - 80px);
 }
 
-// Scrollbar styling
 ::-webkit-scrollbar {
-	width: 10px;
+    width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-	background: $background-secondary;
+    background: $background-secondary;
 }
 
 ::-webkit-scrollbar-thumb {
-	background: $background-tertiary;
-	border-radius: $radius-full;
+    background: $background-tertiary;
+    border-radius: $radius-full;
 
-	&:hover {
-		background: rgba(255, 255, 255, 0.2);
-	}
+    &:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
 }

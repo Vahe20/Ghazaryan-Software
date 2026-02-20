@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
 import { AuthService } from "@/src/services/auth.service";
 import { useAuthStore } from "@/src/store/AuthStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { extractErrorMessage } from "@/src/lib/utils";
 import style from "./SignIn.module.scss";
-import axios from "axios";
 
 interface SignInFormData {
     email: string;
@@ -20,41 +20,20 @@ export const SignIn = () => {
     const fetchUser = useAuthStore(state => state.fetchUser);
 
     const { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>({
-        defaultValues: {
-            email: "",
-            password: "",
-        }
+        defaultValues: { email: "", password: "" },
     });
 
     const onSignIn = async (data: SignInFormData) => {
         if (isLoading) return;
+        setIsLoading(true);
+        setErrorMessage(null);
         try {
-            setIsLoading(true);
-            setErrorMessage(null);
-
-            const res = await AuthService.login({
-                email: data.email,
-                password: data.password,
-            });
-
-
-            if (res.accessToken) {
-                localStorage.setItem("token", res.accessToken);
-            }
-
+            const res = await AuthService.login({ email: data.email, password: data.password });
+            if (res.accessToken) localStorage.setItem("token", res.accessToken);
             await fetchUser();
             router.replace("/");
         } catch (error) {
-            let message = "Failed to sign in. Please try again.";
-
-            if (axios.isAxiosError(error)) {
-                message =
-                    error.response?.data?.error ||
-                    error.response?.statusText ||
-                    message;
-            }
-
-            setErrorMessage(message);
+            setErrorMessage(extractErrorMessage(error, "Failed to sign in. Please try again."));
         } finally {
             setIsLoading(false);
         }
@@ -72,9 +51,7 @@ export const SignIn = () => {
             )}
 
             <div className={style.inputGroup}>
-                <label htmlFor="signin-email" className={style.label}>
-                    Email Address
-                </label>
+                <label htmlFor="signin-email" className={style.label}>Email Address</label>
                 <input
                     id="signin-email"
                     type="email"
@@ -83,23 +60,14 @@ export const SignIn = () => {
                     disabled={isLoading}
                     {...register("email", {
                         required: "Email is required",
-                        pattern: {
-                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                            message: "Invalid email address"
-                        }
+                        pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: "Invalid email address" },
                     })}
                 />
-                {errors.email && (
-                    <span className={style.error}>
-                        {errors.email.message}
-                    </span>
-                )}
+                {errors.email && <span className={style.error}>{errors.email.message}</span>}
             </div>
 
             <div className={style.inputGroup}>
-                <label htmlFor="signin-password" className={style.label}>
-                    Password
-                </label>
+                <label htmlFor="signin-password" className={style.label}>Password</label>
                 <input
                     id="signin-password"
                     type="password"
@@ -108,36 +76,21 @@ export const SignIn = () => {
                     disabled={isLoading}
                     {...register("password", {
                         required: "Password is required",
-                        minLength: {
-                            value: 6,
-                            message: "Password must be at least 6 characters"
-                        }
+                        minLength: { value: 6, message: "Password must be at least 6 characters" },
                     })}
                 />
-                {errors.password && (
-                    <span className={style.error}>
-                        {errors.password.message}
-                    </span>
-                )}
+                {errors.password && <span className={style.error}>{errors.password.message}</span>}
             </div>
 
             <div className={style.options}>
-                <a href="#" className={style.forgotLink}>
-                    Forgot password?
-                </a>
+                <a href="#" className={style.forgotLink}>Forgot password?</a>
             </div>
 
             <button type="submit" className={style.submitBtn} disabled={isLoading}>
                 {isLoading ? "Signing In..." : "Sign In"}
                 {!isLoading && (
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path
-                            d="M4 10H16M16 10L11 5M16 10L11 15"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
+                        <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                 )}
             </button>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { App } from "../../types/Entities";
+import { App } from "../../../types/Entities";
 import style from "./AppCard.module.scss";
 import React, { memo } from "react";
 

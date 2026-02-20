@@ -39,7 +39,6 @@
     margin-bottom: rem(12);
 }
 
-// ── Banners ──────────────────────────────────────
 .successBanner,
 .errorBanner {
     display: flex;
@@ -64,7 +63,6 @@
     color: $error;
 }
 
-// ── Form ─────────────────────────────────────────
 .passwordForm,
 .deleteForm {
     display: flex;
@@ -107,7 +105,6 @@
     font-size: rem(12);
 }
 
-// ── Buttons ───────────────────────────────────────
 .changePasswordBtn {
     display: flex;
     align-items: center;
@@ -194,7 +191,6 @@
     &:active { transform: translateY(0); }
 }
 
-// ── Delete modal ──────────────────────────────────
 .modalOverlay {
     position: fixed;
     inset: 0;
@@ -208,11 +204,6 @@
     animation: fadeIn 0.2s ease-out;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-}
-
 .modal {
     background: $background-card;
     border: 1px solid rgba($error, 0.3);
@@ -222,11 +213,6 @@
     width: 100%;
     box-shadow: $shadow-xl;
     animation: slideUp 0.25s ease-out;
-}
-
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px) scale(0.97); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .modalIcon {
@@ -314,11 +300,6 @@
         opacity: 0.45;
         cursor: not-allowed;
     }
-}
-
-// ── Spinner ───────────────────────────────────────
-@keyframes spin {
-    to { transform: rotate(360deg); }
 }
 
 .spinner {

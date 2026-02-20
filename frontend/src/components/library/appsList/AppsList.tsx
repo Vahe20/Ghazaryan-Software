@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
 import { useState, useMemo } from "react";
 import { useUserLibrary } from "@/src/hooks/queries/useApps";
 import { useLibraryStore } from "@/src/store/LibraryStore";
-import style from "./AppsList.module.scss";
 import { useDebounce } from "@/src/hooks/useDebounce";
+import style from "./AppsList.module.scss";
 
 type filterType = "name" | "date" | "size";
 
@@ -22,7 +22,6 @@ export const AppsList = () => {
             app.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
         );
 
-        // .slice() чтобы не мутировать оригинальный массив из кэша React Query
         switch (sortBy) {
             case "name":
                 return filtered.slice().sort((a, b) => a.name.localeCompare(b.name));
@@ -58,23 +57,17 @@ export const AppsList = () => {
             <div className={style.appsList__controls}>
                 <div className={style.searchBox}>
                     <svg className={style.searchBox__icon} viewBox="0 0 24 24" fill="none">
-                        <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
-                            stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                        <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     </svg>
                     <input
                         type="text"
                         placeholder="Search your library..."
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={e => setSearchQuery(e.target.value)}
                         className={style.searchBox__input}
                     />
                 </div>
-
-                <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as filterType)}
-                    className={style.sortSelect}
-                >
+                <select value={sortBy} onChange={e => setSortBy(e.target.value as filterType)} className={style.sortSelect}>
                     <option value="name">Name</option>
                     <option value="date">Recently Added</option>
                     <option value="size">Size</option>
@@ -84,32 +77,25 @@ export const AppsList = () => {
             {filteredAndSortedApps.length === 0 ? (
                 <div className={style.empty}>
                     <svg className={style.empty__icon} viewBox="0 0 24 24" fill="none">
-                        <path d="M19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21Z"
-                            stroke="currentColor" strokeWidth="2" />
+                        <path d="M19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21Z" stroke="currentColor" strokeWidth="2" />
                         <path d="M9 9L15 15M15 9L9 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     </svg>
                     <h3 className={style.empty__title}>
                         {searchQuery ? "No apps found" : "Your library is empty"}
                     </h3>
                     <p className={style.empty__text}>
-                        {searchQuery
-                            ? "Try adjusting your search"
-                            : "Download some apps to get started"}
+                        {searchQuery ? "Try adjusting your search" : "Download some apps to get started"}
                     </p>
                 </div>
             ) : (
                 <div className={style.appsList__grid}>
-                    {filteredAndSortedApps.map((app) => (
+                    {filteredAndSortedApps.map(app => (
                         <div
                             key={app.id}
                             className={`${style.appItem} ${selectedAppId === app.id ? style.appItem_active : ""}`}
                             onClick={() => setSelectedApp(app.id)}
                         >
-                            <img
-                                src={app.iconUrl}
-                                alt={app.name}
-                                className={style.appItem__icon}
-                            />
+                            <img src={app.iconUrl} alt={app.name} className={style.appItem__icon} />
                             <div className={style.appItem__content}>
                                 <h3 className={style.appItem__name}>{app.name}</h3>
                                 <p className={style.appItem__version}>v{app.version}</p>

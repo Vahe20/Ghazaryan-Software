@@ -7,7 +7,6 @@ import { writeLimiter, readLimiter } from "../../middlewares/rateLimit";
 
 const router = Router();
 
-// All payment routes require authentication
 router.use(authMiddleware);
 
 router.patch(

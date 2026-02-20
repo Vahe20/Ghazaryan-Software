@@ -2,7 +2,7 @@ import rateLimit from "express-rate-limit";
 
 export const apiLimiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
-	max: 100,
+	max: 1000,
 	message: {
 		error: "Too many requests from this IP, please try again later.",
 	},
@@ -74,7 +74,7 @@ export const reviewLimiter = rateLimit({
 
 export const readLimiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
-	max: 300,
+	max: 500,
 	message: {
 		error: "Too many read requests, please slow down.",
 	},

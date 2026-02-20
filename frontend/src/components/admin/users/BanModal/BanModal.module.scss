@@ -1,0 +1,93 @@
+@use "../../../../styles/helpers/" as *;
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: rem(12);
+    padding: rem(14) rem(16);
+    background: $background-tertiary;
+    border-radius: $radius-md;
+    margin-bottom: rem(20);
+}
+
+.userName {
+    margin: 0;
+    font-weight: 700;
+    font-size: rem(15);
+    color: $text-primary;
+}
+
+.userEmail {
+    margin: 0;
+    font-size: rem(12);
+    color: $text-tertiary;
+}
+
+.presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: rem(8);
+}
+
+.presetChip {
+    padding: rem(7) rem(14);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-full;
+    color: $text-secondary;
+    font-size: rem(13);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover {
+        border-color: $warning;
+        color: $warning;
+    }
+
+    &.active {
+        background: rgba($warning, 0.12);
+        border-color: rgba($warning, 0.45);
+        color: $warning;
+    }
+}
+
+.optional {
+    font-weight: 400;
+    color: $text-tertiary;
+}
+
+.warning {
+    display: flex;
+    align-items: flex-start;
+    gap: rem(8);
+    padding: rem(10) rem(14);
+    background: rgba($warning, 0.08);
+    border: 1px solid rgba($warning, 0.2);
+    border-radius: $radius-md;
+    color: $warning;
+    font-size: rem(13);
+    line-height: 1.5;
+    margin-top: rem(4);
+
+    svg { flex-shrink: 0; margin-top: rem(1); }
+}
+
+.btnBan {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(10) rem(20);
+    background: $warning;
+    border: none;
+    border-radius: $radius-md;
+    color: #000;
+    font-size: rem(14);
+    font-weight: 700;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover { background: darken($warning, 8%); transform: translateY(-1px); }
+    &:active { transform: none; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+}

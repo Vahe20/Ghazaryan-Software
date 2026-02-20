@@ -65,9 +65,9 @@ export const useAuthStore = create<AuthState>()(
 
 					const userData = await AuthService.me();
 					set({ user: userData, error: null });
-				} catch (error: any) {
-					const errorMessage =
-						error.response?.data?.message || "Failed to fetch user";
+				} catch (err) {
+					const error = err as { response?: { data?: { message?: string }; status?: number } };
+					const errorMessage = error.response?.data?.message ?? "Failed to fetch user";
 
 					if (error.response?.status === 401) {
 						localStorage.removeItem("token");
@@ -77,7 +77,6 @@ export const useAuthStore = create<AuthState>()(
 						});
 					} else {
 						set({ error: errorMessage });
-						console.error("Failed to fetch user:", error);
 					}
 				} finally {
 					set({ loading: false });
@@ -95,11 +94,11 @@ export const useAuthStore = create<AuthState>()(
 
 					localStorage.setItem("token", accessToken);
 					set({ user, error: null });
-				} catch (error: any) {
-					const errorMessage =
-						error.response?.data?.message || "Login failed";
+				} catch (err) {
+					const error = err as { response?: { data?: { message?: string } } };
+					const errorMessage = error.response?.data?.message ?? "Login failed";
 					set({ error: errorMessage });
-					throw error;
+					throw err;
 				} finally {
 					set({ loading: false });
 				}
@@ -108,11 +107,9 @@ export const useAuthStore = create<AuthState>()(
 			logout: async () => {
 				try {
 					set({ loading: true, error: null });
-
 					localStorage.removeItem("token");
 					set({ user: null, error: null });
-				} catch (error: any) {
-					console.error("Logout error:", error);
+				} catch {
 					localStorage.removeItem("token");
 					set({ user: null });
 				} finally {

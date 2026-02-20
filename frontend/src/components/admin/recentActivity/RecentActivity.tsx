@@ -7,19 +7,18 @@ interface RecentActivityProps {
 }
 
 function getTimeAgo(timestamp: string): string {
-    const diffMs    = Date.now() - new Date(timestamp).getTime();
-    const diffMins  = Math.floor(diffMs / 60_000);
+    const diffMs = Date.now() - new Date(timestamp).getTime();
+    const diffMins = Math.floor(diffMs / 60_000);
     const diffHours = Math.floor(diffMs / 3_600_000);
-    const diffDays  = Math.floor(diffMs / 86_400_000);
+    const diffDays = Math.floor(diffMs / 86_400_000);
 
-    if (diffMins  < 1)  return "Just now";
-    if (diffMins  < 60) return `${diffMins} minute${diffMins  > 1 ? "s" : ""} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours  > 1 ? "s" : ""} ago`;
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? "s" : ""} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
     return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
 }
 
 const RecentActivity = memo(function RecentActivity({ activities }: RecentActivityProps) {
-    // Берём только 5 последних — пересчитывается только при смене activities
     const visibleActivities = useMemo(() => activities.slice(0, 5), [activities]);
 
     return (
@@ -46,9 +45,7 @@ const RecentActivity = memo(function RecentActivity({ activities }: RecentActivi
     );
 });
 
-// Каждый элемент мемоизирован отдельно
 const ActivityItem = memo(function ActivityItem({ activity }: { activity: Activity }) {
-    // timeAgo пересчитывается только при смене timestamp
     const timeAgo = useMemo(() => getTimeAgo(activity.timestamp), [activity.timestamp]);
 
     return (

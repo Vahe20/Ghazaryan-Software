@@ -1,0 +1,22 @@
+@use "../../../../styles/helpers/" as *;
+
+// RoleModal — специфичные стили
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: rem(12);
+    margin-bottom: rem(20);
+}
+
+.userNameText {
+    margin: 0;
+    font-weight: 700;
+    color: $text-primary;
+}
+
+.userEmailText {
+    margin: 0;
+    font-size: rem(13);
+    color: $text-tertiary;
+}

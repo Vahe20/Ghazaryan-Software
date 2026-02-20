@@ -1,0 +1,27 @@
+@use "../../../../styles/helpers/" as *;
+
+// AppsTable — только специфичные стили, общие в _table.module.scss
+
+.appCell {
+    display: flex;
+    align-items: center;
+    gap: rem(10);
+}
+
+.appName {
+    margin: 0;
+    font-weight: 600;
+    color: $text-primary;
+    white-space: nowrap;
+}
+
+.appSlug {
+    margin: 0;
+    font-size: rem(12);
+    color: $text-tertiary;
+}
+
+.actions {
+    display: flex;
+    gap: rem(6);
+}

@@ -57,17 +57,22 @@ export default function AppPage() {
     const alreadyOwned = user?.purchases?.some(p => p.app?.id === app?.id || (p as any).appId === app?.id);
     const isFree = !app?.price || Number(app.price) === 0;
 
+    const { setUser } = useAuthStore();
+
     const handlePurchase = async () => {
         if (!user) { router.push("/auth/login"); return; }
         if (!app) return;
         setPurchasing(true);
         setPurchaseError(null);
         try {
-            await PaymentService.purchaseApp(app.id);
+            const result = await PaymentService.purchaseApp(app.id);
+            // Update balance in store from server response
+            setUser({ ...user, balance: Number(result.balance) });
             setPurchaseSuccess(true);
             queryClient.invalidateQueries({ queryKey: appsKeys.detail(slug) });
-        } catch (err: any) {
-            setPurchaseError(err.response?.data?.error?.message || "Purchase failed");
+        } catch (err: unknown) {
+            const axiosErr = err as { response?: { data?: { error?: { message?: string } } } };
+            setPurchaseError(axiosErr.response?.data?.error?.message ?? "Purchase failed");
         } finally {
             setPurchasing(false);
         }

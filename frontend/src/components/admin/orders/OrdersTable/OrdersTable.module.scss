@@ -1,0 +1,32 @@
+@use "../../../../styles/helpers/" as *;
+
+// OrdersTable — только специфичные стили
+
+.customerCell {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+}
+
+.customerName {
+    margin: 0;
+    font-weight: 600;
+    color: $text-primary;
+}
+
+.customerEmail {
+    margin: 0;
+    font-size: rem(12);
+    color: $text-tertiary;
+}
+
+.appCell {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+}
+
+.amount {
+    font-weight: 700;
+    color: $text-primary;
+}

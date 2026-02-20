@@ -1,0 +1,32 @@
+@use "../../../../styles/helpers/" as *;
+
+// UsersTable — только специфичные стили
+
+.userCellLink {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.userCell {
+    display: flex;
+    align-items: center;
+    gap: rem(10);
+}
+
+.userName {
+    margin: 0;
+    font-weight: 600;
+    color: $text-primary;
+}
+
+.userEmail {
+    margin: 0;
+    font-size: rem(12);
+    color: $text-tertiary;
+}
+
+.actions {
+    display: flex;
+    gap: rem(6);
+}

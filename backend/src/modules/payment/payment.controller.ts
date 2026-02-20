@@ -26,11 +26,12 @@ export const purchaseApp = asyncHandler(async (req: AuthRequest, res: Response) 
 
 	const { appId } = req.body;
 
-	const purchase = await paymentService.purchaseApp(req.user.userId, appId);
+	const result = await paymentService.purchaseApp(req.user.userId, appId);
 
 	return res.status(201).json({
 		message: "Purchase successful",
-		purchase,
+		purchase: result.purchase,
+		balance: result.balance,
 	});
 });
 

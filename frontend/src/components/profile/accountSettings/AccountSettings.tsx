@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuthStore } from '@/src/store/AuthStore';
 import { AuthService } from '@/src/services/auth.service';
+import { useAsyncAction } from '@/src/hooks/useAsyncAction';
+import BaseModal from '@/src/components/shared/BaseModal/BaseModal';
 import style from './AccountSettings.module.scss';
 
 interface PasswordFormData {
@@ -22,14 +24,11 @@ interface AccountSettingsProps {
 
 export default function AccountSettings({ user }: AccountSettingsProps) {
     const { logout } = useAuthStore();
-
-    const [passwordLoading, setPasswordLoading] = useState(false);
     const [passwordSuccess, setPasswordSuccess] = useState(false);
-    const [passwordError, setPasswordError] = useState<string | null>(null);
-
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [deleteLoading, setDeleteLoading] = useState(false);
-    const [deleteError, setDeleteError] = useState<string | null>(null);
+
+    const { loading: passwordLoading, error: passwordError, run: runPassword } = useAsyncAction("Failed to change password");
+    const { loading: deleteLoading, error: deleteError, run: runDelete } = useAsyncAction("Failed to delete account");
 
     const {
         register: regPassword,
@@ -47,39 +46,21 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
     } = useForm<DeleteFormData>();
 
     const onPasswordSubmit = async (data: PasswordFormData) => {
-        setPasswordLoading(true);
-        setPasswordError(null);
-        try {
-            await AuthService.changePassword(data.currentPassword, data.newPassword);
+        await runPassword(() => AuthService.changePassword(data.currentPassword, data.newPassword));
+        if (!passwordError) {
             setPasswordSuccess(true);
             resetPassword();
             setTimeout(() => setPasswordSuccess(false), 3000);
-        } catch (err: any) {
-            setPasswordError(
-                err.response?.data?.error?.message || 'Failed to change password'
-            );
-        } finally {
-            setPasswordLoading(false);
         }
     };
 
     const onDeleteSubmit = async (data: DeleteFormData) => {
-        setDeleteLoading(true);
-        setDeleteError(null);
-        try {
-            await AuthService.deleteAccount(data.password);
-            await logout();
-        } catch (err: any) {
-            setDeleteError(
-                err.response?.data?.error?.message || 'Failed to delete account'
-            );
-            setDeleteLoading(false);
-        }
+        await runDelete(() => AuthService.deleteAccount(data.password));
+        if (!deleteError) await logout();
     };
 
     const handleCloseDeleteModal = () => {
         setShowDeleteModal(false);
-        setDeleteError(null);
         resetDelete();
     };
 
@@ -88,18 +69,11 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
             <div className={style.dangerZone}>
                 <h2 className={style.sectionTitle}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
+                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                     Account Settings
                 </h2>
 
-                {/* Change Password */}
                 <div className={style.settingItem}>
                     <p className={style.settingLabel}>Change Password</p>
 
@@ -125,72 +99,48 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                     <form onSubmit={handlePasswordSubmit(onPasswordSubmit)} className={style.passwordForm}>
                         <div className={style.inputWrap}>
                             <input
-                                {...regPassword('currentPassword', {
-                                    required: 'Current password is required',
-                                })}
+                                {...regPassword('currentPassword', { required: 'Current password is required' })}
                                 type="password"
                                 placeholder="Current Password"
                                 className={style.inputField}
                                 disabled={passwordLoading}
                             />
-                            {passwordErrors.currentPassword && (
-                                <span className={style.error}>{passwordErrors.currentPassword.message}</span>
-                            )}
+                            {passwordErrors.currentPassword && <span className={style.error}>{passwordErrors.currentPassword.message}</span>}
                         </div>
-
                         <div className={style.inputWrap}>
                             <input
                                 {...regPassword('newPassword', {
                                     required: 'New password is required',
                                     minLength: { value: 8, message: 'At least 8 characters' },
-                                    pattern: {
-                                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                                        message: 'Must contain uppercase, lowercase and number',
-                                    },
-                                    validate: (value, formValues) =>
-                                        value !== formValues.currentPassword || 'New password must be different',
+                                    pattern: { value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, message: 'Must contain uppercase, lowercase and number' },
+                                    validate: (v, f) => v !== f.currentPassword || 'New password must be different',
                                 })}
                                 type="password"
                                 placeholder="New Password"
                                 className={style.inputField}
                                 disabled={passwordLoading}
                             />
-                            {passwordErrors.newPassword && (
-                                <span className={style.error}>{passwordErrors.newPassword.message}</span>
-                            )}
+                            {passwordErrors.newPassword && <span className={style.error}>{passwordErrors.newPassword.message}</span>}
                         </div>
-
                         <div className={style.inputWrap}>
                             <input
                                 {...regPassword('confirmNewPassword', {
                                     required: 'Please confirm your new password',
-                                    validate: (value, formValues) =>
-                                        value === formValues.newPassword || 'Passwords do not match',
+                                    validate: (v, f) => v === f.newPassword || 'Passwords do not match',
                                 })}
                                 type="password"
                                 placeholder="Confirm New Password"
                                 className={style.inputField}
                                 disabled={passwordLoading}
                             />
-                            {passwordErrors.confirmNewPassword && (
-                                <span className={style.error}>{passwordErrors.confirmNewPassword.message}</span>
-                            )}
+                            {passwordErrors.confirmNewPassword && <span className={style.error}>{passwordErrors.confirmNewPassword.message}</span>}
                         </div>
-
                         <button type="submit" className={style.changePasswordBtn} disabled={passwordLoading}>
-                            {passwordLoading ? (
-                                <>
-                                    <span className={style.spinner} />
-                                    Saving...
-                                </>
-                            ) : (
-                                'Change Password'
-                            )}
+                            {passwordLoading ? <><span className={style.spinner} />Saving...</> : 'Change Password'}
                         </button>
                     </form>
                 </div>
 
-                {/* Actions */}
                 <div className={style.actions}>
                     <button className={style.logoutBtn} onClick={logout}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -199,7 +149,6 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                         </svg>
                         Logout
                     </button>
-
                     <button className={style.deleteBtn} onClick={() => setShowDeleteModal(true)}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                             <polyline points="3 6 5 6 21 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -212,89 +161,68 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                 </div>
             </div>
 
-            {/* Delete confirmation modal */}
-            {showDeleteModal && (
-                <div className={style.modalOverlay} onClick={handleCloseDeleteModal}>
-                    <div className={style.modal} onClick={e => e.stopPropagation()}>
-                        <div className={style.modalIcon}>
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                        </div>
-
-                        <h3 className={style.modalTitle}>Delete Account</h3>
-                        <p className={style.modalDesc}>
-                            This action is <strong>permanent</strong> and cannot be undone. All your data, purchases and reviews will be lost.
-                        </p>
-
-                        {deleteError && (
-                            <div className={style.errorBanner}>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                                    <path d="M12 8v4m0 4h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                </svg>
-                                {deleteError}
-                            </div>
-                        )}
-
-                        <form onSubmit={handleDeleteSubmit(onDeleteSubmit)} className={style.deleteForm}>
-                            <div className={style.inputWrap}>
-                                <input
-                                    {...regDelete('password', { required: 'Password is required' })}
-                                    type="password"
-                                    placeholder="Enter your password"
-                                    className={style.inputField}
-                                    disabled={deleteLoading}
-                                />
-                                {deleteErrors.password && (
-                                    <span className={style.error}>{deleteErrors.password.message}</span>
-                                )}
-                            </div>
-
-                            <div className={style.inputWrap}>
-                                <input
-                                    {...regDelete('confirmation', {
-                                        required: 'Please type DELETE to confirm',
-                                        validate: v => v === 'DELETE' || 'Type DELETE exactly',
-                                    })}
-                                    type="text"
-                                    placeholder='Type "DELETE" to confirm'
-                                    className={style.inputField}
-                                    disabled={deleteLoading}
-                                />
-                                {deleteErrors.confirmation && (
-                                    <span className={style.error}>{deleteErrors.confirmation.message}</span>
-                                )}
-                            </div>
-
-                            <div className={style.modalActions}>
-                                <button
-                                    type="button"
-                                    className={style.cancelBtn}
-                                    onClick={handleCloseDeleteModal}
-                                    disabled={deleteLoading}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className={style.confirmDeleteBtn}
-                                    disabled={deleteLoading || watchDelete('confirmation') !== 'DELETE'}
-                                >
-                                    {deleteLoading ? (
-                                        <>
-                                            <span className={style.spinner} />
-                                            Deleting...
-                                        </>
-                                    ) : (
-                                        'Delete my account'
-                                    )}
-                                </button>
-                            </div>
-                        </form>
+            <BaseModal
+                isOpen={showDeleteModal}
+                onClose={handleCloseDeleteModal}
+                title="Delete Account"
+                maxWidth={420}
+                footer={
+                    <div className={style.modalActions}>
+                        <button type="button" className={style.cancelBtn} onClick={handleCloseDeleteModal} disabled={deleteLoading}>Cancel</button>
+                        <button
+                            type="submit"
+                            form="delete-account-form"
+                            className={style.confirmDeleteBtn}
+                            disabled={deleteLoading || watchDelete('confirmation') !== 'DELETE'}
+                        >
+                            {deleteLoading ? <><span className={style.spinner} />Deleting...</> : 'Delete my account'}
+                        </button>
                     </div>
+                }
+            >
+                <div className={style.modalIcon}>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                 </div>
-            )}
+                <p className={style.modalDesc}>
+                    This action is <strong>permanent</strong> and cannot be undone. All your data, purchases and reviews will be lost.
+                </p>
+                {deleteError && (
+                    <div className={style.errorBanner}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                            <path d="M12 8v4m0 4h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                        </svg>
+                        {deleteError}
+                    </div>
+                )}
+                <form id="delete-account-form" onSubmit={handleDeleteSubmit(onDeleteSubmit)} className={style.deleteForm}>
+                    <div className={style.inputWrap}>
+                        <input
+                            {...regDelete('password', { required: 'Password is required' })}
+                            type="password"
+                            placeholder="Enter your password"
+                            className={style.inputField}
+                            disabled={deleteLoading}
+                        />
+                        {deleteErrors.password && <span className={style.error}>{deleteErrors.password.message}</span>}
+                    </div>
+                    <div className={style.inputWrap}>
+                        <input
+                            {...regDelete('confirmation', {
+                                required: 'Please type DELETE to confirm',
+                                validate: v => v === 'DELETE' || 'Type DELETE exactly',
+                            })}
+                            type="text"
+                            placeholder='Type "DELETE" to confirm'
+                            className={style.inputField}
+                            disabled={deleteLoading}
+                        />
+                        {deleteErrors.confirmation && <span className={style.error}>{deleteErrors.confirmation.message}</span>}
+                    </div>
+                </form>
+            </BaseModal>
         </>
     );
 }

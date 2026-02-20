@@ -3,6 +3,7 @@
 import { memo, useCallback, useMemo } from "react";
 import style from "./AppsFilters.module.scss";
 import { useCategories } from "@/src/hooks/queries/useCategoryes";
+import FilterCheckbox from "@/src/components/shared/FilterCheckbox/FilterCheckbox";
 
 type SortType = "name" | "downloadCount" | "createdAt" | "rating";
 type PlatformType = "WINDOWS" | "MAC" | "LINUX" | "ANDROID" | "IOS";
@@ -44,55 +45,25 @@ const STATUSES: { value: StatusType; label: string }[] = [
 
 export const AppsFilters = memo(function AppsFilters({ filters, onChange }: AppsFiltersProps) {
     const { data, isLoading } = useCategories();
-    const categories = useMemo(
-        () => (data as { id: string; name: string }[]) ?? [],
-        [data]
-    );
+    const categories = useMemo(() => (data as { id: string; name: string }[]) ?? [], [data]);
 
-    // Патч-обновление фильтров — стабильная функция
     const set = useCallback(
         (patch: Partial<AppsFiltersState>) => onChange({ ...filters, ...patch }),
         [filters, onChange]
     );
 
     const hasActiveFilters = useMemo(
-        () =>
-            filters.categoryId !== "" ||
-            filters.platform   !== "" ||
-            filters.status     !== "" ||
-            filters.sortBy     !== "downloadCount" ||
-            filters.order      !== "desc",
+        () => filters.categoryId !== "" || filters.platform !== "" || filters.status !== "" || filters.sortBy !== "downloadCount" || filters.order !== "desc",
         [filters.categoryId, filters.platform, filters.status, filters.sortBy, filters.order]
     );
 
     const resetFilters = useCallback(
-        () =>
-            onChange({
-                searchQuery: filters.searchQuery,
-                sortBy:      "downloadCount",
-                order:       "desc",
-                categoryId:  "",
-                platform:    "",
-                status:      "",
-            }),
+        () => onChange({ searchQuery: filters.searchQuery, sortBy: "downloadCount", order: "desc", categoryId: "", platform: "", status: "" }),
         [filters.searchQuery, onChange]
-    );
-
-    const handleSearchChange = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => set({ searchQuery: e.target.value }),
-        [set]
-    );
-
-    const handleClearSearch = useCallback(() => set({ searchQuery: "" }), [set]);
-
-    const handleToggleOrder = useCallback(
-        () => set({ order: filters.order === "asc" ? "desc" : "asc" }),
-        [set, filters.order]
     );
 
     return (
         <div className={style.filtersPanel}>
-            {/* Search */}
             <div className={style.searchBox}>
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className={style.searchIcon}>
                     <path d="M19 19L13 13M15 8C15 11.866 11.866 15 8 15C4.13401 15 1 11.866 1 8C1 4.13401 4.13401 1 8 1C11.866 1 15 4.13401 15 8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -101,11 +72,11 @@ export const AppsFilters = memo(function AppsFilters({ filters, onChange }: Apps
                     type="text"
                     placeholder="Search applications..."
                     value={filters.searchQuery}
-                    onChange={handleSearchChange}
+                    onChange={e => set({ searchQuery: e.target.value })}
                     className={style.searchInput}
                 />
                 {filters.searchQuery && (
-                    <button onClick={handleClearSearch} className={style.clearButton} type="button">
+                    <button onClick={() => set({ searchQuery: "" })} className={style.clearButton} type="button">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                             <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                         </svg>
@@ -113,7 +84,6 @@ export const AppsFilters = memo(function AppsFilters({ filters, onChange }: Apps
                 )}
             </div>
 
-            {/* Reset */}
             {hasActiveFilters && (
                 <button className={style.resetBtn} onClick={resetFilters}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -124,7 +94,6 @@ export const AppsFilters = memo(function AppsFilters({ filters, onChange }: Apps
                 </button>
             )}
 
-            {/* Categories */}
             <div className={style.filterSection}>
                 <h3 className={style.filterTitle}>Categories</h3>
                 {isLoading ? (
@@ -132,71 +101,75 @@ export const AppsFilters = memo(function AppsFilters({ filters, onChange }: Apps
                 ) : (
                     <div className={style.checkboxGroup}>
                         {categories.map(cat => (
-                            <CategoryCheckbox
+                            <FilterCheckbox
                                 key={cat.id}
-                                id={cat.id}
-                                name={cat.name}
+                                label={cat.name}
                                 checked={filters.categoryId === cat.id}
-                                onToggle={set}
-                                currentCategoryId={filters.categoryId}
+                                onChange={checked => set({ categoryId: checked ? cat.id : "" })}
+                                className={style.checkboxLabel}
+                                checkmarkClassName={style.checkmark}
+                                labelTextClassName={style.labelText}
                             />
                         ))}
                     </div>
                 )}
             </div>
 
-            {/* Platform */}
             <div className={style.filterSection}>
                 <h3 className={style.filterTitle}>Platform</h3>
                 <div className={style.checkboxGroup}>
                     {PLATFORMS.map(p => (
-                        <PlatformCheckbox
+                        <FilterCheckbox
                             key={p.value}
-                            value={p.value}
                             label={p.label}
                             checked={filters.platform === p.value}
-                            onToggle={set}
-                            currentPlatform={filters.platform}
+                            onChange={checked => set({ platform: checked ? p.value : "" })}
+                            className={style.checkboxLabel}
+                            checkmarkClassName={style.checkmark}
+                            labelTextClassName={style.labelText}
                         />
                     ))}
                 </div>
             </div>
 
-            {/* Status */}
             <div className={style.filterSection}>
                 <h3 className={style.filterTitle}>Status</h3>
                 <div className={style.checkboxGroup}>
                     {STATUSES.map(s => (
-                        <StatusCheckbox
+                        <FilterCheckbox
                             key={s.value}
-                            value={s.value}
                             label={s.label}
                             checked={filters.status === s.value}
-                            onToggle={set}
-                            currentStatus={filters.status}
+                            onChange={checked => set({ status: checked ? s.value : "" })}
+                            className={style.checkboxLabel}
+                            checkmarkClassName={style.checkmark}
+                            labelTextClassName={style.labelText}
                         />
                     ))}
                 </div>
             </div>
 
-            {/* Sort */}
             <div className={style.filterSection}>
                 <h3 className={style.filterTitle}>Sort By</h3>
                 <div className={style.sortGroup}>
                     <div className={style.radioGroup}>
                         {SORT_OPTIONS.map(opt => (
-                            <SortRadio
-                                key={opt.value}
-                                value={opt.value}
-                                label={opt.label}
-                                checked={filters.sortBy === opt.value}
-                                onToggle={set}
-                            />
+                            <label key={opt.value} className={style.radioLabel}>
+                                <input
+                                    type="radio"
+                                    name="sortBy"
+                                    value={opt.value}
+                                    checked={filters.sortBy === opt.value}
+                                    onChange={() => set({ sortBy: opt.value })}
+                                    className={style.radio}
+                                />
+                                <span className={style.radioMark} />
+                                <span className={style.labelText}>{opt.label}</span>
+                            </label>
                         ))}
                     </div>
-
                     <button
-                        onClick={handleToggleOrder}
+                        onClick={() => set({ order: filters.order === "asc" ? "desc" : "asc" })}
                         className={style.sortOrderButton}
                         title={filters.order === "asc" ? "Ascending" : "Descending"}
                     >
@@ -214,96 +187,5 @@ export const AppsFilters = memo(function AppsFilters({ filters, onChange }: Apps
                 </div>
             </div>
         </div>
-    );
-});
-
-// ── Отдельные мемоизированные чекбоксы ────────────────────────────────────────
-// Выносим в отдельные компоненты чтобы при изменении одного чекбокса
-// не перерендеривались все остальные
-
-const CategoryCheckbox = memo(function CategoryCheckbox({
-    id, name, checked, onToggle, currentCategoryId,
-}: {
-    id: string;
-    name: string;
-    checked: boolean;
-    onToggle: (patch: Partial<AppsFiltersState>) => void;
-    currentCategoryId: string;
-}) {
-    const handleChange = useCallback(
-        () => onToggle({ categoryId: currentCategoryId === id ? "" : id }),
-        [onToggle, currentCategoryId, id]
-    );
-    return (
-        <label className={style.checkboxLabel}>
-            <input type="checkbox" checked={checked} onChange={handleChange} className={style.checkbox} />
-            <span className={style.checkmark} />
-            <span className={style.labelText}>{name}</span>
-        </label>
-    );
-});
-
-const PlatformCheckbox = memo(function PlatformCheckbox({
-    value, label, checked, onToggle, currentPlatform,
-}: {
-    value: string;
-    label: string;
-    checked: boolean;
-    onToggle: (patch: Partial<AppsFiltersState>) => void;
-    currentPlatform: string;
-}) {
-    const handleChange = useCallback(
-        () => onToggle({ platform: currentPlatform === value ? "" : value }),
-        [onToggle, currentPlatform, value]
-    );
-    return (
-        <label className={style.checkboxLabel}>
-            <input type="checkbox" checked={checked} onChange={handleChange} className={style.checkbox} />
-            <span className={style.checkmark} />
-            <span className={style.labelText}>{label}</span>
-        </label>
-    );
-});
-
-const StatusCheckbox = memo(function StatusCheckbox({
-    value, label, checked, onToggle, currentStatus,
-}: {
-    value: string;
-    label: string;
-    checked: boolean;
-    onToggle: (patch: Partial<AppsFiltersState>) => void;
-    currentStatus: string;
-}) {
-    const handleChange = useCallback(
-        () => onToggle({ status: currentStatus === value ? "" : value }),
-        [onToggle, currentStatus, value]
-    );
-    return (
-        <label className={style.checkboxLabel}>
-            <input type="checkbox" checked={checked} onChange={handleChange} className={style.checkbox} />
-            <span className={style.checkmark} />
-            <span className={style.labelText}>{label}</span>
-        </label>
-    );
-});
-
-const SortRadio = memo(function SortRadio({
-    value, label, checked, onToggle,
-}: {
-    value: SortType;
-    label: string;
-    checked: boolean;
-    onToggle: (patch: Partial<AppsFiltersState>) => void;
-}) {
-    const handleChange = useCallback(
-        () => onToggle({ sortBy: value }),
-        [onToggle, value]
-    );
-    return (
-        <label className={style.radioLabel}>
-            <input type="radio" name="sortBy" value={value} checked={checked} onChange={handleChange} className={style.radio} />
-            <span className={style.radioMark} />
-            <span className={style.labelText}>{label}</span>
-        </label>
     );
 });

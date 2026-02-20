@@ -1,13 +1,7 @@
-import { memo, useMemo, useCallback } from "react";
+import { memo, useMemo } from "react";
 import { User } from "@/src/types/user.types";
+import { formatBalance } from "@/src/lib/utils";
 import style from "./StatsGrid.module.scss";
-
-function formatBalance(balance: number | undefined): string {
-    const num = Number(balance || 0);
-    if (num >= 1_000_000) return "$" + (num / 1_000_000).toFixed(2) + "M";
-    if (num >= 10_000)    return "$" + (num / 1_000).toFixed(1) + "K";
-    return "$" + num.toFixed(2);
-}
 
 interface StatsGridProps {
     user: User;
@@ -15,7 +9,6 @@ interface StatsGridProps {
 }
 
 export const StatsGrid = memo(function StatsGrid({ user, onTopUpClick }: StatsGridProps) {
-    // Пересчитывается только при изменении balance
     const formattedBalance = useMemo(() => formatBalance(user.balance), [user.balance]);
     const rawBalance       = useMemo(() => "$" + Number(user.balance || 0).toFixed(2), [user.balance]);
     const purchasesCount   = useMemo(() => user.purchases?.length || 0, [user.purchases]);
@@ -68,5 +61,4 @@ export const StatsGrid = memo(function StatsGrid({ user, onTopUpClick }: StatsGr
     );
 });
 
-// Оставляем default export для совместимости
 export default StatsGrid;

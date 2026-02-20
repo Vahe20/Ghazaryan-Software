@@ -1,0 +1,47 @@
+@use "../../../../styles/helpers/" as *;
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: rem(16) rem(20);
+    border-top: 1px solid $border-color;
+    gap: rem(12);
+    flex-wrap: wrap;
+}
+
+.paginationInfo {
+    font-size: rem(13);
+    color: $text-tertiary;
+}
+
+.paginationButtons {
+    display: flex;
+    gap: rem(6);
+}
+
+.pageBtn {
+    width: rem(36);
+    height: rem(36);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
+    color: $text-secondary;
+    font-size: rem(13);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover:not(:disabled) { border-color: $primary; color: $primary; }
+    &:disabled { opacity: 0.3; cursor: not-allowed; }
+}
+
+.pageBtnActive {
+    background: $primary;
+    border-color: $primary;
+    color: white;
+    &:hover { background: $primary-hover; }
+}

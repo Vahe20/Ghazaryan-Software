@@ -1,7 +1,7 @@
 "use client"
 
 import { App } from "@/src/types/Entities";
-import { AppCard } from "@/src/components/appCard/AppCard";
+import { AppCard } from "@/src/components/shared/appCard/AppCard";
 import style from "./AppsGrid.module.scss";
 
 interface AppsGridProps {

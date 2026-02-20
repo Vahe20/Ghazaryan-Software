@@ -1,0 +1,110 @@
+@use "../../../styles/helpers/" as *;
+
+.btnPrimary {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(10) rem(20);
+    background: $primary;
+    border: none;
+    border-radius: $radius-md;
+    color: white;
+    font-size: rem(14);
+    font-weight: 700;
+    cursor: pointer;
+    transition: $transition;
+    white-space: nowrap;
+
+    &:hover { background: $primary-hover; transform: translateY(-1px); box-shadow: 0 4px 14px rgba($primary, 0.35); }
+    &:active { transform: none; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+}
+
+.btnSecondary {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(10) rem(20);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-secondary;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    white-space: nowrap;
+
+    &:hover { border-color: $primary; color: $primary; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btnDanger {
+    display: flex;
+    align-items: center;
+    gap: rem(6);
+    padding: rem(7) rem(14);
+    background: rgba($error, 0.08);
+    border: 1px solid rgba($error, 0.2);
+    border-radius: $radius-sm;
+    color: $error;
+    font-size: rem(13);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover { background: rgba($error, 0.15); border-color: rgba($error, 0.4); }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.btnEdit {
+    display: flex;
+    align-items: center;
+    gap: rem(6);
+    padding: rem(7) rem(14);
+    background: rgba($primary, 0.08);
+    border: 1px solid rgba($primary, 0.2);
+    border-radius: $radius-sm;
+    color: $primary;
+    font-size: rem(13);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover { background: rgba($primary, 0.15); border-color: rgba($primary, 0.4); }
+}
+
+.btnIconDanger {
+    width: rem(36);
+    height: rem(36);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba($error, 0.08);
+    border: 1px solid rgba($error, 0.2);
+    border-radius: $radius-sm;
+    color: $error;
+    cursor: pointer;
+    transition: $transition;
+    flex-shrink: 0;
+
+    &:hover { background: rgba($error, 0.16); }
+}
+
+.btnIconAdd {
+    display: flex;
+    align-items: center;
+    gap: rem(6);
+    padding: rem(7) rem(14);
+    background: rgba($primary, 0.07);
+    border: 1px dashed rgba($primary, 0.3);
+    border-radius: $radius-sm;
+    color: $primary;
+    font-size: rem(13);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    margin-top: rem(4);
+
+    &:hover { background: rgba($primary, 0.12); }
+}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AdminService, DashboardStats, Activity } from '@/src/services/admin.service';
 import DashboardHeader from '@/src/components/admin/dashboardHeader/DashboardHeader';
 import StatsCards from '@/src/components/admin/statsCards/StatsCards';

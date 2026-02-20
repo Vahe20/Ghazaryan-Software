@@ -6,7 +6,7 @@ interface StatCard {
     value: string;
     change: string;
     icon: React.ReactNode;
-    trend: "up" | "down";
+    trend: string;
 }
 
 interface StatsCardsProps {
@@ -23,7 +23,6 @@ const StatsCards = memo(function StatsCards({ stats }: StatsCardsProps) {
     );
 });
 
-// Отдельный мемоизированный компонент для каждой карточки
 const StatCardItem = memo(function StatCardItem({ stat }: { stat: StatCard }) {
     return (
         <div className={style.statCard}>

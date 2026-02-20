@@ -1,0 +1,102 @@
+@use "../../../styles/helpers/" as *;
+
+// ── Page layout ───────────────────────────────────────────────────────────────
+
+.page {
+    max-width: rem(1300);
+    margin: 0 auto;
+    animation: fadeIn 0.3s ease;
+}
+
+.pageHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: rem(16);
+    margin-bottom: rem(32);
+    flex-wrap: wrap;
+}
+
+.pageTitle {
+    font-size: rem(28);
+    font-weight: 800;
+    color: $text-primary;
+    margin: 0 0 rem(4);
+    letter-spacing: -0.5px;
+}
+
+.pageSubtitle {
+    font-size: rem(14);
+    color: $text-tertiary;
+    margin: 0;
+}
+
+// ── Toolbar ───────────────────────────────────────────────────────────────────
+
+.toolbar {
+    display: flex;
+    gap: rem(12);
+    margin-bottom: rem(24);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.searchBox {
+    position: relative;
+    flex: 1;
+    min-width: rem(200);
+}
+
+.searchIcon {
+    position: absolute;
+    left: rem(14);
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-tertiary;
+    pointer-events: none;
+}
+
+.searchInput {
+    width: 100%;
+    padding: rem(10) rem(16) rem(10) rem(40);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-primary;
+    font-size: rem(14);
+    font-family: inherit;
+    transition: $transition;
+    box-sizing: border-box;
+
+    &::placeholder { color: $text-tertiary; }
+
+    &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    }
+}
+
+.filterSelect {
+    padding: rem(10) rem(36) rem(10) rem(14);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-secondary;
+    font-size: rem(14);
+    font-family: inherit;
+    cursor: pointer;
+    transition: $transition;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8d91' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right rem(12) center;
+
+    &:focus { outline: none; border-color: $primary; }
+}
+
+// ── Animations ────────────────────────────────────────────────────────────────
+
+@keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px) } to { opacity: 1; transform: translateY(0) } }
+@keyframes spin    { to { transform: rotate(360deg) } }

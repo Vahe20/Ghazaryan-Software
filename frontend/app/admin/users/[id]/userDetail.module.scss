@@ -1,0 +1,440 @@
+@use "../../../../src/styles/helpers/" as *;
+
+/* ── Layout ─────────────────────────────────────────── */
+.layout {
+    display: grid;
+    grid-template-columns: rem(280) 1fr;
+    gap: rem(24);
+    align-items: start;
+
+    @include tablet {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Back button + header left ──────────────────────── */
+.headerLeft {
+    display: flex;
+    flex-direction: column;
+    gap: rem(12);
+}
+
+.backBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: rem(6);
+    padding: rem(6) rem(12);
+    background: transparent;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
+    color: $text-tertiary;
+    font-size: rem(13);
+    font-weight: 500;
+    cursor: pointer;
+    transition: $transition;
+    width: fit-content;
+
+    &:hover {
+        border-color: $border-color-medium;
+        color: $text-secondary;
+        background: $background-hover;
+    }
+}
+
+/* ── Header action buttons ──────────────────────────── */
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: rem(10);
+    flex-wrap: wrap;
+    align-self: flex-end;
+}
+
+.btnSecondary {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(10) rem(18);
+    background: $background-tertiary;
+    border: 1px solid $border-color-medium;
+    border-radius: $radius-md;
+    color: $text-primary;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    white-space: nowrap;
+
+    &:hover { background: $background-hover; border-color: $primary; color: $primary; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btnWarn {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(10) rem(18);
+    background: rgba($warning, 0.1);
+    border: 1px solid rgba($warning, 0.25);
+    border-radius: $radius-md;
+    color: $warning;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    white-space: nowrap;
+
+    &:hover { background: rgba($warning, 0.18); border-color: $warning; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btnUnban {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(10) rem(18);
+    background: rgba($success, 0.1);
+    border: 1px solid rgba($success, 0.25);
+    border-radius: $radius-md;
+    color: $success;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    white-space: nowrap;
+
+    &:hover { background: rgba($success, 0.18); border-color: $success; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btnDanger {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(10) rem(18);
+    background: rgba($error, 0.1);
+    border: 1px solid rgba($error, 0.25);
+    border-radius: $radius-md;
+    color: $error;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    white-space: nowrap;
+
+    &:hover { background: rgba($error, 0.18); border-color: $error; }
+}
+
+/* ── Ban banner ─────────────────────────────────────── */
+.banBanner {
+    display: flex;
+    align-items: flex-start;
+    gap: rem(12);
+    padding: rem(14) rem(18);
+    background: rgba($warning, 0.08);
+    border: 1px solid rgba($warning, 0.25);
+    border-radius: $radius-md;
+    color: $warning;
+    margin-bottom: rem(24);
+    animation: fadeIn 0.3s ease;
+}
+
+.banBannerText {
+    font-size: rem(14);
+    line-height: 1.5;
+}
+
+.banMeta {
+    color: rgba($warning, 0.7);
+    font-size: rem(13);
+}
+
+/* ── Profile Card ───────────────────────────────────── */
+.profileCard {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: rem(28) rem(20);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: rem(10);
+}
+
+.avatarWrap {
+    position: relative;
+    margin-bottom: rem(4);
+}
+
+.bannedBadge {
+    position: absolute;
+    bottom: rem(-6);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: rem(2) rem(10);
+    background: $warning;
+    color: #000;
+    font-size: rem(10);
+    font-weight: 800;
+    border-radius: $radius-full;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.profileName {
+    font-size: rem(18);
+    font-weight: 800;
+    color: $text-primary;
+    margin-top: rem(4);
+}
+
+.profileEmail {
+    font-size: rem(13);
+    color: $text-tertiary;
+    word-break: break-all;
+}
+
+.roleBadgeWrap { margin: rem(4) 0 rem(8); }
+
+/* ── Stats inside profile card ──────────────────────── */
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+    border-top: 1px solid $border-color;
+    padding-top: rem(16);
+    margin-top: rem(4);
+    gap: rem(1);
+}
+
+.statItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: rem(4);
+    padding: rem(10) rem(4);
+}
+
+.statIcon  { font-size: rem(16); line-height: 1; }
+.statValue { font-size: rem(20); font-weight: 800; color: $text-primary; line-height: 1; }
+.statLabel { font-size: rem(10); color: $text-tertiary; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+
+/* ── Main panel (tabs + content) ────────────────────── */
+.mainPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* ── Tabs ───────────────────────────────────────────── */
+.tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid $border-color;
+    margin-bottom: 0;
+}
+
+.tabBtn {
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(12) rem(20);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: rem(-2);
+    color: $text-tertiary;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover { color: $text-secondary; }
+}
+
+.tabActive {
+    color: $primary;
+    border-bottom-color: $primary;
+}
+
+.tabBadge {
+    padding: rem(2) rem(7);
+    background: rgba($primary, 0.15);
+    border-radius: $radius-full;
+    font-size: rem(11);
+    font-weight: 700;
+    color: $primary;
+}
+
+/* ── Details / Purchases card ───────────────────────── */
+.detailsCard {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-top: none;
+    border-radius: 0 0 $radius-lg $radius-lg;
+    padding: rem(24) rem(28);
+    overflow: hidden;
+}
+
+.infoList { display: flex; flex-direction: column; }
+
+.infoRow {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: rem(16);
+    padding: rem(14) 0;
+    border-bottom: 1px solid $border-color-light;
+    &:last-child { border-bottom: none; }
+}
+
+.infoLabel {
+    font-size: rem(13);
+    font-weight: 600;
+    color: $text-tertiary;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    flex-shrink: 0;
+}
+
+.infoValue {
+    font-size: rem(14);
+    color: $text-primary;
+    font-weight: 500;
+    text-align: right;
+    word-break: break-all;
+}
+
+.textWarning { color: $warning !important; font-weight: 700 !important; }
+
+/* ── Shared sub-table ──────────────────────────────── */
+.subTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: rem(14);
+
+    th {
+        text-align: left;
+        padding: rem(10) rem(12);
+        font-size: rem(12);
+        font-weight: 700;
+        color: $text-tertiary;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid $border-color;
+    }
+
+    td {
+        padding: rem(12) rem(12);
+        color: $text-primary;
+        border-bottom: 1px solid $border-color-light;
+        vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: $background-hover; }
+}
+
+.appCell {
+    display: flex;
+    align-items: center;
+    gap: rem(10);
+}
+
+.appIcon {
+    width: rem(32);
+    height: rem(32);
+    border-radius: $radius-sm;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+/* ── Status badges ──────────────────────────────────── */
+.statusBadge {
+    display: inline-flex;
+    padding: rem(3) rem(10);
+    border-radius: $radius-full;
+    font-size: rem(11);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.statusCOMPLETED { background: rgba($success, 0.12); color: $success; }
+.statusPENDING   { background: rgba($warning, 0.12); color: $warning; }
+.statusFAILED    { background: rgba($error,   0.12); color: $error; }
+.statusREFUNDED  { background: rgba($info,    0.12); color: $info; }
+
+/* ── Platform badge ─────────────────────────────── */
+.platformTag {
+    display: inline-flex;
+    align-items: center;
+    gap: rem(4);
+    padding: rem(3) rem(8);
+    background: rgba($primary, 0.08);
+    border: 1px solid rgba($primary, 0.15);
+    border-radius: $radius-full;
+    font-size: rem(12);
+    font-weight: 600;
+    color: $text-secondary;
+}
+
+/* ── Reviews list ───────────────────────────────── */
+.reviewsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.reviewCard {
+    padding: rem(16) 0;
+    border-bottom: 1px solid $border-color-light;
+    &:last-child { border-bottom: none; }
+}
+
+.reviewCardHeader {
+    display: flex;
+    align-items: center;
+    gap: rem(12);
+    margin-bottom: rem(8);
+    flex-wrap: wrap;
+}
+
+.reviewAppName {
+    font-weight: 600;
+    color: $text-primary;
+    font-size: rem(14);
+}
+
+.reviewStars {
+    display: flex;
+    gap: rem(2);
+    margin-left: auto;
+}
+
+.starOn  { color: #fbbf24; font-size: rem(16); }
+.starOff { color: $border-color-medium; font-size: rem(16); }
+
+.reviewDate {
+    font-size: rem(12);
+    color: $text-tertiary;
+    white-space: nowrap;
+}
+
+.reviewTitle {
+    font-size: rem(14);
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0 0 rem(4);
+}
+
+.reviewComment {
+    font-size: rem(13);
+    color: $text-secondary;
+    line-height: 1.6;
+    margin: 0;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }

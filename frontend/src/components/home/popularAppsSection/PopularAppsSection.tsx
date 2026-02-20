@@ -3,10 +3,9 @@
 import Link from "next/link";
 import { useRef, useState, useEffect, useCallback, memo } from "react";
 import { useApps } from "@/src/hooks/queries/useApps";
-import { AppCard } from "@/src/components/appCard/AppCard";
+import { AppCard } from "@/src/components/shared/appCard/AppCard";
 import style from "./PopularAppsSection.module.scss";
 
-// Скелетоны — статичный массив, не нужно создавать каждый рендер
 const SKELETON_ITEMS = Array.from({ length: 4 }, (_, i) => i);
 
 export const PopularAppsSection = memo(function PopularAppsSection() {
@@ -56,22 +55,12 @@ export const PopularAppsSection = memo(function PopularAppsSection() {
             <div className={style.header}>
                 <h2 className={style.title}>Popular Apps</h2>
                 <div className={style.controls}>
-                    <button
-                        className={`${style.arrow} ${!canScrollLeft ? style.arrowDisabled : ""}`}
-                        onClick={scrollLeft}
-                        disabled={!canScrollLeft}
-                        aria-label="Scroll left"
-                    >
+                    <button className={`${style.arrow} ${!canScrollLeft ? style.arrowDisabled : ""}`} onClick={scrollLeft} disabled={!canScrollLeft} aria-label="Scroll left">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     </button>
-                    <button
-                        className={`${style.arrow} ${!canScrollRight ? style.arrowDisabled : ""}`}
-                        onClick={scrollRight}
-                        disabled={!canScrollRight}
-                        aria-label="Scroll right"
-                    >
+                    <button className={`${style.arrow} ${!canScrollRight ? style.arrowDisabled : ""}`} onClick={scrollRight} disabled={!canScrollRight} aria-label="Scroll right">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
