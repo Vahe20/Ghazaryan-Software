@@ -1,145 +1,323 @@
 @use "../../../styles/helpers/" as *;
 
 .hero {
-  position: relative;
-  padding: rem(80) rem(24) rem(60);
-  text-align: center;
-  background: linear-gradient(
-    135deg,
-    rgba(0, 132, 255, 0.1) 0%,
-    rgba(255, 0, 110, 0.1) 100%
-  );
-  border-radius: $radius-xl;
-  margin: rem(32) rem(24);
-  overflow: hidden;
-  animation: slideDown 0.5s ease;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background:
-      radial-gradient(
-        circle at 30% 50%,
-        rgba(0, 132, 255, 0.15) 0%,
-        transparent 50%
-      ),
-      radial-gradient(
-        circle at 70% 50%,
-        rgba(255, 0, 110, 0.15) 0%,
-        transparent 50%
-      );
-    pointer-events: none;
-  }
-
-  &__content {
     position: relative;
-    z-index: 1;
-    max-width: 800px;
-    margin: 0 auto;
-  }
+    padding: rem(100) rem(24) rem(80);
+    text-align: center;
+    margin: rem(24) rem(24);
+    border-radius: $radius-xl;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(0,132,255,0.06) 0%, rgba(255,0,110,0.06) 100%);
+    border: 1px solid $border-color;
+    animation: fadeIn 0.5s ease both;
+    transition: border-color $transition, box-shadow $transition;
 
-  &__title {
-    font-size: rem(56);
-    font-weight: 800;
-    color: $text-primary;
-    margin-bottom: rem(20);
-    line-height: 1.2;
-    letter-spacing: -1.5px;
+    &:hover {
+        border-color: $border-color-medium;
+        box-shadow: 0 0 60px rgba($primary, 0.06);
+    }
 
     @media (max-width: 768px) {
-      font-size: rem(36);
+        padding: rem(60) rem(16) rem(48);
+        margin: rem(16);
     }
-  }
+}
 
-  &__titleAccent {
+.orb1, .orb2, .orb3 {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.orb1 {
+    width: rem(600); height: rem(600);
+    background: radial-gradient(circle, rgba(0,132,255,0.2) 0%, transparent 70%);
+    top: -30%; left: -15%;
+    animation: orbFloat 18s ease-in-out infinite;
+}
+
+.orb2 {
+    width: rem(500); height: rem(500);
+    background: radial-gradient(circle, rgba(255,0,110,0.18) 0%, transparent 70%);
+    top: -10%; right: -15%;
+    animation: orbFloat 22s ease-in-out infinite reverse;
+    animation-delay: -8s;
+}
+
+.orb3 {
+    width: rem(400); height: rem(400);
+    background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+    bottom: -20%; left: 30%;
+    animation: orbFloat 16s ease-in-out infinite;
+    animation-delay: -4s;
+}
+
+.gridPattern {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: 0;
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 0%, transparent 100%);
+}
+
+.particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    bottom: 0;
+    border-radius: 50%;
     background: linear-gradient(135deg, $primary 0%, $accent 100%);
+    opacity: 0;
+    animation: particleFloat linear infinite;
+}
+
+.hero__content {
+    position: relative;
+    z-index: 2;
+    max-width: rem(800);
+    margin: 0 auto;
+}
+
+.hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(6) rem(18);
+    background: rgba($primary, 0.1);
+    border: 1px solid rgba($primary, 0.25);
+    border-radius: $radius-full;
+    color: $primary;
+    font-size: rem(12);
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: rem(28);
+    animation: slideDown 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+    transition: background $transition, border-color $transition, box-shadow $transition;
+
+    &:hover {
+        background: rgba($primary, 0.15);
+        border-color: rgba($primary, 0.4);
+        box-shadow: 0 0 20px rgba($primary, 0.15);
+    }
+}
+
+.hero__badgeDot {
+    width: rem(6);
+    height: rem(6);
+    border-radius: 50%;
+    background: $primary;
+    animation: pulse 2s ease-in-out infinite;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px rgba($primary, 0.6);
+}
+
+.hero__title {
+    font-size: rem(64);
+    font-weight: 800;
+    color: $text-primary;
+    margin: 0 0 rem(20);
+    line-height: 1.1;
+    letter-spacing: -2px;
+
+    @media (max-width: 768px) {
+        font-size: rem(40);
+        letter-spacing: -1px;
+    }
+}
+
+.hero__titleLine1 {
+    display: inline-block;
+    animation: slideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+
+.hero__titleLine2 {
+    display: inline-block;
+    animation: slideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.26s both;
+}
+
+.hero__titleAccent {
+    display: inline-block;
+    background: linear-gradient(135deg, $primary 0%, $accent 60%, #a855f7 100%);
+    background-size: 200% 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-  }
+    animation: slideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.19s both, gradientShift 4s ease infinite;
+    filter: drop-shadow(0 0 20px rgba($primary, 0.3));
+}
 
-  &__subtitle {
+.hero__subtitle {
     font-size: rem(20);
     color: $text-secondary;
-    margin-bottom: rem(32);
+    margin: 0 0 rem(36);
     line-height: 1.6;
+    animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
 
-    @media (max-width: 768px) {
-      font-size: rem(16);
-    }
-  }
+    @media (max-width: 768px) { font-size: rem(16); }
+}
 
-  &__actions {
+.hero__userName {
+    color: $primary;
+    font-weight: 700;
+    animation: pulse 3s ease-in-out infinite;
+}
+
+.hero__actions {
     display: flex;
     gap: rem(16);
     justify-content: center;
     flex-wrap: wrap;
-  }
+    margin-bottom: rem(48);
+    animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.38s both;
+}
 
-  &__button {
-    padding: rem(14) rem(32);
+.hero__button {
+    padding: rem(15) rem(32);
     background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
-    color: $text-primary;
+    background-size: 200% auto;
+    color: white;
     border-radius: $radius-md;
-    font-weight: 600;
+    font-weight: 700;
     font-size: rem(16);
     text-decoration: none;
-    box-shadow: $shadow-glow;
-    transition: all $transition;
-    display: inline-block;
+    box-shadow: 0 4px 24px rgba($primary, 0.4);
+    transition: transform $transition, box-shadow $transition, background-position $transition-slow;
+    display: inline-flex;
+    align-items: center;
+    gap: rem(10);
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(255,255,255,0.1);
+        opacity: 0;
+        transition: opacity $transition-fast;
+    }
+
+    svg { position: relative; z-index: 1; transition: transform $transition; }
 
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: $shadow-glow-strong;
-      background: linear-gradient(
-        135deg,
-        $primary-hover 0%,
-        $primary 100%
-      );
-      color: white;
+        transform: translateY(-4px);
+        box-shadow: 0 12px 36px rgba($primary, 0.55);
+        background-position: right center;
+        color: white;
+        &::after { opacity: 1; }
+        svg { transform: scale(1.2); }
     }
 
-    &:active {
-      transform: translateY(0);
-    }
-  }
+    &:active { transform: translateY(-2px); }
+}
 
-  &__buttonSecondary {
-    padding: rem(14) rem(32);
+.hero__buttonSecondary {
+    padding: rem(15) rem(32);
     background: $background-card;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(20px);
     color: $text-primary;
-    border: 1px solid $border-color;
+    border: 1px solid $border-color-medium;
     border-radius: $radius-md;
     font-weight: 600;
     font-size: rem(16);
     text-decoration: none;
-    transition: all $transition;
-    display: inline-block;
+    transition: background $transition, border-color $transition, color $transition, transform $transition, box-shadow $transition;
+    display: inline-flex;
+    align-items: center;
+    gap: rem(10);
+
+    svg { transition: transform $transition; }
 
     &:hover {
-      background: $background-hover;
-      border-color: $border-color-medium;
-      transform: translateY(-2px);
+        background: $background-tertiary;
+        border-color: $primary;
+        color: $primary;
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba($primary, 0.15);
+        svg { transform: translateX(5px); }
     }
 
-    &:active {
-      transform: translateY(0);
-    }
-  }
+    &:active { transform: translateY(-1px); }
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.hero__stats {
+    display: inline-flex;
+    align-items: center;
+    gap: rem(32);
+    padding: rem(20) rem(40);
+    background: $background-card;
+    backdrop-filter: blur(20px);
+    border: 1px solid $border-color;
+    border-radius: $radius-xl;
+    animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.48s both;
+    transition: border-color $transition, box-shadow $transition;
+
+    &:hover {
+        border-color: $border-color-medium;
+        box-shadow: $shadow-md;
+    }
+
+    @media (max-width: 480px) {
+        gap: rem(20);
+        padding: rem(16) rem(24);
+    }
 }
+
+.hero__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: rem(4);
+    animation: scaleInBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+    @for $i from 1 through 3 {
+        &:nth-child(#{$i * 2 - 1}) { animation-delay: #{0.5 + $i * 0.06}s; }
+    }
+}
+
+.hero__statNum {
+    font-size: rem(22);
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(135deg, $text-primary 0%, $primary 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    @media (max-width: 480px) { font-size: rem(18); }
+}
+
+.hero__statLabel {
+    font-size: rem(11);
+    font-weight: 700;
+    color: $text-tertiary;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.hero__statDivider {
+    width: 1px;
+    height: rem(36);
+    background: $border-color-medium;
+}
+
+@keyframes particleFloat {
+    0%   { transform: translateY(0) scale(1);    opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.3; }
+    100% { transform: translateY(-100vh) scale(0); opacity: 0; }
+}
+

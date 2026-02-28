@@ -6,7 +6,7 @@
     }
 
     @else {
-        @error 'Не используйте единицы измерения при работе с функцией rem()! Передавайте аргументом только числа.'
+        @error 'Do not use units when working with rem()! Pass only numbers as argument.'
     }
 }
 

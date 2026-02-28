@@ -1,34 +1,36 @@
 "use client";
 
-import { memo, useCallback } from "react";
+import { memo, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/src/store/AuthStore";
-import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/src/app/hooks";
+import { logout } from "@/src/features/slices/authSlice";
 import style from "./AuthMenu.module.scss";
 import Link from "next/link";
 
 export const AuthMenu = memo(function AuthMenu() {
     const router = useRouter();
-    const { user, loading, logout } = useAuthStore();
+    const dispatch = useAppDispatch();
+    const user = useAppSelector(s => s.auth.user);
+    const isInitialized = useAppSelector(s => s.auth.isInitialized);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     const handleLogout = useCallback(async () => {
         try {
             setIsLoggingOut(true);
-            await logout();
+            await dispatch(logout());
             router.push("/");
         } catch (error) {
             console.error("Logout error:", error);
         } finally {
             setIsLoggingOut(false);
         }
-    }, [logout, router]);
+    }, [dispatch, router]);
 
     const handleSignIn = useCallback(() => {
         router.push("/auth");
     }, [router]);
 
-    if (loading) {
+    if (!isInitialized) {
         return (
             <div className={style.authLoading}>
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className={style.spinner}>
@@ -57,7 +59,7 @@ export const AuthMenu = memo(function AuthMenu() {
                         {user.avatarUrl ? (
                             <img src={user.avatarUrl} alt={user.userName} />
                         ) : (
-                            <span>{user.userName[0].toUpperCase()}</span>
+                            <span>{user.userName?.[0]?.toUpperCase() ?? "?"}</span>
                         )}
                     </div>
                     <div className={style.userDetails}>

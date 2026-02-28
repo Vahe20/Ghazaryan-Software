@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useRef, useState, useEffect, useCallback, memo } from "react";
-import { useApps } from "@/src/hooks/queries/useApps";
 import { AppCard } from "@/src/components/shared/appCard/AppCard";
+import { useGetAppsQuery } from "@/src/features/api/appsApi";
 import style from "./PopularAppsSection.module.scss";
 
 const SKELETON_ITEMS = Array.from({ length: 4 }, (_, i) => i);
 
 export const PopularAppsSection = memo(function PopularAppsSection() {
-    const { data, isLoading } = useApps({ limit: 12, sortBy: "downloadCount" });
+    const { data, isLoading } = useGetAppsQuery({ limit: 12, sortBy: "downloadCount" });
     const popularApps = data?.apps ?? [];
 
     const trackRef = useRef<HTMLDivElement>(null);

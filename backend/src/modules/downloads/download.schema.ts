@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { platformSchema } from "../apps/apps.types";
+import { platformSchema } from "../apps/apps.types.js";
 
 export const createDownloadSchema = z.object({
 	appId: z.string().uuid("Invalid app ID"),
@@ -10,7 +10,7 @@ export const createDownloadSchema = z.object({
 			"Version must be in format X.Y.Z (e.g., 1.0.0)",
 		),
 	platform: platformSchema,
-	// ipAddress: z.string().ip("Invalid IP address").optional(),
+
 	userAgent: z
 		.string()
 		.max(500, "User agent must be at most 500 characters")

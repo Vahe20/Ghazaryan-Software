@@ -17,11 +17,12 @@ model Users {
   balance Decimal @default(0)
 
   avatarUrl String?
+  googleId  String? @unique
 
   blockedTime DateTime?
   attempt     Int       @default(0)
 
-  isBanned  Boolean   @default(false)
+  isBanned    Boolean   @default(false)
   bannedUntil DateTime?
   banReason   String?
 
@@ -29,10 +30,11 @@ model Users {
   updatedAt   DateTime  @updatedAt
   lastLoginAt DateTime?
 
-  reviews      Reviews[]
-  downloads    Downloads[]
-  purchases    Purchases[]
-  authoredApps Apps[]      @relation("AuthoredApps")
+  reviews           Reviews[]
+  downloads         Downloads[]
+  purchases         Purchases[]
+  authoredApps      Apps[]             @relation("AuthoredApps")
+  developerRequests DeveloperRequest[]
 
   @@map("users")
 }
@@ -68,6 +70,8 @@ model Apps {
   rating        Float @default(0)
   reviewCount   Int   @default(0)
 
+  deletedAt DateTime?
+
   status   AppStatus @default(BETA)
   featured Boolean   @default(false)
 
@@ -78,10 +82,12 @@ model Apps {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
 
-  reviews   Reviews[]
-  downloads Downloads[]
-  versions  AppsVersion[]
-  purchases Purchases[]
+  reviews    Reviews[]
+  downloads  Downloads[]
+  versions   AppsVersion[]
+  purchases  Purchases[]
+  editions   AppEdition[]
+  promotions AppPromotion[]
 
   price Decimal @default(0) @db.Decimal(10, 2)
 
@@ -89,6 +95,68 @@ model Apps {
   @@index([categoryId])
   @@index([status])
   @@map("apps")
+}
+
+model AppEdition {
+  id          String  @id @default(uuid())
+  app         Apps    @relation(fields: [appId], references: [id], onDelete: Cascade)
+  appId       String
+  name        String
+  description String? @db.Text
+  price       Decimal @db.Decimal(10, 2)
+  downloadUrl String
+  features    String[]
+  isDefault   Boolean @default(false)
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  purchases  Purchases[]
+  promotions AppPromotion[]
+
+  @@index([appId])
+  @@map("appedition")
+}
+
+model AppPromotion {
+  id String @id @default(uuid())
+
+  app       Apps   @relation(fields: [appId], references: [id], onDelete: Cascade)
+  appId     String
+  edition   AppEdition? @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  editionId String?
+
+  discountAmount  Decimal? @db.Decimal(10, 2)
+  discountPercent Int?
+
+  label     String?
+  startsAt  DateTime
+  endsAt    DateTime
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+
+  @@index([appId])
+  @@index([editionId])
+  @@map("apppromotion")
+}
+
+model DeveloperRequest {
+  id     String @id @default(uuid())
+  user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+
+  reason    String  @db.Text
+  portfolio String?
+  status    DeveloperRequestStatus @default(PENDING)
+
+  reviewedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([status])
+  @@map("developerrequest")
 }
 
 model AppsCategory {
@@ -168,8 +236,11 @@ model Purchases {
   id     String @id @default(uuid())
   user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
-  app    Apps   @relation(fields: [appId], references: [id], onDelete: Cascade)
+  app    Apps   @relation(fields: [appId], references: [id], onDelete: Restrict)
   appId  String
+
+  edition   AppEdition? @relation(fields: [editionId], references: [id])
+  editionId String?
 
   price         Decimal @db.Decimal(10, 2)
   paymentMethod String?
@@ -178,9 +249,9 @@ model Purchases {
   status PurchaseStatus @default(COMPLETED)
 
   purchasedAt DateTime  @default(now())
-  expiresAt   DateTime? // Для подписок или временного доступа
+  expiresAt   DateTime?
 
-  @@unique([userId, appId]) // Один пользователь не может купить одно приложение дважды
+  @@unique([userId, appId])
   @@index([userId])
   @@index([appId])
   @@index([purchasedAt])
@@ -203,6 +274,35 @@ enum UserRole {
 enum AppStatus {
   BETA
   RELEASE
+}
+
+enum DeveloperRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model News {
+  id          String   @id @default(uuid())
+  title       String
+  description String   @db.Text
+  tag         String
+  tagColor    TagColor @default(BLUE)
+  coverUrl    String?
+  link        String?
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([publishedAt])
+  @@map("news")
+}
+
+enum TagColor {
+  BLUE
+  PINK
+  PURPLE
+  GREEN
 }
 
 enum Platform {

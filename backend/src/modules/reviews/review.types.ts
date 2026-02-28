@@ -43,13 +43,13 @@ export interface Review {
 	updatedAt: Date;
 }
 
-export interface CreateReviewData {
+export type CreateReviewData = {
 	rating: number;
 	comment: string;
 	title?: string;
 }
 
-export interface UpdateReviewData {
+export type UpdateReviewData = {
 	rating?: number;
 	comment?: string;
 	title?: string;

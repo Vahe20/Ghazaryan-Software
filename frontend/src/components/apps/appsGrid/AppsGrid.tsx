@@ -10,16 +10,32 @@ interface AppsGridProps {
   error: string | null;
 }
 
+const SKELETON_COUNT = 8;
+
 export function AppsGrid({ apps, loading, error }: AppsGridProps) {
   if (loading) {
     return (
-      <div className={style.loading}>
-        <div className={style.spinner}>
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-            <path d="M24 4C12.954 4 4 12.954 4 24C4 35.046 12.954 44 24 44C35.046 44 44 35.046 44 24" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-          </svg>
-        </div>
-        <p>Loading applications...</p>
+      <div className={style.grid}>
+        {Array.from({ length: SKELETON_COUNT }, (_, i) => (
+          <div key={i} className={style.skeletonCard} style={{ animationDelay: `${i * 0.07}s` }}>
+            <div className={style.skeletonImage} />
+            <div className={style.skeletonContent}>
+              <div className={style.skeletonHeader}>
+                <div className={style.skeletonIcon} />
+                <div className={style.skeletonInfo}>
+                  <div className={`${style.skeletonLine} ${style.skeletonTitle}`} />
+                  <div className={`${style.skeletonLine} ${style.skeletonCategory}`} />
+                </div>
+              </div>
+              <div className={`${style.skeletonLine} ${style.skeletonDesc}`} />
+              <div className={`${style.skeletonLine} ${style.skeletonDescShort}`} />
+              <div className={style.skeletonStats}>
+                <div className={`${style.skeletonLine} ${style.skeletonStat}`} />
+                <div className={`${style.skeletonLine} ${style.skeletonStat}`} />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
@@ -27,12 +43,18 @@ export function AppsGrid({ apps, loading, error }: AppsGridProps) {
   if (error) {
     return (
       <div className={style.error}>
-        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-          <path d="M24 14V24M24 34H24.02M44 24C44 35.0457 35.0457 44 24 44C12.9543 44 4 35.0457 4 24C4 12.9543 12.9543 4 24 4C35.0457 4 44 12.9543 44 24Z" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+        <div className={style.errorIcon}>
+          <svg width="40" height="40" viewBox="0 0 48 48" fill="none">
+            <path d="M24 14V24M24 34H24.02M44 24C44 35.0457 35.0457 44 24 44C12.9543 44 4 35.0457 4 24C4 12.9543 12.9543 4 24 4C35.0457 4 44 12.9543 44 24Z" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
         <h3>Failed to Load Apps</h3>
         <p>{error}</p>
         <button onClick={() => window.location.reload()} className={style.retryButton}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M3 3v5h5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
           Try Again
         </button>
       </div>
@@ -42,9 +64,13 @@ export function AppsGrid({ apps, loading, error }: AppsGridProps) {
   if (apps.length === 0) {
     return (
       <div className={style.empty}>
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <path d="M32 8V24M32 40V56M52 32H36M20 32H4M45.2548 45.2548L34.8284 34.8284M29.1716 29.1716L18.7452 18.7452M45.2548 18.7452L34.8284 29.1716M29.1716 34.8284L18.7452 45.2548" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/>
-        </svg>
+        <div className={style.emptyIcon}>
+          <svg width="48" height="48" viewBox="0 0 64 64" fill="none">
+            <circle cx="28" cy="28" r="18" stroke="currentColor" strokeWidth="3"/>
+            <path d="M42 42L56 56" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+            <path d="M22 28H34M28 22V34" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+          </svg>
+        </div>
         <h3>No Applications Found</h3>
         <p>Try adjusting your search or filters</p>
       </div>
@@ -53,8 +79,10 @@ export function AppsGrid({ apps, loading, error }: AppsGridProps) {
 
   return (
     <div className={style.grid}>
-      {apps.map((app) => (
-        <AppCard app={app} key={app.id} />
+      {apps.map((app, i) => (
+        <div key={app.id} className={style.cardWrapper} style={{ animationDelay: `${i * 0.05}s` }}>
+          <AppCard app={app} />
+        </div>
       ))}
     </div>
   );

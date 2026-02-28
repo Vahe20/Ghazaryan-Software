@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { AdminService } from "@/src/services/admin.service";
+import { useState } from "react";
 import { App } from "@/src/types/Entities";
+import { useGetAppsQuery } from "@/src/features/api/appsApi";
+import { useGetCategoriesQuery } from "@/src/features/api/categoriesApi";
 import { useDebounce } from "@/src/hooks/useDebounce";
 import AppModal from "@/src/components/admin/apps/AppModal/AppModal";
 import DeleteAppModal from "@/src/components/admin/apps/DeleteAppModal/DeleteAppModal";
@@ -11,20 +12,11 @@ import AppsToolbar from "@/src/components/admin/apps/AppsToolbar/AppsToolbar";
 import Pagination from "@/src/components/admin/shared/Pagination/Pagination";
 import s from "../admin.module.scss";
 
-interface Category { id: string; name: string; slug: string; }
-
 export default function AdminAppsPage() {
-    const [apps, setApps] = useState<App[]>([]);
-    const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("");
     const [page, setPage] = useState(1);
-
     const [editingApp, setEditingApp] = useState<App | null>(null);
     const [appModalOpen, setAppModalOpen] = useState(false);
     const [deletingApp, setDeletingApp] = useState<App | null>(null);
@@ -32,47 +24,23 @@ export default function AdminAppsPage() {
 
     const debouncedSearch = useDebounce(search, 400);
 
-    const load = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const data = await AdminService.getApps({
-                page,
-                limit: 15,
-                search: debouncedSearch || undefined,
-                status: statusFilter || undefined,
-                categoryId: categoryFilter || undefined,
-            });
-            setApps(data.apps);
-            setPagination(data.pagination);
-        } catch {
-            setError("Failed to load apps");
-        } finally {
-            setLoading(false);
-        }
-    }, [page, debouncedSearch, statusFilter, categoryFilter]);
+    const { data, isLoading, isError } = useGetAppsQuery({
+        page,
+        limit: 15,
+        search: debouncedSearch || undefined,
+        status: statusFilter || undefined,
+        categoryId: categoryFilter || undefined,
+    });
 
-    useEffect(() => { load(); }, [load]);
-    useEffect(() => { setPage(1); }, [debouncedSearch, statusFilter, categoryFilter]);
-    useEffect(() => { AdminService.getCategories().then(setCategories).catch(() => {}); }, []);
+    const { data: categoriesData } = useGetCategoriesQuery();
+    const categories = categoriesData ?? [];
+
+    const apps = data?.apps ?? [];
+    const pagination = data?.pagination ?? { page: 1, totalPages: 1, total: 0 };
 
     const openCreate = () => { setEditingApp(null); setAppModalOpen(true); };
     const openEdit = (app: App) => { setEditingApp(app); setAppModalOpen(true); };
     const openDelete = (app: App) => { setDeletingApp(app); setDeleteModalOpen(true); };
-
-    const handleSaved = (saved: App) => {
-        setApps(prev => {
-            const idx = prev.findIndex(a => a.id === saved.id);
-            return idx >= 0 ? prev.map(a => a.id === saved.id ? saved : a) : [saved, ...prev];
-        });
-        setAppModalOpen(false);
-    };
-
-    const handleDeleted = (id: string) => {
-        setApps(prev => prev.filter(a => a.id !== id));
-        setDeleteModalOpen(false);
-        setPagination(p => ({ ...p, total: p.total - 1 }));
-    };
 
     return (
         <div className={s.page}>
@@ -94,22 +62,22 @@ export default function AdminAppsPage() {
                 statusFilter={statusFilter}
                 categoryFilter={categoryFilter}
                 categories={categories}
-                onSearchChange={setSearch}
-                onStatusChange={setStatusFilter}
-                onCategoryChange={setCategoryFilter}
+                onSearchChange={(v) => { setSearch(v); setPage(1); }}
+                onStatusChange={(v) => { setStatusFilter(v); setPage(1); }}
+                onCategoryChange={(v) => { setCategoryFilter(v); setPage(1); }}
             />
 
             <div className={s.tableCard}>
-                {loading ? (
+                {isLoading ? (
                     <div className={s.loading}><div className={s.spinner} /><p>Loading apps...</p></div>
-                ) : error ? (
-                    <div className={s.errorState}><p>{error}</p></div>
+                ) : isError ? (
+                    <div className={s.errorState}><p>Failed to load apps</p></div>
                 ) : apps.length === 0 ? (
                     <div className={s.empty}><p>No apps found</p></div>
                 ) : (
                     <AppsTable apps={apps} onEdit={openEdit} onDelete={openDelete} />
                 )}
-                {!loading && (
+                {!isLoading && (
                     <Pagination page={page} totalPages={pagination.totalPages} total={pagination.total} onPageChange={setPage} />
                 )}
             </div>
@@ -119,13 +87,13 @@ export default function AdminAppsPage() {
                 app={editingApp}
                 categories={categories}
                 onClose={() => setAppModalOpen(false)}
-                onSaved={handleSaved}
+                onSaved={() => setAppModalOpen(false)}
             />
             <DeleteAppModal
                 isOpen={deleteModalOpen}
                 app={deletingApp}
                 onClose={() => setDeleteModalOpen(false)}
-                onDeleted={handleDeleted}
+                onDeleted={() => setDeleteModalOpen(false)}
             />
         </div>
     );

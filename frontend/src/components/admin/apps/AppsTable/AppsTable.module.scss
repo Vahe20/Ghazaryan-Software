@@ -1,6 +1,5 @@
 @use "../../../../styles/helpers/" as *;
 
-// AppsTable — только специфичные стили, общие в _table.module.scss
 
 .appCell {
     display: flex;
@@ -25,3 +24,4 @@
     display: flex;
     gap: rem(6);
 }
+

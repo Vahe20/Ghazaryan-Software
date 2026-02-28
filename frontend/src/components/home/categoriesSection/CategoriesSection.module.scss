@@ -4,7 +4,6 @@
     padding: rem(16) rem(24) rem(64);
 }
 
-// ── Header ─────────────────────────────────────────────────────────────────
 .header {
     display: flex;
     align-items: flex-end;
@@ -39,7 +38,6 @@
     &:hover { color: $primary-hover; }
 }
 
-// ── Grid ────────────────────────────────────────────────────────────────────
 .grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -50,7 +48,6 @@
     @media (max-width: 360px)  { grid-template-columns: 1fr; }
 }
 
-// ── Card ────────────────────────────────────────────────────────────────────
 .card {
     position: relative;
     display: flex;
@@ -100,7 +97,7 @@
     opacity: 0;
     transition: $transition;
     pointer-events: none;
-    // Fallback with CSS vars since SCSS can't interpolate custom props in rgba
+
     background: linear-gradient(135deg, color-mix(in srgb, var(--from) 8%, transparent), color-mix(in srgb, var(--to) 8%, transparent));
 }
 
@@ -135,7 +132,6 @@
     flex-shrink: 0;
 }
 
-// ── Skeleton ────────────────────────────────────────────────────────────────
 .skeleton {
     height: rem(88);
     border-radius: $radius-lg;
@@ -160,3 +156,4 @@
     color: $text-secondary;
     font-size: rem(15);
 }
+

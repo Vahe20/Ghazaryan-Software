@@ -1,65 +1,88 @@
 @use "../../../styles/helpers" as *;
 
 .header {
-  background: $background-card;
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid $border-color;
-  padding-block: rem(16);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  box-shadow: $shadow-md;
+    background: rgba($background-card, 0.85);
+    backdrop-filter: blur(24px) saturate(1.5);
+    -webkit-backdrop-filter: blur(24px) saturate(1.5);
+    border-bottom: 1px solid $border-color;
+    padding-block: rem(14);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: $shadow-md;
+    animation: headerSlideDown 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 10%;
+        right: 10%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba($primary, 0.35), transparent);
+        pointer-events: none;
+    }
 }
 
 .navbar {
-  padding-inline: rem(24);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: rem(32);
-  max-width: 1400px;
-  margin: 0 auto;
+    padding-inline: rem(24);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: rem(32);
+    max-width: 1400px;
+    margin: 0 auto;
 
-  @media (max-width: 768px) {
-    gap: rem(16);
-    padding-inline: rem(16);
-  }
+    @media (max-width: 768px) {
+        gap: rem(16);
+        padding-inline: rem(16);
+    }
 }
 
 .navbar__logo {
-  cursor: pointer;
-  transition: transform $transition;
-  flex-shrink: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    animation: slideInLeft 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
 
-  &:hover {
-    transform: scale(1.02);
-  }
+    h1 {
+        font-size: rem(22);
+        font-weight: 800;
+        background: linear-gradient(
+            120deg,
+            $primary 0%,
+            $accent 40%,
+            $primary 60%,
+            $accent 100%
+        );
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.5px;
+        margin: 0;
+        transition: filter $transition;
+        animation: logoShimmer 4s linear infinite;
 
-  h1 {
-    font-size: rem(24);
-    font-weight: 700;
-    background: linear-gradient(135deg, $primary 0%, $accent 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-decoration: none;
-    transition: all $transition;
-    letter-spacing: -0.5px;
-    margin: 0;
+        &:hover {
+            filter: brightness(1.2);
+        }
 
-    &:hover {
-      filter: brightness(1.2);
+        @media (max-width: 768px) {
+            font-size: rem(18);
+        }
     }
 
-    @media (max-width: 768px) {
-      font-size: rem(20);
+    &:hover h1 {
+        animation-play-state: paused;
+        filter: brightness(1.25);
     }
-  }
 }
 
 .navbar__auth {
-  display: flex;
-  align-items: center;
-  gap: rem(12);
-  flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: rem(12);
+    flex-shrink: 0;
+    animation: slideInRight 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
 }
+

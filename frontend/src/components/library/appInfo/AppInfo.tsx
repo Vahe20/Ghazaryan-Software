@@ -1,23 +1,61 @@
-"use client"
+"use client";
 
-import { useLibraryStore } from "@/src/store/LibraryStore";
-import { useApp } from "@/src/hooks/queries/useApps";
 import Link from "next/link";
+import { useState, useEffect, useCallback } from "react";
+import { useAppSelector } from "@/src/app/hooks";
+import { useGetAppByIdQuery, useRecordDownloadMutation } from "@/src/features/api/appsApi";
+import { formatSize } from "@/src/lib/utils";
+import BaseModal from "../../shared/BaseModal/BaseModal";
 import style from "./AppInfo.module.scss";
 
 export const AppInfo = () => {
-    const { selectedAppId } = useLibraryStore();
-    const { data: app, isLoading } = useApp(selectedAppId || "");
+    const selectedAppId = useAppSelector(s => s.library.selectedAppId);
+    const { data: app, isLoading } = useGetAppByIdQuery(selectedAppId || "");
+    const [recordDownload] = useRecordDownloadMutation();
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [currentSlide, setCurrentSlide] = useState(0);
+
+    const goToNext = useCallback(() => {
+        if (app?.screenshots) setCurrentSlide(p => (p + 1) % app.screenshots.length);
+    }, [app]);
+
+    const goToPrev = useCallback(() => {
+        if (app?.screenshots) setCurrentSlide(p => (p - 1 + app.screenshots.length) % app.screenshots.length);
+    }, [app]);
+
+    const openModal = useCallback((index: number) => {
+        setCurrentSlide(index);
+        setModalIsOpen(true);
+    }, []);
+
+    const closeModal = useCallback(() => setModalIsOpen(false), []);
+
+    useEffect(() => {
+        if (!modalIsOpen) return;
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "ArrowLeft") goToPrev();
+            else if (e.key === "ArrowRight") goToNext();
+            else if (e.key === "Escape") closeModal();
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [modalIsOpen, goToNext, goToPrev, closeModal]);
 
     if (!selectedAppId) {
         return (
             <div className={style.placeholder}>
-                <svg className={style.placeholder__icon} viewBox="0 0 24 24" fill="none">
-                    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                <h3 className={style.placeholder__title}>Select an app</h3>
-                <p className={style.placeholder__text}>Choose an app from your library to view details</p>
+                <div className={style.placeholder__canvas}>
+                    <div className={style.placeholder__ring} aria-hidden />
+                    <div className={style.placeholder__ring2} aria-hidden />
+                    <svg viewBox="0 0 80 80" fill="none" className={style.placeholder__svg}>
+                        <rect x="8" y="8" width="28" height="28" rx="6" stroke="currentColor" strokeWidth="2"/>
+                        <rect x="44" y="8" width="28" height="28" rx="6" stroke="currentColor" strokeWidth="2"/>
+                        <rect x="8" y="44" width="28" height="28" rx="6" stroke="currentColor" strokeWidth="2"/>
+                        <rect x="44" y="44" width="28" height="28" rx="6" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
+                </div>
+                <h2 className={style.placeholder__title}>Select an app</h2>
+                <p className={style.placeholder__sub}>Click on an app from your library to view its details</p>
             </div>
         );
     }
@@ -25,130 +63,204 @@ export const AppInfo = () => {
     if (isLoading) {
         return (
             <div className={style.loading}>
-                <div className={style.spinner}></div>
-                <p>Loading app details...</p>
+                <div className={style.loading__spinner} />
             </div>
         );
     }
 
     if (!app) {
         return (
-            <div className={style.error}>
-                <p>App not found</p>
+            <div className={style.placeholder}>
+                <p style={{ color: "var(--error, #f02849)" }}>App not found</p>
             </div>
         );
     }
 
     return (
-        <div className={style.appInfo}>
-            <div className={style.appInfo__header}>
-                <img
-                    src={app.iconUrl}
-                    alt={app.name}
-                    className={style.appInfo__icon}
-                />
-                <div className={style.appInfo__headerContent}>
-                    <h2 className={style.appInfo__name}>{app.name}</h2>
-                    <p className={style.appInfo__version}>Version {app.version}</p>
-                    <div className={style.appInfo__meta}>
-                        <span className={style.appInfo__metaItem}>
-                            {app.size ? `${(app.size / 1024 / 1024).toFixed(2)} MB` : "Size unknown"}
-                        </span>
-                        <span className={style.appInfo__metaDivider}>•</span>
-                        <span className={style.appInfo__metaItem}>{app.platform || "Cross-platform"}</span>
+        <div className={style.view} key={app.id}>
+            <div className={style.hero}>
+                <div className={style.hero__bg} style={{ backgroundImage: `url(${app.iconUrl})` }} aria-hidden />
+                <div className={style.hero__veil} aria-hidden />
+
+                <div className={style.hero__content}>
+                    <div className={style.hero__icon}>
+                        <img src={app.iconUrl} alt={app.name} className={style.hero__img} />
+                    </div>
+
+                    <div className={style.hero__info}>
+                        <div className={style.hero__nameLine}>
+                            <h1 className={style.hero__name}>{app.name}</h1>
+                            <span className={style.hero__ver}>v{app.version}</span>
+                        </div>
+
+                        {app.shortDesc && (
+                            <p className={style.hero__desc}>{app.shortDesc}</p>
+                        )}
+
+                        <div className={style.hero__chips}>
+                            {app.category?.name && (
+                                <span className={style.chip}>{app.category.name}</span>
+                            )}
+                            {app.platform?.map(p => (
+                                <span key={p} className={style.chip}>{p}</span>
+                            ))}
+                            {app.size && (
+                                <span className={style.chip}>{formatSize(app.size)}</span>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {app.coverUrl && (
-                <div className={style.appInfo__cover}>
-                    <img src={app.coverUrl} alt={app.name} />
-                </div>
-            )}
-
-            <div className={style.appInfo__section}>
-                <h3 className={style.appInfo__sectionTitle}>Description</h3>
-                <p className={style.appInfo__description}>{app.description || app.shortDesc}</p>
-            </div>
-
-            {app.screenshots && app.screenshots.length > 0 && (
-                <div className={style.appInfo__section}>
-                    <h3 className={style.appInfo__sectionTitle}>Screenshots</h3>
-                    <div className={style.screenshots}>
-                        {app.screenshots.map((screenshot, index) => (
-                            <img
-                                key={index}
-                                src={screenshot}
-                                alt={`${app.name} screenshot ${index + 1}`}
-                                className={style.screenshots__image}
-                            />
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {app.changelog && (
-                <div className={style.appInfo__section}>
-                    <h3 className={style.appInfo__sectionTitle}>Whats New</h3>
-                    <div className={style.changelog}>
-                        <p>{app.changelog}</p>
-                    </div>
-                </div>
-            )}
-
-            <div className={style.appInfo__actions}>
+            <div className={style.actions}>
                 {app.downloadUrl && (
                     <a
                         href={app.downloadUrl}
-                        className={style.appInfo__button}
                         download
+                        className={`${style.btn} ${style.btn_primary}`}
+                        onClick={() => recordDownload({ id: app.id, version: app.version })}
                     >
                         <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M12 3V16M12 16L16 11.625M12 16L8 11.625M21 16V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V16"
-                                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M12 3v13M12 16l-4-4.5M12 16l4-4.5M20 17v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"
+                                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                         Download
                     </a>
                 )}
                 {app.sourceUrl && (
-                    <a
-                        href={app.sourceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={style.appInfo__buttonSecondary}
-                    >
+                    <a href={app.sourceUrl} target="_blank" rel="noopener noreferrer" className={style.btn}>
                         <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M10 6H6C4.89543 6 4 6.89543 4 8V18C4 19.1046 4.89543 20 6 20H16C17.1046 20 18 19.1046 18 18V14M14 4H20M20 4V10M20 4L10 14"
-                                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                         Source Code
                     </a>
                 )}
                 {app.documentationUrl && (
-                    <a
-                        href={app.documentationUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={style.appInfo__buttonSecondary}
-                    >
+                    <a href={app.documentationUrl} target="_blank" rel="noopener noreferrer" className={style.btn}>
                         <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M9 12H15M9 16H15M17 21H7C5.89543 21 5 20.1046 5 19V5C5 3.89543 5.89543 3 7 3H12.5858C12.851 3 13.1054 3.10536 13.2929 3.29289L18.7071 8.70711C18.8946 8.89464 19 9.149 19 9.41421V19C19 20.1046 18.1046 21 17 21Z"
-                                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M9 12h6M9 16h6M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414A1 1 0 0 1 19 9.414V19a2 2 0 0 1-2 2z"
+                                stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
                         </svg>
-                        Documentation
+                        Docs
                     </a>
                 )}
-                <Link
-                    href={`/apps/${app.slug}`}
-                    className={style.appInfo__buttonSecondary}
-                >
+                <Link href={`/apps/${app.slug}`} className={style.btn}>
                     <svg viewBox="0 0 24 24" fill="none">
-                        <path d="M13 16H12V12H11M12 8H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8"/>
+                        <path d="M12 8v4l3 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
                     </svg>
                     View in Store
                 </Link>
             </div>
+
+            {app.description && (
+                <section className={style.block}>
+                    <h2 className={style.block__title}>
+                        <svg viewBox="0 0 20 20" fill="none">
+                            <circle cx="10" cy="10" r="8.5" stroke="currentColor" strokeWidth="1.5"/>
+                            <path d="M10 9v5M10 7v1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                        </svg>
+                        About
+                    </h2>
+                    <p className={style.block__text}>{app.description}</p>
+                </section>
+            )}
+
+            {app.screenshots && app.screenshots.length > 0 && (
+                <section className={style.block}>
+                    <h2 className={style.block__title}>
+                        <svg viewBox="0 0 20 20" fill="none">
+                            <rect x="2" y="3.5" width="16" height="13" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+                            <circle cx="7" cy="9" r="2" stroke="currentColor" strokeWidth="1.5"/>
+                            <path d="M2 14l4-3 3 2.5 3-3.5 4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        Screenshots
+                        <span className={style.block__badge}>{app.screenshots.length}</span>
+                    </h2>
+                    <div className={style.shots}>
+                        {app.screenshots.map((src, i) => (
+                            <button key={i} className={style.shot} onClick={() => openModal(i)} type="button">
+                                <img src={src} alt={`${app.name} screenshot ${i + 1}`} className={style.shot__img} />
+                                <div className={style.shot__overlay} aria-hidden>
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"
+                                            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {app.changelog && (
+                <section className={style.block}>
+                    <h2 className={style.block__title}>
+                        <svg viewBox="0 0 20 20" fill="none">
+                            <path d="M4 10h12M4 6h8M4 14h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                        </svg>
+                        What's New
+                    </h2>
+                    <div className={style.changelog}>{app.changelog}</div>
+                </section>
+            )}
+
+            {modalIsOpen && app?.screenshots && (
+                <BaseModal isOpen={modalIsOpen} onClose={closeModal} title={app.name} maxWidth={1200}>
+                    <div className={style.lb}>
+                        <p className={style.lb__counter}>{currentSlide + 1} / {app.screenshots.length}</p>
+
+                        <div className={style.lb__stage}>
+                            <button className={style.lb__arrow} onClick={goToPrev} aria-label="Previous">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </button>
+
+                            <div className={style.lb__frame}>
+                                <img
+                                    key={currentSlide}
+                                    src={app.screenshots[currentSlide]}
+                                    alt={`Screenshot ${currentSlide + 1}`}
+                                    className={style.lb__img}
+                                />
+                            </div>
+
+                            <button className={style.lb__arrow} onClick={goToNext} aria-label="Next">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div className={style.lb__dots}>
+                            {app.screenshots.map((_, i) => (
+                                <button
+                                    key={i}
+                                    className={`${style.lb__dot} ${i === currentSlide ? style.lb__dot_on : ""}`}
+                                    onClick={() => setCurrentSlide(i)}
+                                    aria-label={`Go to screenshot ${i + 1}`}
+                                    type="button"
+                                />
+                            ))}
+                        </div>
+
+                        <div className={style.lb__strip}>
+                            {app.screenshots.map((src, i) => (
+                                <button
+                                    key={i}
+                                    className={`${style.lb__thumb} ${i === currentSlide ? style.lb__thumb_on : ""}`}
+                                    onClick={() => setCurrentSlide(i)}
+                                    type="button"
+                                >
+                                    <img src={src} alt={`Thumbnail ${i + 1}`} />
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </BaseModal>
+            )}
         </div>
     );
 };

@@ -1,8 +1,8 @@
 import { Router } from "express";
-import authMiddleware from "../../middlewares/auth.middleware";
-import { validate } from "../../middlewares/validation.middleware";
-import { createDownloadSchema } from "./download.schema";
-import * as downloadController from "./download.controller";
+import authMiddleware from "../../middlewares/auth.middleware.js";
+import { validate } from "../../middlewares/validation.middleware.js";
+import { createDownloadSchema } from "./download.schema.js";
+import * as downloadController from "./download.controller.js";
 
 const router = Router();
 

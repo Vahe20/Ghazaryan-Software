@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminUser } from "@/src/services/admin.service";
+import { AdminUser } from "@/src/types/Admin";
 import RoleBadge from "../RoleBadge/RoleBadge";
 import UserAvatar from "../UserAvatar/UserAvatar";
 import { formatDate } from "@/src/lib/utils";
@@ -58,7 +58,7 @@ export default function UsersTable({ users, onEditRole, onDelete }: UsersTablePr
                             </Link>
                         </td>
                         <td className={table.tableTd}><RoleBadge role={user.role} /></td>
-                        <td className={table.tableTd}>{Number(user.balance).toLocaleString()} AMD</td>
+                        <td className={table.tableTd}>{Number(user.balance).toLocaleString()} USD</td>
                         <td className={table.tableTd}>{user._count.purchases}</td>
                         <td className={table.tableTd}>{user._count.downloads}</td>
                         <td className={table.tableTd}>{user._count.reviews}</td>

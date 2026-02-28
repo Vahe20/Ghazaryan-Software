@@ -1,112 +1,144 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useUserLibrary } from "@/src/hooks/queries/useApps";
-import { useLibraryStore } from "@/src/store/LibraryStore";
+import { useAppDispatch, useAppSelector } from "@/src/app/hooks";
+import { setSelectedApp } from "@/src/features/slices/librarySlice";
 import { useDebounce } from "@/src/hooks/useDebounce";
 import style from "./AppsList.module.scss";
+import { useGetUserLibraryQuery } from "@/src/features/api/appsApi";
 
-type filterType = "name" | "date" | "size";
+type FilterType = "date" | "name" | "size";
+
+const SORT_TABS: { label: string; value: FilterType }[] = [
+    { label: "Recent", value: "date" },
+    { label: "A–Z", value: "name" },
+    { label: "Size", value: "size" },
+];
 
 export const AppsList = () => {
     const [searchQuery, setSearchQuery] = useState("");
-    const [sortBy, setSortBy] = useState<filterType>("name");
-    const { data, isLoading } = useUserLibrary();
-    const { selectedAppId, setSelectedApp } = useLibraryStore();
+    const [sortBy, setSortBy] = useState<FilterType>("date");
+    const { data, isLoading } = useGetUserLibraryQuery();
+    const dispatch = useAppDispatch();
+    const selectedAppId = useAppSelector(s => s.library.selectedAppId);
     const debouncedSearchQuery = useDebounce(searchQuery);
 
-    const filteredAndSortedApps = useMemo(() => {
+    const apps = useMemo(() => {
         if (!data?.apps) return [];
-
         const filtered = data.apps.filter(app =>
             app.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
         );
-
         switch (sortBy) {
-            case "name":
-                return filtered.slice().sort((a, b) => a.name.localeCompare(b.name));
-            case "date":
-                return filtered.slice().sort((a, b) =>
-                    new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
-                );
-            case "size":
-                return filtered.slice().sort((a, b) => (b.size || 0) - (a.size || 0));
-            default:
-                return filtered;
+            case "name": return filtered.slice().sort((a, b) => a.name.localeCompare(b.name));
+            case "date": return filtered.slice().sort((a, b) =>
+                new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+            case "size": return filtered.slice().sort((a, b) => (b.size || 0) - (a.size || 0));
+            default: return filtered;
         }
     }, [data, debouncedSearchQuery, sortBy]);
 
-    if (isLoading) {
-        return (
-            <div className={style.loading}>
-                <div className={style.spinner}></div>
-                <p>Loading your library...</p>
-            </div>
-        );
-    }
-
     return (
-        <div className={style.appsList}>
-            <div className={style.appsList__header}>
-                <h2 className={style.appsList__title}>My Library</h2>
-                <div className={style.appsList__stats}>
-                    {filteredAndSortedApps.length} {filteredAndSortedApps.length === 1 ? "app" : "apps"}
+        <div className={style.rail}>
+            <div className={style.head}>
+                <div className={style.head__top}>
+                    <div className={style.head__title}>
+                        <svg viewBox="0 0 24 24" fill="none" className={style.head__icon}>
+                            <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.8"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.8"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.8"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.8"/>
+                        </svg>
+                        <span>Library</span>
+                    </div>
+                    {!isLoading && (
+                        <span className={style.head__count}>{apps.length}</span>
+                    )}
                 </div>
-            </div>
 
-            <div className={style.appsList__controls}>
-                <div className={style.searchBox}>
-                    <svg className={style.searchBox__icon} viewBox="0 0 24 24" fill="none">
-                        <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <div className={style.search}>
+                    <svg viewBox="0 0 24 24" fill="none" className={style.search__ico}>
+                        <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8"/>
+                        <path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
                     </svg>
                     <input
                         type="text"
-                        placeholder="Search your library..."
+                        placeholder="Search apps..."
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
-                        className={style.searchBox__input}
+                        className={style.search__input}
                     />
+                    {searchQuery && (
+                        <button className={style.search__clear} onClick={() => setSearchQuery("")} aria-label="Clear">
+                            <svg viewBox="0 0 14 14" fill="none">
+                                <path d="M2 2L12 12M12 2L2 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                            </svg>
+                        </button>
+                    )}
                 </div>
-                <select value={sortBy} onChange={e => setSortBy(e.target.value as filterType)} className={style.sortSelect}>
-                    <option value="name">Name</option>
-                    <option value="date">Recently Added</option>
-                    <option value="size">Size</option>
-                </select>
-            </div>
 
-            {filteredAndSortedApps.length === 0 ? (
-                <div className={style.empty}>
-                    <svg className={style.empty__icon} viewBox="0 0 24 24" fill="none">
-                        <path d="M19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21Z" stroke="currentColor" strokeWidth="2" />
-                        <path d="M9 9L15 15M15 9L9 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                    <h3 className={style.empty__title}>
-                        {searchQuery ? "No apps found" : "Your library is empty"}
-                    </h3>
-                    <p className={style.empty__text}>
-                        {searchQuery ? "Try adjusting your search" : "Download some apps to get started"}
-                    </p>
-                </div>
-            ) : (
-                <div className={style.appsList__grid}>
-                    {filteredAndSortedApps.map(app => (
-                        <div
-                            key={app.id}
-                            className={`${style.appItem} ${selectedAppId === app.id ? style.appItem_active : ""}`}
-                            onClick={() => setSelectedApp(app.id)}
+                <div className={style.tabs}>
+                    {SORT_TABS.map(tab => (
+                        <button
+                            key={tab.value}
+                            className={`${style.tab} ${sortBy === tab.value ? style.tab_active : ""}`}
+                            onClick={() => setSortBy(tab.value)}
                         >
-                            <img src={app.iconUrl} alt={app.name} className={style.appItem__icon} />
-                            <div className={style.appItem__content}>
-                                <h3 className={style.appItem__name}>{app.name}</h3>
-                                <p className={style.appItem__version}>v{app.version}</p>
-                            </div>
-                            <div className={style.appItem__size}>
-                                {app.size ? `${(app.size / 1024 / 1024).toFixed(1)} MB` : "N/A"}
-                            </div>
-                        </div>
+                            {tab.label}
+                        </button>
                     ))}
                 </div>
-            )}
+            </div>
+
+            <div className={style.list}>
+                {isLoading ? (
+                    <div className={style.skeletons}>
+                        {Array.from({ length: 6 }).map((_, i) => (
+                            <div key={i} className={style.skeleton} style={{ opacity: 1 - i * 0.12 }} />
+                        ))}
+                    </div>
+                ) : apps.length === 0 ? (
+                    <div className={style.empty}>
+                        <svg viewBox="0 0 48 48" fill="none" className={style.empty__svg}>
+                            <circle cx="24" cy="24" r="22" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 3"/>
+                            <path d="M16 24h16M24 16v16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        </svg>
+                        <p className={style.empty__label}>
+                            {searchQuery ? "No results found" : "Your library is empty"}
+                        </p>
+                        <p className={style.empty__hint}>
+                            {searchQuery ? "Try a different search term" : "Download apps from the catalog to get started"}
+                        </p>
+                    </div>
+                ) : (
+                    apps.map((app, i) => {
+                        const isActive = selectedAppId === app.id;
+                        return (
+                            <button
+                                key={app.id}
+                                className={`${style.card} ${isActive ? style.card_active : ""}`}
+                                onClick={() => dispatch(setSelectedApp(app.id))}
+                                style={{ animationDelay: `${i * 25}ms` }}
+                            >
+                                <div className={style.card__thumb}>
+                                    <img src={app.iconUrl} alt={app.name} className={style.card__img} />
+                                </div>
+                                <div className={style.card__body}>
+                                    <span className={style.card__name}>{app.name}</span>
+                                    <div className={style.card__row}>
+                                        <span className={style.card__ver}>v{app.version}</span>
+                                        {app.size && (
+                                            <span className={style.card__size}>
+                                                {(app.size / 1024 / 1024).toFixed(1)} MB
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                {isActive && <div className={style.card__dot} aria-hidden />}
+                            </button>
+                        );
+                    })
+                )}
+            </div>
         </div>
     );
 };

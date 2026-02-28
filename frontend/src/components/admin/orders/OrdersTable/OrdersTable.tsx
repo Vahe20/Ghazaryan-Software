@@ -1,4 +1,4 @@
-import { Purchase } from "@/src/services/admin.service";
+import { Purchase } from "@/src/types/Admin";
 import StatusBadge from "../StatusBadge/StatusBadge";
 import { formatDate } from "@/src/lib/utils";
 import s from "./OrdersTable.module.scss";
@@ -48,7 +48,7 @@ export default function OrdersTable({ purchases, onView }: OrdersTableProps) {
                             </div>
                         </td>
                         <td className={table.tableTd}>
-                            <span className={s.amount}>{Number(p.price).toLocaleString()} AMD</span>
+                            <span className={s.amount}>{Number(p.price).toLocaleString()} USD</span>
                         </td>
                         <td className={table.tableTd}><StatusBadge status={p.status} /></td>
                         <td className={table.tableTd}>{p.paymentMethod ?? "—"}</td>

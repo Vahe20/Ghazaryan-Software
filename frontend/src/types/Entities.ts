@@ -1,9 +1,15 @@
-import { UUID } from "crypto";
 import { Role } from "./Role";
 
 
+export type Platform = "Windows" | "macOS" | "Linux" | "Cross-platform";
+export type PlatformType = "WINDOWS" | "MAC" | "LINUX" | "ANDROID" | "IOS";
+export type SortType = "name" | "downloadCount" | "createdAt" | "rating";
+export type StatusType = "BETA" | "RELEASE";
+export type TagColor = "BLUE" | "PINK" | "PURPLE" | "GREEN";
+
+
 export interface User {
-    id: UUID;
+    id: string;
     email: string;
     userName: string;
     role: Role;
@@ -31,11 +37,14 @@ export interface App {
     categoryId: string;
     tags: string[];
     size: number;
-    platform: string;
+    status: StatusType;
+    platform: Platform[];
     downloadUrl: string;
     sourceUrl: string;
     documentationUrl: string;
     rating: number;
+    viewCount: number;
+    reviews: Review[];
     reviewCount: number;
     downloadCount: number;
     price: number;
@@ -52,9 +61,11 @@ export interface Category {
 }
 
 export interface Review {
-    id: UUID;
-    userId: UUID;
+    id: string;
+    user: User;
+    userId: string;
     appId: string;
+    title: string;
     rating: number;
     comment: string;
     createdAt: Date;
@@ -62,18 +73,33 @@ export interface Review {
 }
 
 export interface Download {
-    id: UUID;
-    userId: UUID;
+    id: string;
+    userId: string;
     appId: string;
     version: string;
-    platform: string;
+    platform: Platform;
     downloadedAt: Date;
 }
 
+export interface NewsItem {
+    id: string;
+    title: string;
+    description: string;
+    tag: string;
+    tagColor: TagColor;
+    coverUrl?: string | null;
+    link?: string | null;
+    publishedAt: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export interface Purchase {
-    id: UUID;
+    id: string;
     user: User;
+    userId: string;
     app: App;
+    appId: string;
     price: number;
     status: "pending" | "completed" | "failed";
     paymentMethod: string;

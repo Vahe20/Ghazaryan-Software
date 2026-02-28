@@ -1,14 +1,18 @@
-import multer, { FileFilterCallback } from "multer";
+import multer, { type FileFilterCallback } from "multer";
 import path from "path";
+import { fileURLToPath } from "url";
 import crypto from "crypto";
 import fs from "fs";
-import { Request } from "express";
+import type { Request } from "express";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const ALLOWED_UPLOAD_TYPES = [
 	"avatar",
 	"mods",
 	"screenshots",
 	"archives",
+	"news",
 ] as const;
 
 type UploadType = (typeof ALLOWED_UPLOAD_TYPES)[number];
@@ -26,14 +30,14 @@ const storage = multer.diskStorage({
 		const type = req.params.type;
 
 		if (Array.isArray(type)) {
-			return;
+			return cb(new Error("Invalid upload type"), "");
 		}
 
 		if (!type || !isValidUploadType(type)) {
 			return cb(new Error("Invalid upload type"), "");
 		}
 
-		const uploadDir = path.resolve("uploads", type);
+		const uploadDir = path.resolve(__dirname, "..", "..", "uploads", type);
 
 		if (!fs.existsSync(uploadDir)) {
 			fs.mkdirSync(uploadDir, { recursive: true });
@@ -57,8 +61,10 @@ const storage = multer.diskStorage({
 const ALLOWED_MIME_TYPES_BY_TYPE: Record<UploadType, string[]> = {
 	avatar: ["image/png", "image/jpeg", "image/webp"],
 	screenshots: ["image/png", "image/jpeg", "image/webp"],
-	mods: ["application/zip"],
-	archives: ["application/zip"],
+	news: ["image/png", "image/jpeg", "image/webp"],
+
+	mods: ["application/zip", "application/x-zip-compressed", "application/x-zip", "application/octet-stream"],
+	archives: ["application/zip", "application/x-zip-compressed", "application/x-zip", "application/octet-stream"],
 };
 
 export const upload = multer({

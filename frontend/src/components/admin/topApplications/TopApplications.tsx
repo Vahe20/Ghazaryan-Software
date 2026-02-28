@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { DashboardStats } from "@/src/services/admin.service";
+import { DashboardStats } from "@/src/types/Admin";
 import style from "./TopApplications.module.scss";
 
 type TopApp = DashboardStats["topApps"][number];

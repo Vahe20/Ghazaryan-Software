@@ -1,21 +1,18 @@
 "use client";
 
 import { memo, useCallback, useMemo } from "react";
-import style from "./AppsFilters.module.scss";
-import { useCategories } from "@/src/hooks/queries/useCategoryes";
 import FilterCheckbox from "@/src/components/shared/FilterCheckbox/FilterCheckbox";
-
-type SortType = "name" | "downloadCount" | "createdAt" | "rating";
-type PlatformType = "WINDOWS" | "MAC" | "LINUX" | "ANDROID" | "IOS";
-type StatusType = "BETA" | "RELEASE";
+import { useGetCategoriesQuery } from "@/src/features/api/categoriesApi";
+import type { PlatformType, SortType, StatusType } from "@/src/types/Entities";
+import style from "./AppsFilters.module.scss";
 
 export interface AppsFiltersState {
     searchQuery: string;
     sortBy: SortType;
     order: "asc" | "desc";
     categoryId: string;
-    platform: string;
-    status: string;
+    platform: PlatformType | "";
+    status: StatusType | "";
 }
 
 interface AppsFiltersProps {
@@ -44,7 +41,7 @@ const STATUSES: { value: StatusType; label: string }[] = [
 ];
 
 export const AppsFilters = memo(function AppsFilters({ filters, onChange }: AppsFiltersProps) {
-    const { data, isLoading } = useCategories();
+    const { data, isLoading } = useGetCategoriesQuery();
     const categories = useMemo(() => (data as { id: string; name: string }[]) ?? [], [data]);
 
     const set = useCallback(

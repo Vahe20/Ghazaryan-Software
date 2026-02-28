@@ -2,10 +2,10 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import style from './layout.module.scss';
-import { useAuthStore } from '@/src/store/AuthStore';
+import { useAppSelector } from '@/src/app/hooks';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import style from './layout.module.scss';
 
 export default function AdminLayout({
     children,
@@ -13,7 +13,8 @@ export default function AdminLayout({
     children: React.ReactNode
 }) {
     const pathname = usePathname();
-    const { user, loading } = useAuthStore();
+    const user = useAppSelector(s => s.auth.user);
+    const loading = useAppSelector(s => s.auth.loading);
     const router = useRouter();
 
     useEffect(() => {
@@ -79,6 +80,25 @@ export default function AdminLayout({
             ),
             path: '/admin/orders',
         },
+        {
+            title: 'News',
+            icon: (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l4 4v10a2 2 0 0 1-2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M17 20v-8H7v8M7 4v4h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            ),
+            path: '/admin/news',
+        },
+        {
+            title: 'Categories',
+            icon: (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            ),
+            path: '/admin/categories',
+        },
     ];
 
     return (
@@ -112,22 +132,6 @@ export default function AdminLayout({
                         );
                     })}
                 </nav>
-
-                <div className={style.sidebarFooter}>
-                    <div className={style.userCard}>
-                        <div className={style.userAvatar}>
-                            {user.avatarUrl ? (
-                                <img src={user.avatarUrl} alt="Avatar" />
-                            ) : (
-                                <span>{user.userName?.charAt(0).toUpperCase()}</span>
-                            )}
-                        </div>
-                        <div className={style.userInfo}>
-                            <p className={style.userName}>{user.userName}</p>
-                            <p className={style.userRole}>Administrator</p>
-                        </div>
-                    </div>
-                </div>
             </aside>
 
             <main className={style.mainContent}>

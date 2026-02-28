@@ -1,0 +1,98 @@
+@use "../../../styles/helpers/" as *;
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    padding: rem(8) rem(10);
+    border-radius: $radius-sm;
+    transition: background 0.2s ease;
+    gap: rem(12);
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.04);
+
+        .checkmark {
+            border-color: $primary;
+            transform: scale(1.05);
+        }
+
+        .labelText {
+            color: $text-primary;
+        }
+    }
+}
+
+.hiddenInput {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.checkmark {
+    position: relative;
+    flex-shrink: 0;
+    width: rem(20);
+    height: rem(20);
+    border: 2px solid $border-color-medium;
+    border-radius: rem(5);
+    background: transparent;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    &.checked {
+        background: $primary;
+        border-color: $primary;
+        box-shadow: 0 0 0 rem(3) rgba($primary, 0.2);
+        animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+}
+
+.checkIcon {
+    width: rem(12);
+    height: rem(10);
+    opacity: 0;
+    transform: scale(0.5) rotate(-10deg);
+    transition:
+        opacity 0.15s ease 0.05s,
+        transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s;
+
+    .checked & {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+.labelText {
+    font-size: rem(14);
+    font-weight: 500;
+    color: $text-secondary;
+    transition: color 0.2s ease;
+
+    &.labelChecked {
+        color: $text-primary;
+    }
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0.7);
+    }
+    60% {
+        transform: scale(1.15);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+

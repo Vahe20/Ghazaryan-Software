@@ -1,42 +1,17 @@
 "use client"
 
-import { useCallback, useEffect, useState } from 'react';
-import { AdminService, DashboardStats, Activity } from '@/src/services/admin.service';
 import DashboardHeader from '@/src/components/admin/dashboardHeader/DashboardHeader';
 import StatsCards from '@/src/components/admin/statsCards/StatsCards';
 import RecentActivity from '@/src/components/admin/recentActivity/RecentActivity';
-import TopApplications from '@/src/components/admin/topApplications/TopApplications';
-import QuickActions from '@/src/components/admin/quickActions/QuickActions';
+import { useGetDashboardStatsQuery, useGetRecentActivityQuery } from '@/src/features/api/adminApi';
 import style from './page.module.scss';
 
 export default function AdminDashboard() {
-    const [stats, setStats] = useState<DashboardStats | null>(null);
-    const [activities, setActivities] = useState<Activity[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const { data: stats, isLoading, error, refetch } = useGetDashboardStatsQuery();
+    const { data: activities } = useGetRecentActivityQuery();
 
-    useEffect(() => {
-        loadDashboardData();
-    }, []);
-
-    const loadDashboardData = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            const [statsData, activityData] = await Promise.all([
-                AdminService.getDashboardStats(),
-                AdminService.getRecentActivity(),
-            ]);
-
-            setStats(statsData);
-            setActivities(activityData);
-        } catch (err) {
-            console.error('Error loading dashboard:', err);
-            setError('Failed to load dashboard data');
-        } finally {
-            setLoading(false);
-        }
+    const loadDashboardData = () => {
+        refetch();
     };
 
     const formatCurrency = (amount: number) => {
@@ -51,7 +26,7 @@ export default function AdminDashboard() {
         return `${sign}${change.toFixed(1)}%`;
     };
 
-    if (loading) {
+    if (isLoading) {
         return (
             <div className={style.dashboard}>
                 <div className={style.loading}>Loading dashboard...</div>
@@ -62,7 +37,9 @@ export default function AdminDashboard() {
     if (error || !stats) {
         return (
             <div className={style.dashboard}>
-                <div className={style.error}>{error || 'No data available'}</div>
+                <div className={style.error}>
+                    {error ? 'Failed to load dashboard' : 'No data available'}
+                </div>
             </div>
         );
     }
@@ -126,13 +103,9 @@ export default function AdminDashboard() {
             <StatsCards stats={statsCards} />
 
             <div className={style.contentGrid}>
-                <RecentActivity activities={activities} />
-                <TopApplications apps={stats.topApps} />
+            <RecentActivity activities={activities || []} />
             </div>
 
-            <div className={style.contentGrid}>
-                <QuickActions onRefresh={loadDashboardData} />
-            </div>
         </div>
     );
 }

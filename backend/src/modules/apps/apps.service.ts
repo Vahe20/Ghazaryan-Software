@@ -1,12 +1,12 @@
-import { prisma } from "../../config/prisma";
-import { CreateAppInput, UpdateAppInput, GetAppsQuery } from "./apps.types";
-import { slugGenerator } from "../../utils/slugGenerator";
-import { DownloadMetadata, Platform } from "../../types";
+import { prisma } from "../../config/prisma.js";
+import type { CreateAppInput, UpdateAppInput, GetAppsQuery } from "./apps.types.js";
+import { slugGenerator } from "../../utils/slugGenerator.js";
+import type { DownloadMetadata, Platform, AppStatus } from "../../types/index.js";
 import {
 	NotFoundError,
 	ConflictError,
 	DatabaseError,
-} from "../../utils/errors";
+} from "../../utils/errors.js";
 
 export async function getAllApps(query: GetAppsQuery) {
 	try {
@@ -23,10 +23,22 @@ export async function getAllApps(query: GetAppsQuery) {
 
 		const limitNum = typeof limit === "number" ? limit : Number(limit);
 		const pageNum = typeof page === "number" ? page : Number(page);
-
 		const skip = (pageNum - 1) * limitNum;
 
-		const where: any = {};
+		interface WhereCondition {
+			deletedAt: null;
+			OR?: Array<{
+				name?: { contains: string; mode: "insensitive" };
+				shortDesc?: { contains: string; mode: "insensitive" };
+				description?: { contains: string; mode: "insensitive" };
+				tags?: { hasSome: string[] };
+			}>;
+			categoryId?: string;
+			status?: AppStatus;
+			platform?: { has: Platform };
+		}
+
+		const where: WhereCondition = { deletedAt: null };
 
 		if (search) {
 			where.OR = [
@@ -83,7 +95,7 @@ export async function getAllApps(query: GetAppsQuery) {
 
 export async function getAppById(id: string) {
 	try {
-		return await prisma.apps.findUnique({
+		return await prisma.apps.findFirst({
 			where: { id },
 			include: {
 				category: true,
@@ -119,8 +131,8 @@ export async function getAppById(id: string) {
 
 export async function getAppBySlug(slug: string) {
 	try {
-		return await prisma.apps.findUnique({
-			where: { slug },
+		return await prisma.apps.findFirst({
+			where: { slug, deletedAt: null },
 			include: {
 				category: true,
 				versions: {
@@ -177,6 +189,10 @@ export async function addApp(data: CreateAppInput) {
 			data: {
 				...data,
 				slug,
+				changelog: data.changelog ?? null,
+				coverUrl: data.coverUrl ?? null,
+				sourceUrl: data.sourceUrl ?? null,
+				documentationUrl: data.documentationUrl ?? null,
 			},
 			include: {
 				category: true,
@@ -222,7 +238,13 @@ export async function updateAppById(id: string, data: UpdateAppInput) {
 
 		return await prisma.apps.update({
 			where: { id },
-			data,
+			data: {
+				...data,
+				changelog: data.changelog !== undefined ? (data.changelog ?? null) : undefined,
+				coverUrl: data.coverUrl !== undefined ? (data.coverUrl ?? null) : undefined,
+				sourceUrl: data.sourceUrl !== undefined ? (data.sourceUrl ?? null) : undefined,
+				documentationUrl: data.documentationUrl !== undefined ? (data.documentationUrl ?? null) : undefined,
+			},
 			include: {
 				category: true,
 			},
@@ -245,7 +267,10 @@ export async function deleteAppById(id: string) {
 			throw new NotFoundError("App", id);
 		}
 
-		return await prisma.apps.delete({ where: { id } });
+		return await prisma.apps.update({
+			where: { id },
+			data: { deletedAt: new Date() },
+		});
 	} catch (error) {
 		if (error instanceof NotFoundError) {
 			throw error;
@@ -260,7 +285,7 @@ export async function recordDownload(
 	metadata?: DownloadMetadata,
 ): Promise<void> {
 	try {
-		const app = await prisma.apps.findUnique({
+		const app = await prisma.apps.findFirst({
 			where: { id: appId },
 		});
 
@@ -271,12 +296,12 @@ export async function recordDownload(
 		await prisma.downloads.create({
 			data: {
 				appId,
-				userId,
+				userId: userId ?? null,
 				version: metadata?.version || app.version,
 				platform: metadata?.platform as Platform,
-				ipAddress: metadata?.ipAddress,
-				userAgent: metadata?.userAgent,
-				country: metadata?.country,
+				ipAddress: metadata?.ipAddress ?? null,
+				userAgent: metadata?.userAgent ?? null,
+				country: metadata?.country ?? null,
 			},
 		});
 
@@ -296,11 +321,12 @@ export async function recordDownload(
 	}
 }
 
-export async function getPopularApps(limit: number = 10): Promise<any[]> {
+export async function getPopularApps(limit: number = 10) {
 	try {
 		return await prisma.apps.findMany({
 			where: {
 				status: "RELEASE",
+				deletedAt: null,
 			},
 			take: limit,
 			orderBy: [{ downloadCount: "desc" }, { rating: "desc" }],
@@ -373,7 +399,17 @@ export async function getUserLibrary(userId: string, query: GetAppsQuery) {
 			};
 		}
 
-		const where: any = {
+		interface LibraryWhereCondition {
+			id: { in: string[] };
+			OR?: Array<{
+				name?: { contains: string; mode: "insensitive" };
+				shortDesc?: { contains: string; mode: "insensitive" };
+				description?: { contains: string; mode: "insensitive" };
+				tags?: { hasSome: string[] };
+			}>;
+		}
+
+		const where: LibraryWhereCondition = {
 			id: { in: appIds },
 		};
 
@@ -388,7 +424,8 @@ export async function getUserLibrary(userId: string, query: GetAppsQuery) {
 
 		const total = await prisma.apps.count({ where });
 
-		let orderBy: any;
+		type OrderBy = { [key: string]: "asc" | "desc" };
+		let orderBy: OrderBy | undefined;
 		if (sortBy === "purchasedAt") {
 			const apps = await prisma.apps.findMany({
 				where,

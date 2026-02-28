@@ -1,7 +1,7 @@
 import "../src/styles/main.scss";
 import { Header } from "@/src/components/layout/header/Header";
 import { AuthInitializer } from "@/src/components/providers/AuthInitializer";
-import { ReactQueryProvider } from "@/src/components/providers/ReactQueryProvider";
+import { ReduxProvider } from "@/src/components/providers/ReduxProvider";
 
 export default function RootLayout({
   children,
@@ -14,7 +14,7 @@ export default function RootLayout({
         <title>Ghazaryan SoftWare</title>
         <meta name="description" content="my application" />
       </head>
-      <ReactQueryProvider>
+      <ReduxProvider>
         <AuthInitializer>
           <body className="container">
             <Header />
@@ -23,7 +23,7 @@ export default function RootLayout({
             </main>
           </body>
         </AuthInitializer>
-      </ReactQueryProvider>
+      </ReduxProvider>
     </html>
   );
 }

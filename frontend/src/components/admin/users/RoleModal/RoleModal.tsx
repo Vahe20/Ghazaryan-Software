@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { AdminService, AdminUser } from "@/src/services/admin.service";
+import { AdminUser } from "@/src/types/Admin";
+import { useUpdateUserRoleMutation } from "@/src/features/api/adminApi";
+import { SerializedError } from "@reduxjs/toolkit";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import UserAvatar from "../UserAvatar/UserAvatar";
 import BaseModal from "@/src/components/shared/BaseModal/BaseModal";
 import s from "./RoleModal.module.scss";
 import form from "../../shared/_form.module.scss";
 import btns from "../../shared/_buttons.module.scss";
-import { useAsyncAction } from "@/src/hooks/useAsyncAction";
 
 const ROLES = ["USER", "DEVELOPER", "ADMIN"] as const;
 type Role = typeof ROLES[number];
@@ -14,18 +16,30 @@ interface RoleModalProps {
     isOpen: boolean;
     user: AdminUser | null;
     onClose: () => void;
-    onSaved: (updated: AdminUser) => void;
+    onSaved: () => void;
 }
 
 export default function RoleModal({ isOpen, user, onClose, onSaved }: RoleModalProps) {
     const [role, setRole] = useState<Role>(user?.role ?? "USER");
-    const { loading, error, run } = useAsyncAction("Failed to update role");
+    const [updateUserRole, { isLoading, error }] = useUpdateUserRoleMutation();
 
     const handleSave = async () => {
         if (!user) return;
-        await run(() => AdminService.updateUserRole(user.id, role));
-        if (!error) onSaved({ ...user, role });
+        try {
+            await updateUserRole({ userId: user.id, role }).unwrap();
+            onSaved();
+        } catch {}
     };
+
+    const getErrorMessage = (error: FetchBaseQueryError | SerializedError | undefined): string | null => {
+        if (!error) return null;
+        if ("data" in error && error.data && typeof error.data === "object" && "message" in error.data) {
+            return error.data.message as string;
+        }
+        return "Failed to update role";
+    };
+
+    const errorMessage = getErrorMessage(error);
 
     return (
         <BaseModal
@@ -36,8 +50,8 @@ export default function RoleModal({ isOpen, user, onClose, onSaved }: RoleModalP
             footer={
                 <>
                     <button className={btns.btnSecondary} onClick={onClose}>Cancel</button>
-                    <button className={btns.btnPrimary} onClick={handleSave} disabled={loading || role === user?.role}>
-                        {loading ? "Saving..." : "Save"}
+                    <button className={btns.btnPrimary} onClick={handleSave} disabled={isLoading || role === user?.role}>
+                        {isLoading ? "Saving..." : "Save"}
                     </button>
                 </>
             }
@@ -51,7 +65,7 @@ export default function RoleModal({ isOpen, user, onClose, onSaved }: RoleModalP
                     </div>
                 </div>
             )}
-            {error && <div className={form.alertError}>{error}</div>}
+            {errorMessage && <div className={form.alertError}>{errorMessage}</div>}
             <div className={form.formGroup}>
                 <label className={form.formLabel}>Role</label>
                 <select className={form.formSelect} value={role} onChange={e => setRole(e.target.value as Role)}>

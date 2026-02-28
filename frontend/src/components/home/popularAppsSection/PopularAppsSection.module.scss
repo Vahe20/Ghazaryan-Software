@@ -2,15 +2,16 @@
 
 .section {
     padding: rem(48) rem(24) rem(32);
+    animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
 }
 
-// ── Header ────────────────────────────────────────────────────────────────────
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: rem(28);
     gap: rem(16);
+    animation: fadeInDown 0.45s ease 0.05s both;
 }
 
 .title {
@@ -19,6 +20,10 @@
     color: $text-primary;
     letter-spacing: -0.5px;
     margin: 0;
+    background: linear-gradient(135deg, $text-primary 0%, rgba($primary, 0.8) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .controls {
@@ -38,44 +43,61 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: $transition;
+    transition:
+        background $transition,
+        border-color $transition,
+        color $transition,
+        transform $transition-fast,
+        box-shadow $transition;
     flex-shrink: 0;
+
+    svg { transition: transform $transition; }
+
+    &:first-child:hover:not(:disabled) svg { transform: translateX(-2px); }
+    &:last-child:hover:not(:disabled)  svg { transform: translateX(2px); }
 
     &:hover:not(:disabled) {
         background: $primary;
         border-color: $primary;
         color: white;
-        transform: scale(1.05);
-        box-shadow: 0 4px 12px rgba($primary, 0.35);
+        transform: scale(1.1);
+        box-shadow: 0 4px 14px rgba($primary, 0.4);
     }
 
-    &:active:not(:disabled) {
-        transform: scale(0.97);
-    }
+    &:active:not(:disabled) { transform: scale(0.95); }
 }
 
 .arrowDisabled {
-    opacity: 0.3;
+    opacity: 0.25;
     cursor: not-allowed;
 }
 
 .viewAll {
     color: $primary;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 700;
     font-size: rem(14);
-    transition: $transition;
-    white-space: nowrap;
     margin-left: rem(4);
+    padding: rem(8) rem(14);
+    border: 1px solid rgba($primary, 0.2);
+    border-radius: $radius-full;
+    background: rgba($primary, 0.05);
+    transition: background $transition, border-color $transition, color $transition, transform $transition-fast, gap $transition;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: rem(4);
 
     &:hover {
+        background: rgba($primary, 0.12);
+        border-color: rgba($primary, 0.4);
         color: $primary-hover;
-        transform: translateX(3px);
-        display: inline-block;
+        transform: translateX(2px);
     }
+
+    &:active { transform: translateX(0); }
 }
 
-// ── Slider ────────────────────────────────────────────────────────────────────
 .sliderWrapper {
     position: relative;
 }
@@ -86,7 +108,7 @@
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
-    padding-bottom: rem(4);
+    padding-block: rem(14);
 
     &::-webkit-scrollbar { display: none; }
 }
@@ -94,34 +116,32 @@
 .cardWrap {
     flex: 0 0 rem(300);
     scroll-snap-align: start;
+    animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 
-    // Make AppCard fill the slot fully
+    @for $i from 1 through 12 {
+        &:nth-child(#{$i}) { animation-delay: #{$i * 0.06}s; }
+    }
+
     > a { height: 100%; }
 
-    @media (max-width: 480px) {
-        flex: 0 0 85vw;
-    }
+    @media (max-width: 480px) { flex: 0 0 85vw; }
 }
 
-// Fade edges
 .fadeLeft,
 .fadeRight {
     position: absolute;
     top: 0;
     bottom: rem(4);
-    width: rem(60);
+    width: rem(80);
     pointer-events: none;
     opacity: 0;
     transition: opacity $transition;
     z-index: 1;
 }
 
-.fadeLeft  { left: 0;  background: linear-gradient(to right, $background-primary, transparent); }
 .fadeRight { right: 0; background: linear-gradient(to left,  $background-primary, transparent); }
-
 .fadeVisible { opacity: 1; }
 
-// ── Skeleton ──────────────────────────────────────────────────────────────────
 .skeletonTrack {
     display: flex;
     gap: rem(24);
@@ -130,28 +150,24 @@
 
 .skeleton {
     flex: 0 0 rem(300);
-    height: rem(340);
-    border-radius: $radius-lg;
-    background: linear-gradient(
-        90deg,
-        $background-tertiary 25%,
-        rgba(255,255,255,0.04) 50%,
-        $background-tertiary 75%
-    );
+    height: rem(360);
+    border-radius: rem(18);
+    background: linear-gradient(90deg, $background-tertiary 25%, rgba(255,255,255,0.04) 50%, $background-tertiary 75%);
     background-size: 200% 100%;
-    animation: shimmer 1.4s infinite;
+    animation: shimmer 1.4s ease-in-out infinite;
+
+    @for $i from 1 through 4 {
+        &:nth-child(#{$i}) { animation-delay: #{$i * 0.08}s; }
+    }
 
     @media (max-width: 480px) { flex: 0 0 85vw; }
 }
 
-@keyframes shimmer {
-    from { background-position: 200% 0; }
-    to   { background-position: -200% 0; }
-}
-
 .empty {
     text-align: center;
-    padding: rem(48);
+    padding: rem(60);
     color: $text-secondary;
-    font-size: rem(16);
+    font-size: rem(15);
+    animation: fadeIn 0.4s ease;
 }
+

@@ -3,14 +3,15 @@
 .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     z-index: 1000;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: rem(20);
-    animation: fadeIn 0.15s ease;
+    animation: fadeIn 0.2s ease;
 }
 
 .modal {
@@ -20,31 +21,50 @@
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
-    animation: slideUp 0.2s ease;
+    animation: scaleInBounce 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     scrollbar-width: thin;
     scrollbar-color: $border-color transparent;
     position: relative;
     outline: none;
+    box-shadow: $shadow-xl, 0 0 0 1px rgba($primary, 0.06);
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 10%;
+        right: 10%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, $primary, $accent, transparent);
+        border-radius: 0 0 rem(2) rem(2);
+        pointer-events: none;
+        z-index: 2;
+    }
 }
 
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: rem(24) rem(28) rem(20);
+    padding: rem(22) rem(28) rem(18);
     border-bottom: 1px solid $border-color;
+    animation: fadeInDown 0.3s ease 0.05s both;
 
     h2 {
         font-size: rem(18);
         font-weight: 700;
         color: $text-primary;
         margin: 0;
+        background: linear-gradient(135deg, $text-primary 0%, rgba($text-primary, 0.8) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 }
 
 .close {
-    width: rem(36);
-    height: rem(36);
+    width: rem(34);
+    height: rem(34);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -53,23 +73,33 @@
     border-radius: $radius-sm;
     color: $text-tertiary;
     cursor: pointer;
-    transition: $transition;
+    transition: background $transition, color $transition, transform $transition-fast, border-color $transition, box-shadow $transition;
     flex-shrink: 0;
 
     &:hover {
-        background: $background-hover;
-        color: $text-primary;
+        background: rgba($error, 0.1);
+        border-color: rgba($error, 0.3);
+        color: $error;
+        transform: rotate(90deg) scale(1.1);
+        box-shadow: 0 0 8px rgba($error, 0.2);
+    }
+
+    &:active {
+        transform: rotate(90deg) scale(0.95);
     }
 }
 
 .body {
     padding: rem(24) rem(28);
+    animation: fadeInUp 0.35s ease 0.08s both;
 }
 
 .footer {
     display: flex;
     justify-content: flex-end;
     gap: rem(10);
-    padding: rem(20) rem(28) rem(24);
+    padding: rem(18) rem(28) rem(22);
     border-top: 1px solid $border-color;
+    animation: fadeInUp 0.35s ease 0.12s both;
 }
+

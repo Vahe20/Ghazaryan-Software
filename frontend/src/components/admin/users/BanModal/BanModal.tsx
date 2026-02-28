@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { AdminService, AdminUser } from "@/src/services/admin.service";
+import { AdminUser } from "@/src/types/Admin";
 import BaseModal from "@/src/components/shared/BaseModal/BaseModal";
 import UserAvatar from "../UserAvatar/UserAvatar";
-import { useAsyncAction } from "@/src/hooks/useAsyncAction";
+import { useBanUserMutation } from "@/src/features/api/adminApi";
+import { extractErrorMessage } from "@/src/lib/utils";
 import form from "../../shared/_form.module.scss";
 import btns from "../../shared/_buttons.module.scss";
 import s from "./BanModal.module.scss";
@@ -26,17 +27,26 @@ interface BanModalProps {
 export default function BanModal({ isOpen, user, onClose, onSaved }: BanModalProps) {
     const [preset, setPreset] = useState<number | null>(24);
     const [reason, setReason] = useState("");
-    const { loading, error, run } = useAsyncAction<AdminUser>("Failed to ban user");
+    const [banUser, { isLoading, error }] = useBanUserMutation();
+    const errorMessage = error
+        ? extractErrorMessage(error, "Failed to ban user")
+        : null;
 
     const handleBan = async () => {
         if (!user) return;
         const until = preset === null
             ? null
             : new Date(Date.now() + preset * 3600 * 1000).toISOString();
-        const updated = await run(() =>
-            AdminService.banUser(user.id, { reason: reason.trim() || undefined, until })
-        );
-        if (updated) onSaved(updated);
+        try {
+            const updated = await banUser({
+                userId: user.id,
+                reason: reason.trim() || undefined,
+                until,
+            }).unwrap();
+            onSaved(updated);
+        } catch {
+            return;
+        }
     };
 
     return (
@@ -48,8 +58,8 @@ export default function BanModal({ isOpen, user, onClose, onSaved }: BanModalPro
             footer={
                 <>
                     <button className={btns.btnSecondary} onClick={onClose}>Cancel</button>
-                    <button className={s.btnBan} onClick={handleBan} disabled={loading}>
-                        {loading ? "Banning..." : "Ban User"}
+                    <button className={s.btnBan} onClick={handleBan} disabled={isLoading}>
+                        {isLoading ? "Banning..." : "Ban User"}
                     </button>
                 </>
             }
@@ -64,7 +74,7 @@ export default function BanModal({ isOpen, user, onClose, onSaved }: BanModalPro
                 </div>
             )}
 
-            {error && <div className={form.alertError}>{error}</div>}
+            {errorMessage && <div className={form.alertError}>{errorMessage}</div>}
 
             <div className={form.formGroup}>
                 <label className={form.formLabel}>Ban Duration</label>

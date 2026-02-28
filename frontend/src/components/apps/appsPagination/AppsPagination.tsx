@@ -1,7 +1,19 @@
 "use client";
 
 import { memo, useCallback, useMemo } from "react";
+import { usePrefetch } from "@/src/features/api/appsApi";
 import style from "./AppsPagination.module.scss";
+
+interface GetAppsParams {
+	page?: number;
+	limit?: number;
+	search?: string;
+	categoryId?: string;
+	sortBy?: string;
+	order?: "asc" | "desc";
+	platform?: string;
+	status?: string;
+}
 
 interface AppsPaginationProps {
     totalPages: number;
@@ -14,29 +26,23 @@ export const AppsPagination = memo(function AppsPagination({
     currentPage,
     onPageChange,
 }: AppsPaginationProps) {
-    if (totalPages <= 1) return null;
-
     const handlePageChange = useCallback(
         (page: number) => {
             if (page >= 1 && page <= totalPages) {
                 onPageChange(page);
-                window.scrollTo({ top: 0, behavior: "smooth" });
+                Promise.resolve().then(() => {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                })
             }
         },
         [totalPages, onPageChange]
     );
 
-    const handlePrev = useCallback(
-        () => handlePageChange(currentPage - 1),
-        [handlePageChange, currentPage]
-    );
+    const handlePrev = () => handlePageChange(currentPage - 1);
 
-    const handleNext = useCallback(
-        () => handlePageChange(currentPage + 1),
-        [handlePageChange, currentPage]
-    );
+    const handleNext = () => handlePageChange(currentPage + 1);
 
-    // Пересчитывается только при смене currentPage / totalPages
+
     const pages = useMemo(() => {
         const result: (number | "...")[] = [];
         const maxVisible = 5;
@@ -62,6 +68,10 @@ export const AppsPagination = memo(function AppsPagination({
         return result;
     }, [currentPage, totalPages]);
 
+    const preFetchApps = usePrefetch("getApps");
+
+    if (totalPages <= 1) return null;
+
     return (
         <div className={style.pagination}>
             <button
@@ -82,12 +92,13 @@ export const AppsPagination = memo(function AppsPagination({
                             ...
                         </span>
                     ) : (
-                        <PageButton
+                        <button
                             key={pageNum}
-                            page={pageNum}
-                            isActive={pageNum === currentPage}
-                            onClick={handlePageChange}
-                        />
+                            onClick={() => handlePageChange(pageNum)}
+                            className={`${style.pageButton} ${pageNum === currentPage ? style.active : ""}`}
+                        >
+                            {pageNum}
+                        </button>
                     )
                 )}
             </div>
@@ -96,6 +107,7 @@ export const AppsPagination = memo(function AppsPagination({
                 onClick={handleNext}
                 disabled={currentPage === totalPages}
                 className={style.navButton}
+                onMouseEnter={() => { preFetchApps({ page: currentPage + 1 }) }}
             >
                 Next
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -106,7 +118,6 @@ export const AppsPagination = memo(function AppsPagination({
     );
 });
 
-// Мемоизированная кнопка страницы — не перерендеривается если page/isActive не изменились
 const PageButton = memo(function PageButton({
     page,
     isActive,
@@ -115,6 +126,7 @@ const PageButton = memo(function PageButton({
     page: number;
     isActive: boolean;
     onClick: (page: number) => void;
+    preFetchApps: (options: GetAppsParams) => void
 }) {
     const handleClick = useCallback(() => onClick(page), [onClick, page]);
     return (

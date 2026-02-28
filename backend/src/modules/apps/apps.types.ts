@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AppStatus, Platform, SortParams } from "../../types";
+import type { AppStatus, Platform, SortParams } from "../../types/index.js";
 
 export const appStatusSchema = z.enum(["BETA", "RELEASE"]);
 export const platformSchema = z.enum(["WINDOWS", "MAC", "LINUX", "ANDROID", "IOS"]);
@@ -39,8 +39,8 @@ export const createAppSchema = z.object({
 		.max(5, "Maximum 5 platforms allowed"),
 	minVersion: z.string().optional(),
 	downloadUrl: z.string().url("Invalid download URL"),
-	sourceUrl: z.string().url("Invalid source URL").optional(),
-	documentationUrl: z.string().url("Invalid documentation URL").optional(),
+	sourceUrl: z.string().url("Invalid source URL").or(z.literal("")).optional(),
+	documentationUrl: z.string().url("Invalid documentation URL").or(z.literal("")).optional(),
 	status: appStatusSchema.default("BETA"),
 	price: z.number().min(0, "Price must be 0 or greater").default(0),
 });
@@ -85,8 +85,8 @@ export const updateAppSchema = z.object({
 		.optional(),
 	minVersion: z.string().optional(),
 	downloadUrl: z.string().url("Invalid download URL").optional(),
-	sourceUrl: z.string().url("Invalid source URL").optional(),
-	documentationUrl: z.string().url("Invalid documentation URL").optional(),
+	sourceUrl: z.string().url("Invalid source URL").or(z.literal("")).optional(),
+	documentationUrl: z.string().url("Invalid documentation URL").or(z.literal("")).optional(),
 	status: appStatusSchema.optional(),
 	price: z.number().min(0, "Price must be 0 or greater").optional(),
 });
@@ -130,10 +130,10 @@ export interface AppWithRelations {
 }
 
 export interface AppFilters {
-	search?: string;
-	categoryId?: string;
-	status?: AppStatus;
-	platform?: Platform;
+	search?: string | undefined;
+	categoryId?: string | undefined;
+	status?: AppStatus | undefined;
+	platform?: Platform | undefined;
 }
 
 export interface AppSortOptions extends SortParams {

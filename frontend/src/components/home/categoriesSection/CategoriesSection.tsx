@@ -2,18 +2,18 @@
 
 import Link from "next/link";
 import { memo, useMemo } from "react";
-import { useCategories } from "@/src/hooks/queries/useCategoryes";
+import { useGetCategoriesQuery } from "@/src/features/api/categoriesApi";
 import style from "./CategoriesSection.module.scss";
 
 const GRADIENTS = [
-    ["#0084ff", "#00c6ff"],
-    ["#ff006e", "#ff6b9d"],
-    ["#7c3aed", "#a78bfa"],
-    ["#059669", "#34d399"],
-    ["#d97706", "#fbbf24"],
-    ["#dc2626", "#f87171"],
-    ["#0891b2", "#67e8f9"],
-    ["#9d174d", "#f472b6"],
+    ["
+    ["
+    ["
+    ["
+    ["
+    ["
+    ["
+    ["
 ];
 
 const ICONS = [
@@ -32,14 +32,14 @@ const SKELETON_ITEMS = Array.from({ length: 8 }, (_, i) => i);
 interface Category { id: string; name: string; slug: string; }
 
 export const CategoriesSection = memo(function CategoriesSection() {
-    const { data, isLoading } = useCategories();
+    const { data, isLoading } = useGetCategoriesQuery();
     const categories = useMemo(() => (data as Category[]) ?? [], [data]);
 
     const categoriesWithMeta = useMemo(
         () => categories.map((cat, i) => ({
             ...cat,
             from: GRADIENTS[i % GRADIENTS.length][0],
-            to:   GRADIENTS[i % GRADIENTS.length][1],
+            to: GRADIENTS[i % GRADIENTS.length][1],
             icon: ICONS[i % ICONS.length],
         })),
         [categories]
@@ -50,7 +50,7 @@ export const CategoriesSection = memo(function CategoriesSection() {
             <div className={style.header}>
                 <div>
                     <h2 className={style.title}>Browse by Category</h2>
-                    <p className={style.subtitle}>Find exactly what you're looking for</p>
+                    <p className={style.subtitle}>{"Find exactly what you're looking for"}</p>
                 </div>
                 <Link href="/apps" className={style.viewAll}>View All →</Link>
             </div>

@@ -1,9 +1,12 @@
-import { Request, Response } from "express";
-import * as authService from "./auth.service";
-import { AuthRequest } from "../../types";
-import { LoginInput, ChangePasswordInput } from "./auth.types";
-import { asyncHandler } from "../../middlewares/error.middleware";
-import { ApiError } from "../../utils/errors";
+import type { Request, Response } from "express";
+import passport from "passport";
+import * as authService from "./auth.service.js";
+import { updateUserAvatar } from "./avatar.service.js";
+import type { AuthRequest } from "../../types/index.js";
+import type { LoginInput, ChangePasswordInput } from "./auth.types.js";
+import { asyncHandler } from "../../middlewares/error.middleware.js";
+import { ApiError } from "../../utils/errors.js";
+import env from "../../config/env.js";
 
 export const getMe = asyncHandler(async (req: AuthRequest, res: Response) => {
 	if (!req.user) {
@@ -40,6 +43,15 @@ export const changePassword = asyncHandler(async (req: AuthRequest, res: Respons
 	return res.json({ message: "Password changed successfully" });
 });
 
+export const updateAvatar = asyncHandler(async (req: AuthRequest, res: Response) => {
+	if (!req.user) throw ApiError.unauthorized("Authentication required");
+	if (!req.file) throw ApiError.badRequest("Avatar file is required");
+
+	const avatarUrl = `/uploads/avatar/${req.file.filename}`;
+	const result = await updateUserAvatar(req.user.userId, avatarUrl);
+	res.json(result);
+});
+
 export const deleteAccount = asyncHandler(async (req: AuthRequest, res: Response) => {
 	if (!req.user) {
 		throw ApiError.unauthorized("Authentication required");
@@ -55,4 +67,44 @@ export const deleteAccount = asyncHandler(async (req: AuthRequest, res: Response
 
 	return res.json({ message: "Account deleted successfully" });
 });
+
+export const googleAuth = passport.authenticate("google", {
+	scope: ["profile", "email"],
+	session: false,
+});
+
+export const googleAuthCallback = (req: Request, res: Response) => {
+	passport.authenticate(
+		"google",
+		{ session: false },
+		async (err: any, user: any) => {
+			if (err) {
+				return res.redirect(
+					`${env.FRONTEND_URL}/auth?error=authentication_failed`
+				);
+			}
+
+			if (!user) {
+				return res.redirect(
+					`${env.FRONTEND_URL}/auth?error=user_not_found`
+				);
+			}
+
+			try {
+				const accessToken = authService.generateAuthToken(
+					user.id,
+					user.role
+				);
+
+				return res.redirect(
+					`${env.FRONTEND_URL}/auth/callback?token=${accessToken}`
+				);
+			} catch (error) {
+				return res.redirect(
+					`${env.FRONTEND_URL}/auth?error=token_generation_failed`
+				);
+			}
+		}
+	)(req, res);
+};
 

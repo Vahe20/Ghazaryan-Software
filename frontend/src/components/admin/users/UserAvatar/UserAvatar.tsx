@@ -1,4 +1,4 @@
-import { AdminUser } from "@/src/services/admin.service";
+import { AdminUser } from "@/src/types/Admin";
 import misc from "../../shared/_misc.module.scss";
 
 interface UserAvatarProps {

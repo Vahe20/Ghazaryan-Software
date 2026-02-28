@@ -1,6 +1,5 @@
 @use "../../../../styles/helpers/" as *;
 
-// UsersTable — только специфичные стили
 
 .userCellLink {
     display: block;
@@ -30,3 +29,4 @@
     display: flex;
     gap: rem(6);
 }
+

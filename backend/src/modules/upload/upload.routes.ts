@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { upload } from "../../middlewares/upload.middleware";
-import authMiddleware from "../../middlewares/auth.middleware";
-import { uploadFile } from "./upload.controller";
-import { requireRole } from "../../middlewares/role.middleware";
-import { uploadLimiter } from "../../middlewares/rateLimit/index";
+import { upload } from "../../middlewares/upload.middleware.js";
+import authMiddleware from "../../middlewares/auth.middleware.js";
+import { uploadFile } from "./upload.controller.js";
+import { requireRole } from "../../middlewares/role.middleware.js";
+import { uploadLimiter } from "../../middlewares/rateLimit/index.js";
 
 const router = Router();
 

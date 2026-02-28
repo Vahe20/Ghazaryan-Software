@@ -1,23 +1,27 @@
-// Global types and interfaces
-import { Request } from "express";
+import type { Request } from "express";
 
-// User types
+declare global {
+	namespace Express {
+		interface User {
+			userId: string;
+			role: UserRole;
+		}
+	}
+}
+
 export type UserRole = "ADMIN" | "USER" | "DEVELOPER";
 
-// App types
+
 export type AppStatus = "BETA" | "RELEASE";
 export type Platform = "WINDOWS" | "MAC" | "LINUX" | "ANDROID" | "IOS";
 
-// Request types
+
 export interface AuthRequest extends Request {
-	user?: {
-		userId: string;
-		role: UserRole;
-	};
+	user: Express.User | undefined;
 	file?: Express.Multer.File;
 }
 
-// Pagination types
+
 export interface PaginationParams {
 	page: number;
 	limit: number;
@@ -35,29 +39,29 @@ export interface PaginatedResponse<T> {
 	pagination: PaginationResult;
 }
 
-// Query types
+
 export interface SortParams {
 	sortBy: string;
 	order: "asc" | "desc";
 }
 
-// Download metadata
+
 export interface DownloadMetadata {
 	version: string;
 	platform: Platform;
-	ipAddress?: string;
-	userAgent?: string;
-	country?: string;
+	ipAddress?: string | undefined;
+	userAgent?: string | undefined;
+	country?: string | undefined;
 }
 
-// Error response
+
 export interface ErrorResponse {
 	error: string;
-	details?: any;
+	details?: unknown;
 }
 
-// Success response
+
 export interface SuccessResponse {
 	message: string;
-	data?: any;
+	data?: unknown;
 }

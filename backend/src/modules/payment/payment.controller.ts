@@ -1,8 +1,8 @@
-import { Response } from "express";
-import { AuthRequest } from "../../types";
-import { asyncHandler } from "../../middlewares/error.middleware";
-import { ApiError } from "../../utils/errors";
-import * as paymentService from "./payment.service";
+import type { Response } from "express";
+import type { AuthRequest } from "../../types/index.js";
+import { asyncHandler } from "../../middlewares/error.middleware.js";
+import { ApiError } from "../../utils/errors.js";
+import * as paymentService from "./payment.service.js";
 
 export const topUpBalance = asyncHandler(async (req: AuthRequest, res: Response) => {
 	if (!req.user) {

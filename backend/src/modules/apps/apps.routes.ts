@@ -1,21 +1,21 @@
 import { Router } from "express";
-import * as appsController from "./apps.controller";
+import * as appsController from "./apps.controller.js";
 import {
 	validate,
 	validateQuery,
-} from "../../middlewares/validation.middleware";
-import authMiddleware from "../../middlewares/auth.middleware";
+} from "../../middlewares/validation.middleware.js";
+import authMiddleware from "../../middlewares/auth.middleware.js";
 import {
 	createAppSchema,
 	updateAppSchema,
 	getAppsQuerySchema,
-} from "./apps.types";
-import { requireRole } from "../../middlewares/role.middleware";
+} from "./apps.types.js";
+import { requireRole } from "../../middlewares/role.middleware.js";
 import {
 	readLimiter,
 	writeLimiter,
 	downloadLimiter,
-} from "../../middlewares/rateLimit";
+} from "../../middlewares/rateLimit/index.js";
 
 const router = Router();
 

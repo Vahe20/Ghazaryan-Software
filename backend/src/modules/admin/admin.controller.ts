@@ -1,7 +1,7 @@
-import { Response } from "express";
-import { AuthRequest } from "../../types";
-import * as adminService from "./admin.service";
-import { asyncHandler } from "../../middlewares/error.middleware";
+import type { Response } from "express";
+import type { AuthRequest } from "../../types/index.js";
+import * as adminService from "./admin.service.js";
+import { asyncHandler } from "../../middlewares/error.middleware.js";
 import { array } from "zod";
 
 export const getUsers = asyncHandler(
@@ -16,7 +16,7 @@ export const getUserById = asyncHandler(
 	async (req: AuthRequest, res: Response) => {
 		const { id } = req.params;
 
-		if (Array.isArray(id))
+		if (!id || Array.isArray(id))
 			return res.status(400).json({ message: "Invalid user ID" });
 
 		const data = await adminService.getUserById(id);
@@ -29,7 +29,7 @@ export const updateUserRole = asyncHandler(
 		const { id } = req.params;
 		const { role } = req.body;
 
-		if (Array.isArray(id))
+		if (!id || Array.isArray(id))
 			return res.status(400).json({ message: "Invalid user ID" });
 
 		const data = await adminService.updateUserRole(id, role);
@@ -44,7 +44,7 @@ export const banUser = asyncHandler(async (req: AuthRequest, res: Response) => {
 		until?: string | null;
 	};
 
-	if (Array.isArray(id))
+	if (!id || Array.isArray(id))
 		return res.status(400).json({ message: "Invalid user ID" });
 
 	const data = await adminService.banUser(id, { reason, until });
@@ -55,7 +55,7 @@ export const unbanUser = asyncHandler(
 	async (req: AuthRequest, res: Response) => {
 		const { id } = req.params;
 
-		if (Array.isArray(id))
+		if (!id || Array.isArray(id))
 			return res.status(400).json({ message: "Invalid user ID" });
 
 		const data = await adminService.unbanUser(id);
@@ -67,7 +67,7 @@ export const deleteUser = asyncHandler(
 	async (req: AuthRequest, res: Response) => {
 		const { id } = req.params;
 
-		if (Array.isArray(id))
+		if (!id || Array.isArray(id))
 			return res.status(400).json({ message: "Invalid user ID" });
 
 		const data = await adminService.deleteUser(id);
@@ -80,7 +80,7 @@ export const getUserPurchases = asyncHandler(
 		const { id } = req.params;
 		const { page, limit } = req.query;
 
-		if (Array.isArray(id))
+		if (!id || Array.isArray(id))
 			return res.status(400).json({ message: "Invalid user ID" });
 
 		const data = await adminService.getUserPurchases(id, {
@@ -96,7 +96,7 @@ export const getUserDownloads = asyncHandler(
 		const { id } = req.params;
 		const { page, limit } = req.query;
 
-		if (Array.isArray(id))
+		if (!id || Array.isArray(id))
 			return res.status(400).json({ message: "Invalid user ID" });
 
 		const data = await adminService.getUserDownloads(id, {
@@ -112,7 +112,7 @@ export const getUserReviews = asyncHandler(
 		const { id } = req.params;
 		const { page, limit } = req.query;
 
-		if (Array.isArray(id))
+		if (!id || Array.isArray(id))
 			return res.status(400).json({ message: "Invalid user ID" });
 
 		const data = await adminService.getUserReviews(id, {

@@ -1,6 +1,6 @@
-import { prisma } from "../../config/prisma";
-import { AppVersion, CreateVersionData } from "./version.types";
-import { NotFoundError, DatabaseError } from "../../utils/errors";
+import { prisma } from "../../config/prisma.js";
+import type { CreateVersionData } from "./version.types.js";
+import { NotFoundError, DatabaseError } from "../../utils/errors.js";
 
 export async function addVersion(
 	appId: string,
@@ -9,7 +9,7 @@ export async function addVersion(
 ) {
 	try {
 		const app = await prisma.apps.findUnique({ where: { id: appId } });
-		
+
 		if (!app) {
 			throw new NotFoundError("App", appId);
 		}

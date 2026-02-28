@@ -1,4 +1,4 @@
-@use "../../../../styles/helpers/" as *;
+@use "../../../../styles/helpers/"as *;
 
 .userInfo {
     display: flex;
@@ -70,7 +70,10 @@
     line-height: 1.5;
     margin-top: rem(4);
 
-    svg { flex-shrink: 0; margin-top: rem(1); }
+    svg {
+        flex-shrink: 0;
+        margin-top: rem(1);
+    }
 }
 
 .btnBan {
@@ -87,7 +90,18 @@
     cursor: pointer;
     transition: $transition;
 
-    &:hover { background: darken($warning, 8%); transform: translateY(-1px); }
-    &:active { transform: none; }
-    &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    &:hover {
+        background: darken($warning, 8%);
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        transform: none;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
 }

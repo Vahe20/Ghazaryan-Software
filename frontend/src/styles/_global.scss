@@ -1,15 +1,15 @@
-@use "helpers"as *;
+@use "helpers" as *;
 
 :root {
-    --text-primary: #{$text-primary};
-    --text-secondary: #{$text-secondary};
-    --text-tertiary: #{$text-tertiary};
-    --background-primary: #{$background-primary};
+    --text-primary:        #{$text-primary};
+    --text-secondary:      #{$text-secondary};
+    --text-tertiary:       #{$text-tertiary};
+    --background-primary:  #{$background-primary};
     --background-tertiary: #{$background-tertiary};
-    --border-color: #{$border-color};
-    --primary: #{$primary};
-    --error: #{$error};
-    --success: #{$success};
+    --border-color:        #{$border-color};
+    --primary:             #{$primary};
+    --error:               #{$error};
+    --success:             #{$success};
 }
 
 * {
@@ -30,9 +30,7 @@ body {
         -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
         "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
         sans-serif;
-    background: linear-gradient(135deg,
-            $background-primary 0%,
-            $background-secondary 100%);
+    background: linear-gradient(135deg, $background-primary 0%, $background-secondary 100%);
     background-attachment: fixed;
     color: $text-primary;
     min-height: 100vh;
@@ -61,7 +59,7 @@ body {
     display: flex;
     align-items: center;
     gap: rem(8);
-    animation: slideDown 0.3s ease;
+    animation: slideDown 0.3s ease, errorShake 0.4s ease 0.05s;
     box-shadow: $shadow-md;
 
     &::before {
@@ -73,16 +71,11 @@ body {
 a {
     color: $link-color;
     text-decoration: none;
-    transition: $transition;
+    transition: color $transition, opacity $transition;
     position: relative;
 
-    &:hover {
-        color: $link-hover;
-    }
-
-    &:active {
-        transform: scale(0.98);
-    }
+    &:hover  { color: $link-hover; }
+    &:active { opacity: 0.8; }
 }
 
 input,
@@ -95,12 +88,13 @@ select {
     border-radius: $radius-md;
     color: $text-primary;
     padding: rem(12) rem(16);
-    transition: all $transition;
+    transition: border-color $transition, box-shadow $transition, background $transition;
 
     &:focus {
         outline: none;
         border-color: $primary;
-        box-shadow: 0 0 0 3px $primary-light;
+        box-shadow: 0 0 0 3px rgba($primary, 0.15);
+        background: rgba($background-tertiary, 0.9);
     }
 
     &:hover:not(:focus) {
@@ -110,17 +104,10 @@ select {
 
 input,
 textarea {
-    &::placeholder {
-        color: $text-tertiary;
-    }
+    &::placeholder { color: $text-tertiary; }
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
     color: $text-color;
 }
 
@@ -136,20 +123,21 @@ button {
     border: none;
     background: none;
     outline: none;
-    transition: all $transition;
+    transition:
+        color $transition,
+        background $transition,
+        border-color $transition,
+        box-shadow $transition,
+        transform $transition-fast,
+        opacity $transition;
     font-weight: 500;
 
-    &:hover {
-        transform: translateY(-1px);
-    }
-
-    &:active {
-        transform: translateY(0);
-    }
+    &:not(:disabled):hover  { transform: translateY(-1px); }
+    &:not(:disabled):active { transform: translateY(0) scale(0.98); }
+    &:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 }
 
-ul,
-ol {
+ul, ol {
     list-style: none;
 }
 
@@ -158,7 +146,8 @@ main {
 }
 
 ::-webkit-scrollbar {
-    width: 10px;
+    width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -166,10 +155,15 @@ main {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: $background-tertiary;
+    background: rgba(255, 255, 255, 0.1);
     border-radius: $radius-full;
+    transition: background 0.2s ease;
 
-    &:hover {
-        background: rgba(255, 255, 255, 0.2);
-    }
+    &:hover { background: rgba(255, 255, 255, 0.2); }
 }
+
+::selection {
+    background: rgba($primary, 0.3);
+    color: $text-primary;
+}
+

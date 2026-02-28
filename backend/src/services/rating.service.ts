@@ -1,4 +1,4 @@
-import { prisma } from "../config/prisma";
+import { prisma } from "../config/prisma.js";
 
 export async function recalcAppRating(appId: string) {
 	const result = await prisma.reviews.aggregate({

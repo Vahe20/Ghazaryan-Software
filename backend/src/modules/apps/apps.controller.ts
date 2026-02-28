@@ -1,18 +1,19 @@
-import { Request, Response } from "express";
-import * as appsService from "./apps.service";
-import { AuthRequest, DownloadMetadata } from "../../types";
-import { asyncHandler } from "../../middlewares/error.middleware";
-import { ApiError, NotFoundError, ValidationError } from "../../utils/errors";
+import type { Request, Response } from "express";
+import * as appsService from "./apps.service.js";
+import type { AuthRequest, DownloadMetadata } from "../../types/index.js";
+import { asyncHandler } from "../../middlewares/error.middleware.js";
+import { ApiError, NotFoundError, ValidationError } from "../../utils/errors.js";
+import type { GetAppsQuery } from "./apps.types.js";
 
 export const getApps = asyncHandler(async (req: Request, res: Response) => {
-	const result = await appsService.getAllApps(req.query as any);
+	const result = await appsService.getAllApps(req.query as unknown as GetAppsQuery);
 	res.json(result);
 });
 
 export const getAppById = asyncHandler(async (req: Request, res: Response) => {
 	const { id } = req.params;
-	
-	if (Array.isArray(id)) {
+
+	if (!id || Array.isArray(id)) {
 		throw new ValidationError("Invalid ID parameter");
 	}
 
@@ -28,8 +29,8 @@ export const getAppById = asyncHandler(async (req: Request, res: Response) => {
 
 export const getAppBySlug = asyncHandler(async (req: Request, res: Response) => {
 	const { slug } = req.params;
-	
-	if (Array.isArray(slug)) {
+
+	if (!slug || Array.isArray(slug)) {
 		throw new ValidationError("Invalid slug parameter");
 	}
 
@@ -50,8 +51,8 @@ export const createApp = asyncHandler(async (req: Request, res: Response) => {
 
 export const updateApp = asyncHandler(async (req: Request, res: Response) => {
 	const { id } = req.params;
-	
-	if (Array.isArray(id)) {
+
+	if (!id || Array.isArray(id)) {
 		throw new ValidationError("Invalid ID parameter");
 	}
 
@@ -61,8 +62,8 @@ export const updateApp = asyncHandler(async (req: Request, res: Response) => {
 
 export const deleteApp = asyncHandler(async (req: Request, res: Response) => {
 	const { id } = req.params;
-	
-	if (Array.isArray(id)) {
+
+	if (!id || Array.isArray(id)) {
 		throw new ValidationError("Invalid ID parameter");
 	}
 
@@ -72,8 +73,8 @@ export const deleteApp = asyncHandler(async (req: Request, res: Response) => {
 
 export const downloadApp = asyncHandler(async (req: AuthRequest, res: Response) => {
 	const { id } = req.params;
-	
-	if (Array.isArray(id)) {
+
+	if (!id || Array.isArray(id)) {
 		throw new ValidationError("Invalid ID parameter");
 	}
 
@@ -108,7 +109,7 @@ export const getUserLibrary = asyncHandler(async (req: AuthRequest, res: Respons
 
 	const result = await appsService.getUserLibrary(
 		req.user.userId,
-		req.query as any,
+		req.query as unknown as GetAppsQuery,
 	);
 	res.json(result);
 });

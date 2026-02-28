@@ -1,14 +1,14 @@
 import bcrypt from "bcrypt";
-import * as jwt from "jsonwebtoken";
-import { prisma } from "../../config/prisma";
-import { jwtConfig } from "../../config/jwt";
-import { UserCreateData, LoginInput } from "./auth.types";
+import jwt from "jsonwebtoken";
+import { prisma } from "../../config/prisma.js";
+import { jwtConfig } from "../../config/jwt.js";
+import type { UserCreateData, LoginInput } from "./auth.types.js";
 import {
 	NotFoundError,
 	ConflictError,
 	AuthenticationError,
 	DatabaseError,
-} from "../../utils/errors";
+} from "../../utils/errors.js";
 
 export async function getUserById(id: string) {
 	try {
@@ -146,6 +146,25 @@ export async function loginUser(data: LoginInput) {
 
 		const user = await prisma.users.findUnique({
 			where: { email },
+			select: {
+				id: true,
+				email: true,
+				userName: true,
+				role: true,
+				balance: true,
+				blockedTime: true,
+				attempt: true,
+				avatarUrl: true,
+				reviews: true,
+				downloads: true,
+				purchases: true,
+				authoredApps: true,
+				passwordHash: true,
+				lastLoginAt: true,
+				googleId: true,
+				createdAt: true,
+				updatedAt: true,
+			},
 		});
 
 		if (!user) {
@@ -209,13 +228,84 @@ export async function loginUser(data: LoginInput) {
 				id: user.id,
 				email: user.email,
 				role: user.role,
+				userName: user.userName,
+				balance: user.balance,
+				avatarUrl: user.avatarUrl,
+				reviews: user.reviews,
+				downloads: user.downloads,
+				purchases: user.purchases,
+				authoredApps: user.authoredApps,
+				lastLoginAt: user.lastLoginAt,
+				createdAt: user.createdAt,
+				updatedAt: user.updatedAt,
 			},
 		};
-	} catch (error) {
+	} catch (error: any) {
 		if (error instanceof AuthenticationError) {
 			throw error;
 		}
-		throw new DatabaseError("Failed to login", error);
+		throw new DatabaseError(error);
 	}
 }
 
+export async function findOrCreateGoogleUser(profile: {
+	googleId: string;
+	email: string;
+	displayName: string;
+	avatarUrl?: string;
+}) {
+	try {
+		let user = await prisma.users.findUnique({
+			where: { googleId: profile.googleId },
+		});
+
+		if (user) {
+			await prisma.users.update({
+				where: { id: user.id },
+				data: { lastLoginAt: new Date() },
+			});
+			return user;
+		}
+
+		user = await prisma.users.findUnique({
+			where: { email: profile.email },
+		});
+
+		if (user) {
+			user = await prisma.users.update({
+				where: { id: user.id },
+				data: {
+					googleId: profile.googleId,
+					avatarUrl: profile.avatarUrl || user.avatarUrl,
+					lastLoginAt: new Date(),
+				},
+			});
+			return user;
+		}
+
+		const userName = profile.displayName ?? profile.email.split("@")[0];
+		user = await prisma.users.create({
+			data: {
+				email: profile.email,
+				userName,
+				passwordHash: "",
+				googleId: profile.googleId,
+				avatarUrl: profile.avatarUrl,
+			},
+		});
+
+		return user;
+	} catch (error) {
+		throw new DatabaseError("Failed to process Google authentication", error);
+	}
+}
+
+export function generateAuthToken(userId: string, role: string) {
+	const accessToken = jwt.sign(
+		{ userId, role },
+		jwtConfig.accessSecret,
+		{ expiresIn: jwtConfig.accessExpiresIn },
+	);
+
+	return accessToken;
+}

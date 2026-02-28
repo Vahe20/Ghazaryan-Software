@@ -1,4 +1,4 @@
-import { User } from '@/src/types/user.types';
+import { User } from '@/src/types/Entities';
 import style from './ProfileHeader.module.scss';
 
 interface ProfileHeaderProps {
@@ -18,7 +18,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
                         )}
                     </span>
                 </div>
-                <button className={style.changeAvatarBtn}>
+                {/* <button className={style.changeAvatarBtn}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path
                             d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z"
@@ -31,7 +31,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
                             strokeWidth="2"
                         />
                     </svg>
-                </button>
+                </button> */}
             </div>
 
             <div className={style.userInfo}>

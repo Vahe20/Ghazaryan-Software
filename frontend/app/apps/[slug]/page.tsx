@@ -2,111 +2,84 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { useAppBySlug } from "@/src/hooks/queries/useApps";
-import { useAuthStore } from "@/src/store/AuthStore";
-import { PaymentService } from "@/src/services/payment.service";
-import { ReviewService } from "@/src/services/review.service";
-import { useQueryClient } from "@tanstack/react-query";
-import { appsKeys } from "@/src/hooks/queries/useApps";
+import { useForm } from "react-hook-form";
+import { useAppDispatch, useAppSelector } from "@/src/app/hooks";
+import { api } from "@/src/features/api/baseApi";
+import { useGetAppBySlugQuery, usePurchaseAppMutation, useCreateReviewMutation } from "@/src/features/api/appsApi";
+import { formatDate, formatSize, extractErrorMessage } from "@/src/lib/utils";
+import { setUser } from "@/src/features/slices/authSlice";
 import style from "./page.module.scss";
 
-const PLATFORM_ICONS: Record<string, string> = {
-    WINDOWS: "🪟",
-    MAC: "🍎",
-    LINUX: "🐧",
-    ANDROID: "🤖",
-    IOS: "📱",
-};
-
-function formatSize(bytes: number): string {
-    if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(1) + " GB";
-    if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + " MB";
-    return (bytes / 1024).toFixed(1) + " KB";
-}
-
-function formatDate(date?: Date | string): string {
-    if (!date) return "—";
-    return new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long", day: "numeric" }).format(new Date(date));
+interface ReviewFormValues {
+    title: string;
+    comment: string;
 }
 
 export default function AppPage() {
     const { slug } = useParams<{ slug: string }>();
     const router = useRouter();
-    const queryClient = useQueryClient();
-
-    const { data: app, isLoading, error } = useAppBySlug(slug);
-    const { user } = useAuthStore();
+    const dispatch = useAppDispatch();
+    const { data: app, isLoading, error } = useGetAppBySlugQuery(slug);
+    const user = useAppSelector(s => s.auth.user);
 
     const [activeTab, setActiveTab] = useState<"overview" | "screenshots" | "reviews" | "changelog">("overview");
     const [activeScreenshot, setActiveScreenshot] = useState(0);
 
-    // Purchase state
-    const [purchasing, setPurchasing] = useState(false);
-    const [purchaseError, setPurchaseError] = useState<string | null>(null);
     const [purchaseSuccess, setPurchaseSuccess] = useState(false);
+    const [purchaseApp, { isLoading: purchasing, error: purchaseError }] = usePurchaseAppMutation();
 
-    // Review state
     const [reviewRating, setReviewRating] = useState(0);
     const [reviewHover, setReviewHover] = useState(0);
-    const [reviewComment, setReviewComment] = useState("");
-    const [reviewTitle, setReviewTitle] = useState("");
-    const [reviewLoading, setReviewLoading] = useState(false);
-    const [reviewError, setReviewError] = useState<string | null>(null);
     const [reviewSuccess, setReviewSuccess] = useState(false);
+    const [createReview, { isLoading: reviewLoading, error: reviewError }] = useCreateReviewMutation();
 
-    const alreadyOwned = user?.purchases?.some(p => p.app?.id === app?.id || (p as any).appId === app?.id);
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors, isValid },
+    } = useForm<ReviewFormValues>({ mode: "onChange" });
+
+    const alreadyOwned = user?.purchases?.some(p => p.app?.id === app?.id || p.appId === app?.id);
     const isFree = !app?.price || Number(app.price) === 0;
-
-    const { setUser } = useAuthStore();
 
     const handlePurchase = async () => {
         if (!user) { router.push("/auth/login"); return; }
         if (!app) return;
-        setPurchasing(true);
-        setPurchaseError(null);
         try {
-            const result = await PaymentService.purchaseApp(app.id);
-            // Update balance in store from server response
-            setUser({ ...user, balance: Number(result.balance) });
+            const result = await purchaseApp(app.id).unwrap();
+            dispatch(setUser({ ...user, balance: result.balance }));
             setPurchaseSuccess(true);
-            queryClient.invalidateQueries({ queryKey: appsKeys.detail(slug) });
-        } catch (err: unknown) {
-            const axiosErr = err as { response?: { data?: { error?: { message?: string } } } };
-            setPurchaseError(axiosErr.response?.data?.error?.message ?? "Purchase failed");
-        } finally {
-            setPurchasing(false);
+        } catch {
+            return;
         }
     };
 
-    const handleReviewSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const onReviewSubmit = async (values: ReviewFormValues) => {
         if (!app || reviewRating === 0) return;
-        setReviewLoading(true);
-        setReviewError(null);
         try {
-            await ReviewService.createReview(app.id, {
+            await createReview({
+                appId: app.id,
                 rating: reviewRating,
-                title: reviewTitle || undefined,
-                comment: reviewComment,
-            });
+                title: values.title || undefined,
+                comment: values.comment,
+            }).unwrap();
             setReviewSuccess(true);
             setReviewRating(0);
-            setReviewComment("");
-            setReviewTitle("");
-            queryClient.invalidateQueries({ queryKey: appsKeys.detail(slug) });
+            reset();
             setTimeout(() => setReviewSuccess(false), 3000);
-        } catch (err: any) {
-            setReviewError(err.response?.data?.error?.message || "Failed to submit review");
-        } finally {
-            setReviewLoading(false);
+        } catch {
+            return;
         }
     };
 
-    // ── Loading ─────────────────────────────────────────
     if (isLoading) {
         return (
             <div className={style.loadingPage}>
-                <div className={style.loadingSpinner} />
+                <svg className={style.loadingSpinner} viewBox="0 0 50 50">
+                    <circle cx="25" cy="25" r="20" fill="none" />
+                    <path d="M25 5 A20 20 0 0 1 45 25" fill="none" />
+                </svg>
                 <p>Loading application...</p>
             </div>
         );
@@ -129,12 +102,11 @@ export default function AppPage() {
 
     const platforms = Array.isArray(app.platform) ? app.platform : [app.platform].filter(Boolean);
     const screenshots = app.screenshots ?? [];
-    const reviews = (app as any).reviews ?? [];
+    const reviews = app.reviews ?? [];
 
     return (
         <div className={style.page}>
 
-            {/* ── HERO ─────────────────────────────────────── */}
             <div className={style.hero}>
                 <div className={style.heroBg}>
                     {app.coverUrl && <img src={app.coverUrl} alt="" aria-hidden />}
@@ -157,7 +129,6 @@ export default function AppPage() {
                                 <span className={`${style.badge} ${app.status === "RELEASE" ? style.badgeRelease : style.badgeBeta}`}>
                                     {app.status === "RELEASE" ? "Released" : "Beta"}
                                 </span>
-                                {app.featured && <span className={`${style.badge} ${style.badgeFeatured}`}>⭐ Featured</span>}
                                 <span className={style.badge}>{app.category?.name}</span>
                             </div>
 
@@ -183,13 +154,12 @@ export default function AppPage() {
                             <div className={style.platforms}>
                                 {platforms.map((p: string) => (
                                     <span key={p} className={style.platformTag}>
-                                        {PLATFORM_ICONS[p] ?? "💻"} {p.charAt(0) + p.slice(1).toLowerCase()}
+                                        {p.charAt(0) + p.slice(1).toLowerCase()}
                                     </span>
                                 ))}
                             </div>
                         </div>
 
-                        {/* ── CTA ─────────────────────────── */}
                         <div className={style.cta}>
                             <div className={style.ctaPrice}>
                                 {isFree ? (
@@ -197,7 +167,7 @@ export default function AppPage() {
                                 ) : (
                                     <>
                                         <span className={style.priceAmount}>{Number(app.price).toLocaleString()}</span>
-                                        <span className={style.priceCurrency}>AMD</span>
+                                        <span className={style.priceCurrency}>USD</span>
                                     </>
                                 )}
                             </div>
@@ -211,7 +181,7 @@ export default function AppPage() {
                                 </div>
                             ) : (
                                 <>
-                                    {purchaseError && <p className={style.ctaError}>{purchaseError}</p>}
+                                    {purchaseError && <p className={style.ctaError}>{extractErrorMessage(purchaseError, "Purchase failed")}</p>}
                                     <button
                                         className={style.buyBtn}
                                         onClick={handlePurchase}
@@ -232,7 +202,7 @@ export default function AppPage() {
                                 <span>{formatSize(app.size)}</span>
                                 <span>·</span>
                                 <span>v{app.version}</span>
-                                {app.publishedAt && <><span>·</span><span>{formatDate((app as any).publishedAt)}</span></>}
+                                {app.createdAt && <><span>·</span><span>{formatDate(app.createdAt)}</span></>}
                             </div>
 
                             <div className={style.ctaLinks}>
@@ -259,7 +229,6 @@ export default function AppPage() {
                 </div>
             </div>
 
-            {/* ── TABS ─────────────────────────────────────── */}
             <div className={style.container}>
                 <div className={style.tabs}>
                     {(["overview", "screenshots", "reviews", "changelog"] as const).map(tab => (
@@ -277,7 +246,6 @@ export default function AppPage() {
 
                 <div className={style.tabContent}>
 
-                    {/* ── OVERVIEW ──────────────────────────── */}
                     {activeTab === "overview" && (
                         <div className={style.overviewGrid}>
                             <div className={style.descriptionCard}>
@@ -287,7 +255,9 @@ export default function AppPage() {
                                 {app.tags?.length > 0 && (
                                     <div className={style.tags}>
                                         {app.tags.map((tag: string) => (
-                                            <span key={tag} className={style.tag}>#{tag}</span>
+                                            <span key={tag} className={style.tag}>
+                                                {tag}
+                                            </span>
                                         ))}
                                     </div>
                                 )}
@@ -315,18 +285,12 @@ export default function AppPage() {
                                         </div>
                                         <div className={style.infoItem}>
                                             <dt>Published</dt>
-                                            <dd>{formatDate((app as any).publishedAt)}</dd>
+                                            <dd>{formatDate((app).createdAt)}</dd>
                                         </div>
                                         <div className={style.infoItem}>
                                             <dt>Platforms</dt>
                                             <dd>{platforms.join(", ")}</dd>
                                         </div>
-                                        {app.minVersion && (
-                                            <div className={style.infoItem}>
-                                                <dt>Min. version</dt>
-                                                <dd>{app.minVersion}</dd>
-                                            </div>
-                                        )}
                                     </dl>
                                 </div>
 
@@ -342,7 +306,7 @@ export default function AppPage() {
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" /><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
                                         </svg>
-                                        <span>{(app as any).viewCount?.toLocaleString() ?? "—"}</span>
+                                        <span>{(app).viewCount?.toLocaleString() ?? "—"}</span>
                                         <small>Views</small>
                                     </div>
                                     <div className={style.statRow}>
@@ -357,7 +321,6 @@ export default function AppPage() {
                         </div>
                     )}
 
-                    {/* ── SCREENSHOTS ───────────────────────── */}
                     {activeTab === "screenshots" && (
                         <div className={style.screenshotsSection}>
                             {screenshots.length === 0 ? (
@@ -385,11 +348,9 @@ export default function AppPage() {
                         </div>
                     )}
 
-                    {/* ── REVIEWS ───────────────────── */}
                     {activeTab === "reviews" && (
                         <div className={style.reviewsSection}>
 
-                            {/* Summary banner */}
                             <div className={style.reviewsSummary}>
                                 <div className={style.ratingBig}>{app.rating.toFixed(1)}</div>
                                 <div className={style.summaryRight}>
@@ -407,11 +368,10 @@ export default function AppPage() {
                                 </div>
                             </div>
 
-                            {/* Leave review form */}
                             {user && (
                                 <div className={style.reviewForm}>
                                     <h3>Leave a Review</h3>
-                                    <form onSubmit={handleReviewSubmit}>
+                                    <form onSubmit={handleSubmit(onReviewSubmit)}>
                                         <div className={style.starPicker}>
                                             {[1, 2, 3, 4, 5].map(s => (
                                                 <button
@@ -430,31 +390,34 @@ export default function AppPage() {
                                                     </svg>
                                                 </button>
                                             ))}
+                                            {reviewRating === 0 && (
+                                                <span className={style.ratingHint}>Select a rating</span>
+                                            )}
                                         </div>
 
                                         <div className={style.reviewFormFields}>
                                             <input
                                                 type="text"
                                                 placeholder="Title (optional)"
-                                                value={reviewTitle}
-                                                onChange={e => setReviewTitle(e.target.value)}
                                                 className={style.reviewInput}
+                                                {...register("title")}
                                             />
                                             <textarea
                                                 placeholder="Share your experience..."
-                                                value={reviewComment}
-                                                onChange={e => setReviewComment(e.target.value)}
-                                                required
                                                 rows={4}
                                                 className={style.reviewTextarea}
+                                                {...register("comment", { required: "Comment is required" })}
                                             />
+                                            {errors.comment && (
+                                                <span className={style.fieldError}>{errors.comment.message}</span>
+                                            )}
                                         </div>
 
                                         <div className={style.reviewFormFooter}>
                                             <button
                                                 type="submit"
                                                 className={style.reviewSubmitBtn}
-                                                disabled={reviewLoading || reviewRating === 0 || !reviewComment.trim()}
+                                                disabled={reviewLoading || reviewRating === 0 || !isValid}
                                             >
                                                 {reviewLoading
                                                     ? <><span className={style.btnSpinner} />Submitting...</>
@@ -475,7 +438,7 @@ export default function AppPage() {
                                                         <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
                                                         <path d="M12 8v4m0 4h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                                     </svg>
-                                                    {reviewError}
+                                                    {extractErrorMessage(reviewError, "Failed to submit review")}
                                                 </div>
                                             )}
                                         </div>
@@ -483,7 +446,6 @@ export default function AppPage() {
                                 </div>
                             )}
 
-                            {/* Reviews list */}
                             <div>
                                 <div className={style.reviewsListHeader}>
                                     <h3>All Reviews</h3>
@@ -492,7 +454,7 @@ export default function AppPage() {
                                     {reviews.length === 0 ? (
                                         <div className={style.empty}><p>No reviews yet. Be the first!</p></div>
                                     ) : (
-                                        reviews.map((r: any) => (
+                                        reviews.map((r) => (
                                             <div key={r.id} className={style.reviewCard}>
                                                 <div className={style.reviewHeader}>
                                                     <div className={style.reviewAvatar}>
@@ -526,35 +488,18 @@ export default function AppPage() {
                         </div>
                     )}
 
-                    {/* ── CHANGELOG ─────────────────────────── */}
                     {activeTab === "changelog" && (
                         <div className={style.changelogSection}>
                             {app.changelog ? (
                                 <div className={style.changelogCard}>
                                     <div className={style.changelogVersion}>
                                         <span className={style.versionBadge}>v{app.version}</span>
-                                        <span className={style.changelogDate}>{formatDate((app as any).updatedAt)}</span>
+                                        <span className={style.changelogDate}>{formatDate((app).updatedAt)}</span>
                                     </div>
                                     <pre className={style.changelogText}>{app.changelog}</pre>
                                 </div>
                             ) : (
                                 <div className={style.empty}><p>No changelog available</p></div>
-                            )}
-
-                            {(app as any).versions?.length > 0 && (
-                                <div className={style.versionHistory}>
-                                    <h3>Version History</h3>
-                                    {(app as any).versions.map((v: any) => (
-                                        <div key={v.id} className={style.versionCard}>
-                                            <div className={style.versionHeader}>
-                                                <span className={style.versionBadge}>v{v.version}</span>
-                                                <span className={style.changelogDate}>{formatDate(v.releaseDate)}</span>
-                                                {!v.isStable && <span className={style.betaBadge}>Beta</span>}
-                                            </div>
-                                            <pre className={style.changelogText}>{v.changelog}</pre>
-                                        </div>
-                                    ))}
-                                </div>
                             )}
                         </div>
                     )}

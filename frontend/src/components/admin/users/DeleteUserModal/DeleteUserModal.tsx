@@ -1,22 +1,34 @@
 import ConfirmModal from "@/src/components/shared/ConfirmModal/ConfirmModal";
-import { AdminService, AdminUser } from "@/src/services/admin.service";
-import { useAsyncAction } from "@/src/hooks/useAsyncAction";
+import { useDeleteUserMutation } from "@/src/features/api/adminApi";
+import { AdminUser } from "@/src/types/Admin";
 
 interface DeleteUserModalProps {
     isOpen: boolean;
     user: AdminUser | null;
     onClose: () => void;
-    onDeleted: (id: string) => void;
+    onDeleted: () => void;
 }
 
 export default function DeleteUserModal({ isOpen, user, onClose, onDeleted }: DeleteUserModalProps) {
-    const { loading, error, run } = useAsyncAction("Failed to delete user");
+    const [deleteUser, { isLoading, error }] = useDeleteUserMutation();
 
     const handleDelete = async () => {
         if (!user) return;
-        await run(() => AdminService.deleteUser(user.id));
-        if (!error) onDeleted(user.id);
+        try {
+            await deleteUser(user.id).unwrap();
+            onDeleted();
+        } catch {}
     };
+
+    const getErrorMessage = (error: FetchBaseQueryError | SerializedError | undefined): string | null => {
+        if (!error) return null;
+        if ("data" in error && error.data && typeof error.data === "object" && "message" in error.data) {
+            return error.data.message as string;
+        }
+        return "Failed to delete user";
+    };
+
+    const errorMessage = getErrorMessage(error);
 
     return (
         <ConfirmModal
@@ -25,8 +37,8 @@ export default function DeleteUserModal({ isOpen, user, onClose, onDeleted }: De
             onConfirm={handleDelete}
             title="Delete User?"
             description={<>Are you sure you want to delete <strong>{user?.userName}</strong>? This action cannot be undone.</>}
-            loading={loading}
-            error={error}
+            loading={isLoading}
+            error={errorMessage}
         />
     );
 }

@@ -1,74 +1,115 @@
 @use "../../src/styles/helpers/" as *;
 
-.library {
+.gate {
+    position: relative;
     min-height: calc(100vh - 80px);
-    padding: rem(32) rem(24);
-    display: grid;
-    grid-template-columns: 400px 1fr;
-    gap: rem(24);
-    max-width: 1600px;
-    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
     animation: fadeIn 0.5s ease;
+}
 
-    @media (max-width: 1200px) {
-        grid-template-columns: 350px 1fr;
-        gap: rem(20);
+.gate__orb {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: rem(600);
+    height: rem(600);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba($primary, 0.12) 0%, transparent 65%);
+    pointer-events: none;
+    animation: pulse 5s ease-in-out infinite;
+}
+
+.gate__body {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+
+    h1 {
+        font-size: rem(26);
+        font-weight: 700;
+        color: $text-primary;
+        margin: rem(24) 0 rem(10);
     }
 
-    @media (max-width: 992px) {
+    p {
+        font-size: rem(15);
+        color: $text-secondary;
+    }
+}
+
+.gate__iconRing {
+    width: rem(88);
+    height: rem(88);
+    border-radius: 50%;
+    background: rgba($primary, 0.08);
+    border: 1px solid rgba($primary, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    color: $primary;
+
+    svg {
+        width: rem(38);
+        height: rem(38);
+    }
+}
+
+.shell {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    height: calc(100vh - 80px);
+    overflow: hidden;
+
+    @include laptop {
+        grid-template-columns: 320px 1fr;
+    }
+
+    @include tablet {
         grid-template-columns: 1fr;
-        padding: rem(24) rem(16);
-    }
-}
-
-.apps {
-    height: calc(100vh - 144px);
-    position: sticky;
-    top: rem(80);
-
-    @media (max-width: 992px) {
-        position: relative;
-        top: 0;
         height: auto;
-        max-height: 60vh;
+        overflow: visible;
     }
 }
 
-.appInfo {
-    height: calc(100vh - 144px);
+.shell__rail {
+    border-right: 1px solid $border-color;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slideInLeft 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+    @include tablet {
+        border-right: none;
+        border-bottom: 1px solid $border-color;
+        max-height: 50vh;
+    }
+}
+
+.shell__stage {
     overflow-y: auto;
-    padding-right: rem(4);
+    animation: fadeIn 0.5s ease 0.1s both;
 
     &::-webkit-scrollbar {
-        width: 8px;
+        width: 5px;
     }
 
     &::-webkit-scrollbar-track {
-        background: $background-tertiary;
-        border-radius: $radius-sm;
+        background: transparent;
     }
 
     &::-webkit-scrollbar-thumb {
         background: $border-color-medium;
-        border-radius: $radius-sm;
-
-        &:hover {
-            background: $border-color-strong;
-        }
+        border-radius: $radius-full;
     }
 
-    @media (max-width: 992px) {
-        height: auto;
-        overflow-y: visible;
-        padding-right: 0;
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
+    @include tablet {
+        overflow: visible;
+        min-height: 60vh;
     }
 }

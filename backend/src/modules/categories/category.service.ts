@@ -1,11 +1,11 @@
-import { prisma } from "../../config/prisma";
-import { slugGenerator } from "../../utils/slugGenerator";
-import { CreateCategoryInput, UpdateCategoryInput } from "./category.types";
+import { prisma } from "../../config/prisma.js";
+import { slugGenerator } from "../../utils/slugGenerator.js";
+import type { CreateCategoryInput, UpdateCategoryInput } from "./category.types.js";
 import {
 	NotFoundError,
 	ConflictError,
 	DatabaseError,
-} from "../../utils/errors";
+} from "../../utils/errors.js";
 
 export async function getAllCategories() {
 	try {

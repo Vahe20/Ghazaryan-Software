@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { upload } from "../../middlewares/upload.middleware";
-import { createAppVersionSchema } from "./version.types";
-import * as ctrl from "./version.controller";
-import authMiddleware from "../../middlewares/auth.middleware";
-import { validate } from "../../middlewares/validation.middleware";
+import { upload } from "../../middlewares/upload.middleware.js";
+import { createAppVersionSchema } from "./version.types.js";
+import * as ctrl from "./version.controller.js";
+import authMiddleware from "../../middlewares/auth.middleware.js";
+import { validate } from "../../middlewares/validation.middleware.js";
 
 const router = Router();
 

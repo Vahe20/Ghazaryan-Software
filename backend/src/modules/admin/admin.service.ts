@@ -1,7 +1,7 @@
-import { prisma } from "../../config/prisma";
-import { Prisma, PurchaseStatus } from "../../generated/prisma";
-import { UserRole } from "../../types";
-import { NotFoundError, DatabaseError } from "../../utils/errors";
+import { prisma } from "../../config/prisma.js";
+import { Prisma, PurchaseStatus } from "../../generated/prisma/index.js";
+import type { UserRole } from "../../types/index.js";
+import { NotFoundError, DatabaseError } from "../../utils/errors.js";
 
 const userSelect = {
 	id: true,
@@ -25,23 +25,23 @@ const userSelect = {
 } as const;
 
 interface GetUsersParams {
-	page?: number;
-	limit?: number;
-	search?: string;
-	role?: string;
+	page?: number | undefined;
+	limit?: number | undefined;
+	search?: string | undefined;
+	role?: string | undefined;
 }
 
 interface GetPurchasesParams {
-	page?: number;
-	limit?: number;
-	userId?: string;
-	appId?: string;
-	status?: string;
+	page?: number | undefined;
+	limit?: number | undefined;
+	userId?: string | undefined;
+	appId?: string | undefined;
+	status?: string | undefined;
 }
 
 interface GetUserSubParams {
-	page?: number;
-	limit?: number;
+	page?: number | undefined;
+	limit?: number | undefined;
 }
 
 export async function getUsers(params: GetUsersParams = {}) {
@@ -151,7 +151,7 @@ export async function updateUserRole(id: string, role: UserRole) {
 
 export async function banUser(
 	id: string,
-	data: { reason?: string; until?: string | null },
+	data: { reason?: string | undefined; until?: string | null | undefined },
 ) {
 	try {
 		return await prisma.users.update({

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { AdminService, AdminUser } from "@/src/services/admin.service";
+import { useState } from "react";
+import { AdminUser } from "@/src/types/Admin";
+import { useGetAdminUsersQuery } from "@/src/features/api/adminApi";
 import { useDebounce } from "@/src/hooks/useDebounce";
 import RoleModal from "@/src/components/admin/users/RoleModal/RoleModal";
 import DeleteUserModal from "@/src/components/admin/users/DeleteUserModal/DeleteUserModal";
@@ -11,15 +12,9 @@ import Pagination from "@/src/components/admin/shared/Pagination/Pagination";
 import s from "../admin.module.scss";
 
 export default function AdminUsersPage() {
-    const [users, setUsers] = useState<AdminUser[]>([]);
-    const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("");
     const [page, setPage] = useState(1);
-
     const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
     const [roleModalOpen, setRoleModalOpen] = useState(false);
     const [deletingUser, setDeletingUser] = useState<AdminUser | null>(null);
@@ -27,40 +22,18 @@ export default function AdminUsersPage() {
 
     const debouncedSearch = useDebounce(search, 400);
 
-    const load = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const data = await AdminService.getUsers({
-                page, limit: 15,
-                search: debouncedSearch || undefined,
-                role: roleFilter || undefined,
-            });
-            setUsers(data.users);
-            setPagination(data.pagination);
-        } catch {
-            setError("Failed to load users");
-        } finally {
-            setLoading(false);
-        }
-    }, [page, debouncedSearch, roleFilter]);
+    const { data, isLoading, isError } = useGetAdminUsersQuery({
+        page,
+        limit: 15,
+        search: debouncedSearch || undefined,
+        role: roleFilter || undefined,
+    });
 
-    useEffect(() => { load(); }, [load]);
-    useEffect(() => { setPage(1); }, [debouncedSearch, roleFilter]);
+    const users = data?.users ?? [];
+    const pagination = data?.pagination ?? { page: 1, totalPages: 1, total: 0 };
 
     const openRoleEdit = (user: AdminUser) => { setEditingUser(user); setRoleModalOpen(true); };
     const openDelete = (user: AdminUser) => { setDeletingUser(user); setDeleteModalOpen(true); };
-
-    const handleRoleSaved = (updated: AdminUser) => {
-        setUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
-        setRoleModalOpen(false);
-    };
-
-    const handleDeleted = (id: string) => {
-        setUsers(prev => prev.filter(u => u.id !== id));
-        setDeleteModalOpen(false);
-        setPagination(p => ({ ...p, total: p.total - 1 }));
-    };
 
     return (
         <div className={s.page}>
@@ -74,21 +47,21 @@ export default function AdminUsersPage() {
             <UsersToolbar
                 search={search}
                 roleFilter={roleFilter}
-                onSearchChange={setSearch}
-                onRoleChange={setRoleFilter}
+                onSearchChange={(v) => { setSearch(v); setPage(1); }}
+                onRoleChange={(v) => { setRoleFilter(v); setPage(1); }}
             />
 
             <div className={s.tableCard}>
-                {loading ? (
+                {isLoading ? (
                     <div className={s.loading}><div className={s.spinner} /><p>Loading users...</p></div>
-                ) : error ? (
-                    <div className={s.errorState}><p>{error}</p></div>
+                ) : isError ? (
+                    <div className={s.errorState}><p>Failed to load users</p></div>
                 ) : users.length === 0 ? (
                     <div className={s.empty}><p>No users found</p></div>
                 ) : (
                     <UsersTable users={users} onEditRole={openRoleEdit} onDelete={openDelete} />
                 )}
-                {!loading && (
+                {!isLoading && (
                     <Pagination page={page} totalPages={pagination.totalPages} total={pagination.total} onPageChange={setPage} />
                 )}
             </div>
@@ -97,13 +70,13 @@ export default function AdminUsersPage() {
                 isOpen={roleModalOpen}
                 user={editingUser}
                 onClose={() => setRoleModalOpen(false)}
-                onSaved={handleRoleSaved}
+                onSaved={() => setRoleModalOpen(false)}
             />
             <DeleteUserModal
                 isOpen={deleteModalOpen}
                 user={deletingUser}
                 onClose={() => setDeleteModalOpen(false)}
-                onDeleted={handleDeleted}
+                onDeleted={() => setDeleteModalOpen(false)}
             />
         </div>
     );

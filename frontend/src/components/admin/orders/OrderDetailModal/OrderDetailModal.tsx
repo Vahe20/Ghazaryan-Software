@@ -1,4 +1,4 @@
-import { Purchase } from "@/src/services/admin.service";
+import { Purchase } from "@/src/types/Admin";
 import StatusBadge from "../StatusBadge/StatusBadge";
 import BaseModal from "@/src/components/shared/BaseModal/BaseModal";
 import btns from "../../shared/_buttons.module.scss";
@@ -24,7 +24,7 @@ export default function OrderDetailModal({ isOpen, purchase, onClose }: OrderDet
                 <div className={form.formGrid}>
                     <div className={form.formGroup}>
                         <span className={form.formLabel}>Order ID</span>
-                        <code style={{ fontSize: "12px", color: "var(--text-tertiary, #8a8d91)", wordBreak: "break-all" }}>{purchase.id}</code>
+                        <code style={{ fontSize: "12px", color: "var(--text-tertiary, #666)" }}>{purchase.id}</code>
                     </div>
                     <div className={form.formGroup}>
                         <span className={form.formLabel}>Status</span>
@@ -44,7 +44,7 @@ export default function OrderDetailModal({ isOpen, purchase, onClose }: OrderDet
                     </div>
                     <div className={form.formGroup}>
                         <span className={form.formLabel}>Amount</span>
-                        <p style={{ margin: 0, fontWeight: 700, fontSize: "18px" }}>{Number(purchase.price).toLocaleString()} AMD</p>
+                        <p style={{ margin: 0, fontWeight: 700, fontSize: "18px" }}>{Number(purchase.price).toLocaleString()} USD</p>
                     </div>
                     <div className={form.formGroup}>
                         <span className={form.formLabel}>Payment Method</span>

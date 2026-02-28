@@ -1,6 +1,5 @@
 @use "../../../../styles/helpers/" as *;
 
-// RoleModal — специфичные стили
 
 .userInfo {
     display: flex;
@@ -20,3 +19,4 @@
     font-size: rem(13);
     color: $text-tertiary;
 }
+

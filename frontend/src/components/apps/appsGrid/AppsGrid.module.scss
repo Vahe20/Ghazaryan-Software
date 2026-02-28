@@ -1,98 +1,162 @@
 @use "../../../styles/helpers/" as *;
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(rem(300), 1fr));
-  gap: rem(24);
-  margin-bottom: rem(40);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(rem(300), 1fr));
+    gap: rem(24);
+    margin-bottom: rem(40);
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: rem(20);
-  }
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: rem(16);
+    }
 }
+
+.cardWrapper {
+    animation: cardEntrance 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.skeletonCard {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: rem(18);
+    overflow: hidden;
+    animation: cardEntrance 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+$shimmer: linear-gradient(90deg, $background-tertiary 25%, rgba(255,255,255,0.05) 50%, $background-tertiary 75%);
+
+.skeletonImage {
+    width: 100%;
+    height: rem(196);
+    background: $shimmer;
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeletonContent {
+    padding: rem(18) rem(20) rem(14);
+    display: flex;
+    flex-direction: column;
+    gap: rem(12);
+}
+
+.skeletonHeader {
+    display: flex;
+    gap: rem(12);
+    align-items: flex-start;
+}
+
+.skeletonIcon {
+    width: rem(50);
+    height: rem(50);
+    border-radius: rem(13);
+    flex-shrink: 0;
+    background: $shimmer;
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease-in-out 0.1s infinite;
+}
+
+.skeletonInfo { flex: 1; display: flex; flex-direction: column; gap: rem(8); }
+
+.skeletonLine {
+    border-radius: $radius-sm;
+    background: $shimmer;
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeletonTitle    { height: rem(16); width: 75%; animation-delay: 0.12s; }
+.skeletonCategory { height: rem(12); width: 50%; animation-delay: 0.17s; }
+.skeletonDesc     { height: rem(13); width: 100%; animation-delay: 0.22s; }
+.skeletonDescShort{ height: rem(13); width: 65%; animation-delay: 0.27s; }
+.skeletonStats    { display: flex; gap: rem(16); padding-top: rem(10); border-top: 1px solid $border-color-light; }
+.skeletonStat     { height: rem(13); width: rem(70); animation-delay: 0.32s; }
 
 .loading,
 .error,
 .empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: rem(80) rem(24);
-  text-align: center;
-  color: $text-secondary;
-
-  svg {
-    margin: rem(24);
-    color: $text-tertiary;
-  }
-
-  h3 {
-    font-size: rem(24);
-    font-weight: 700;
-    color: $text-primary;
-    margin: 0 0 rem(12) 0;
-  }
-
-  p {
-    font-size: rem(16);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: rem(80) rem(24);
+    text-align: center;
     color: $text-secondary;
-    margin: 0;
-  }
-}
+    animation: fadeIn 0.5s ease;
 
-.loading {
-  .spinner {
-    animation: spin 1s linear infinite;
-
-    svg {
-      color: $primary;
+    h3 {
+        font-size: rem(20);
+        font-weight: 700;
+        color: $text-primary;
+        margin: 0 0 rem(10);
+        animation: fadeInUp 0.4s ease 0.1s both;
     }
-  }
+
+    p {
+        font-size: rem(14);
+        color: $text-secondary;
+        margin: 0;
+        animation: fadeInUp 0.4s ease 0.15s both;
+    }
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.error {
-  svg {
+.errorIcon {
+    width: rem(76);
+    height: rem(76);
+    border-radius: 50%;
+    background: rgba($error, 0.08);
+    border: 1px solid rgba($error, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: rem(20);
     color: $error;
-  }
+    animation: scaleInBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), errorShake 0.5s ease 0.3s;
+}
+
+.emptyIcon {
+    width: rem(76);
+    height: rem(76);
+    border-radius: 50%;
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: rem(20);
+    color: $text-tertiary;
+    animation: scaleInBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    svg { animation: float 3s ease-in-out infinite; }
 }
 
 .retryButton {
-  margin-top: rem(24);
-  padding: rem(12) rem(32);
-  background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
-  color: white;
-  border: none;
-  border-radius: $radius-md;
-  font-size: rem(15);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all $transition;
-  font-family: inherit;
+    margin-top: rem(20);
+    padding: rem(11) rem(26);
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+    color: white;
+    border: none;
+    border-radius: $radius-md;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform $transition, box-shadow $transition;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    box-shadow: 0 4px 16px rgba($primary, 0.3);
+    animation: fadeInUp 0.4s ease 0.2s both;
 
-  &:hover {
-    transform: translateY(rem(-2));
-    box-shadow: $shadow-glow;
-  }
+    svg { transition: transform $transition; }
 
-  &:active {
-    transform: translateY(0);
-  }
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 28px rgba($primary, 0.45);
+        svg { transform: rotate(-180deg); }
+    }
+
+    &:active { transform: translateY(-1px); }
 }
 
-.empty {
-  svg {
-    color: $text-tertiary;
-    opacity: 0.5;
-  }
-}

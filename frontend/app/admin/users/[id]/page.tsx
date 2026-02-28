@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useCallback } from "react";
 import {
-	AdminService, AdminUser,
+	AdminUser,
 	UserPurchase, UserDownload, UserReview,
 	PurchaseStatus,
-} from "@/src/services/admin.service";
+} from "@/src/types/Admin";
 import { useParams, useRouter } from "next/navigation";
 import RoleModal from "@/src/components/admin/users/RoleModal/RoleModal";
 import DeleteUserModal from "@/src/components/admin/users/DeleteUserModal/DeleteUserModal";
@@ -145,7 +145,7 @@ export default function UserDetailPage() {
 		{ label: "User ID",    value: user.id },
 		{ label: "Email",      value: user.email },
 		{ label: "Username",   value: user.userName },
-		{ label: "Balance",    value: `${Number(user.balance ?? 0).toFixed(2)} AMD` },
+		{ label: "Balance",    value: `${Number(user.balance ?? 0).toFixed(2)} USD` },
 		{ label: "Registered", value: new Date(user.createdAt).toLocaleString() },
 		{ label: "Last Login", value: user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : "—" },
 	];
@@ -305,7 +305,7 @@ export default function UserDetailPage() {
 														{p.app.iconUrl && <img src={p.app.iconUrl} alt={p.app.name} className={us.appIcon} />}
 														<span>{p.app.name}</span>
 													</div></td>
-													<td>{Number(p.price).toFixed(2)} AMD</td>
+													<td>{Number(p.price).toFixed(2)} USD</td>
 													<td><span className={`${us.statusBadge} ${us[`status${p.status}`]}`}>{STATUS_LABELS[p.status]}</span></td>
 													<td>{p.paymentMethod ?? "—"}</td>
 													<td>{new Date(p.purchasedAt).toLocaleDateString()}</td>

@@ -7,6 +7,6 @@ export {
 	reviewLimiter,
 	readLimiter,
 	writeLimiter,
-} from "./rateLimiters";
+} from "./rateLimiters.js";
 
-export { getCurrentRateLimitConfig } from "./config";
+export { getCurrentRateLimitConfig } from "./config.js";

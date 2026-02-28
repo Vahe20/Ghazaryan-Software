@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
-import * as categoryService from "./category.service";
-import { asyncHandler } from "../../middlewares/error.middleware";
-import { NotFoundError, ValidationError } from "../../utils/errors";
+import type { Request, Response } from "express";
+import * as categoryService from "./category.service.js";
+import { asyncHandler } from "../../middlewares/error.middleware.js";
+import { NotFoundError, ValidationError } from "../../utils/errors.js";
 
 export const getCategories = asyncHandler(async (req: Request, res: Response) => {
 	const categories = await categoryService.getAllCategories();
@@ -10,8 +10,8 @@ export const getCategories = asyncHandler(async (req: Request, res: Response) =>
 
 export const getCategoryById = asyncHandler(async (req: Request, res: Response) => {
 	const { id } = req.params;
-	
-	if (Array.isArray(id)) {
+
+	if (!id || Array.isArray(id)) {
 		throw new ValidationError("Invalid ID parameter");
 	}
 
@@ -26,8 +26,8 @@ export const getCategoryById = asyncHandler(async (req: Request, res: Response) 
 
 export const getCategoryBySlug = asyncHandler(async (req: Request, res: Response) => {
 	const { slug } = req.params;
-	
-	if (Array.isArray(slug)) {
+
+	if (!slug || Array.isArray(slug)) {
 		throw new ValidationError("Invalid slug parameter");
 	}
 
@@ -47,8 +47,8 @@ export const createCategory = asyncHandler(async (req: Request, res: Response) =
 
 export const updateCategory = asyncHandler(async (req: Request, res: Response) => {
 	const { id } = req.params;
-	
-	if (Array.isArray(id)) {
+
+	if (!id || Array.isArray(id)) {
 		throw new ValidationError("Invalid ID parameter");
 	}
 
@@ -58,8 +58,8 @@ export const updateCategory = asyncHandler(async (req: Request, res: Response) =
 
 export const deleteCategory = asyncHandler(async (req: Request, res: Response) => {
 	const { id } = req.params;
-	
-	if (Array.isArray(id)) {
+
+	if (!id || Array.isArray(id)) {
 		throw new ValidationError("Invalid ID parameter");
 	}
 

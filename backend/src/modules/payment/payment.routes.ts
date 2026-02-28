@@ -1,9 +1,9 @@
 import { Router } from "express";
-import * as paymentController from "./payment.controller";
-import { validate } from "../../middlewares/validation.middleware";
-import authMiddleware from "../../middlewares/auth.middleware";
-import { topUpSchema, purchaseAppSchema } from "./payment.types";
-import { writeLimiter, readLimiter } from "../../middlewares/rateLimit";
+import * as paymentController from "./payment.controller.js";
+import { validate } from "../../middlewares/validation.middleware.js";
+import authMiddleware from "../../middlewares/auth.middleware.js";
+import { topUpSchema, purchaseAppSchema } from "./payment.types.js";
+import { writeLimiter, readLimiter } from "../../middlewares/rateLimit/index.js";
 
 const router = Router();
 

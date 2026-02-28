@@ -4,10 +4,28 @@
 .page {
     min-height: 100vh;
     background: $background-primary;
+    animation: pageEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 // ── Loading / Error ───────────────────────────────────────────────────────────
-.loadingPage,
+.loadingPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: rem(20);
+    min-height: 60vh;
+    color: $text-secondary;
+    animation: fadeIn 0.4s ease;
+
+    p {
+        margin: 0;
+        font-size: rem(16);
+        color: $text-tertiary;
+        animation: pulse 2s ease-in-out infinite;
+    }
+}
+
 .errorPage {
     display: flex;
     flex-direction: column;
@@ -16,18 +34,34 @@
     gap: rem(16);
     min-height: 60vh;
     color: $text-secondary;
+    animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 
     p, h2 { margin: 0; }
     h2 { font-size: rem(22); color: $text-primary; }
+
+    svg {
+        color: $error;
+        opacity: 0.7;
+    }
 }
 
+// Modern SVG spinner instead of CSS border spinner
 .loadingSpinner {
-    width: rem(48);
-    height: rem(48);
-    border: 3px solid rgba($primary, 0.2);
-    border-top-color: $primary;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    width: rem(56);
+    height: rem(56);
+    animation: spinnerRotate 1.2s linear infinite;
+
+    circle {
+        stroke: rgba($primary, 0.2);
+        stroke-width: 4;
+    }
+
+    path {
+        stroke: $primary;
+        stroke-width: 4;
+        stroke-linecap: round;
+        animation: spinnerDash 1.5s ease-in-out infinite;
+    }
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -47,6 +81,7 @@
 
 // ── HERO ──────────────────────────────────────────────────────────────────────
 .hero {
+    animation: fadeIn 0.6s ease both;
     position: relative;
     overflow: hidden;
     min-height: rem(340);
@@ -116,6 +151,7 @@
 
 .heroMain {
     display: grid;
+    animation: fadeInUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
     grid-template-columns: rem(100) 1fr rem(260);
     gap: rem(28);
     align-items: start;
@@ -130,6 +166,9 @@
 
 .appIcon {
     width: rem(100);
+    animation: scaleInBounce 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+    transition: transform $transition, box-shadow $transition;
+    &:hover { transform: scale(1.06) rotate(-2deg); box-shadow: $shadow-glow; }
     height: rem(100);
     border-radius: $radius-xl;
     overflow: hidden;
@@ -147,6 +186,7 @@
 
 .heroInfo {
     min-width: 0;
+    animation: slideInLeft 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
 }
 
 .heroBadges {
@@ -222,6 +262,7 @@
 // ── CTA card ──────────────────────────────────────────────────────────────────
 .cta {
     background: $background-card;
+    animation: slideInRight 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
     border: 1px solid $border-color-medium;
     border-radius: $radius-xl;
     padding: rem(24);
@@ -272,20 +313,35 @@
     gap: rem(8);
     padding: rem(14) rem(24);
     background: linear-gradient(135deg, $primary 0%, $primary-hover 100%);
+    background-size: 200% auto;
     border: none;
     border-radius: $radius-md;
     color: white;
     font-size: rem(15);
     font-weight: 700;
     cursor: pointer;
-    transition: $transition;
+    transition: transform $transition, box-shadow $transition, background-position $transition-slow;
     box-shadow: 0 4px 16px rgba($primary, 0.35);
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(255,255,255,0.12);
+        opacity: 0;
+        transition: opacity $transition-fast;
+        border-radius: inherit;
+    }
 
     &:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba($primary, 0.45);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 28px rgba($primary, 0.5);
+        background-position: right center;
+        &::after { opacity: 1; }
     }
-    &:active:not(:disabled) { transform: translateY(0); }
+    &:active:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 16px rgba($primary, 0.35); }
     &:disabled { opacity: 0.6; cursor: not-allowed; }
 }
 
@@ -356,6 +412,7 @@
     gap: rem(4);
     border-bottom: 1px solid $border-color;
     margin-bottom: rem(40);
+    animation: fadeInDown 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
     overflow-x: auto;
     scrollbar-width: none;
     &::-webkit-scrollbar { display: none; }
@@ -370,12 +427,18 @@
     font-size: rem(14);
     font-weight: 600;
     cursor: pointer;
-    transition: $transition;
+    transition: color $transition, border-color $transition, background $transition, transform $transition-fast;
     white-space: nowrap;
     margin-bottom: rem(-1);
     text-transform: capitalize;
+    border-radius: $radius-sm $radius-sm 0 0;
 
-    &:hover { color: $text-primary; }
+    &:hover {
+        color: $text-primary;
+        background: rgba(255,255,255,0.03);
+        transform: translateY(-1px);
+    }
+    &:active { transform: translateY(0); }
 }
 
 .tabActive {
@@ -386,6 +449,7 @@
 // ── Overview ──────────────────────────────────────────────────────────────────
 .overviewGrid {
     display: grid;
+    animation: fadeInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
     grid-template-columns: 1fr rem(300);
     gap: rem(32);
     align-items: start;
@@ -398,6 +462,9 @@
     border: 1px solid $border-color;
     border-radius: $radius-lg;
     padding: rem(32);
+    transition: border-color $transition, box-shadow $transition;
+    animation: slideInLeft 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+    &:hover { border-color: $border-color-medium; box-shadow: $shadow-sm; }
 
     h2 {
         font-size: rem(20);
@@ -447,6 +514,9 @@
     border: 1px solid $border-color;
     border-radius: $radius-lg;
     padding: rem(24);
+    animation: slideInRight 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+    transition: border-color $transition, box-shadow $transition;
+    &:hover { border-color: $border-color-medium; box-shadow: $shadow-sm; }
 
     h3 {
         font-size: rem(16);
@@ -619,6 +689,7 @@
     border: 1px solid $border-color;
     border-radius: $radius-lg;
     padding: rem(28) rem(32);
+    animation: scaleIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 
     @media (max-width: 640px) { padding: rem(20); }
 
@@ -761,11 +832,17 @@
     border: 1px solid $border-color;
     border-radius: $radius-lg;
     padding: rem(20) rem(24);
-    transition: $transition;
+    transition: border-color $transition, box-shadow $transition, transform $transition;
+    animation: cardEntrance 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+    @for $i from 1 through 10 {
+        &:nth-child(#{$i}) { animation-delay: #{$i * 0.06}s; }
+    }
 
     &:hover {
         border-color: $border-color-medium;
-        box-shadow: $shadow-sm;
+        box-shadow: $shadow-md;
+        transform: translateY(-2px);
     }
 
     @media (max-width: 640px) { padding: rem(16); }

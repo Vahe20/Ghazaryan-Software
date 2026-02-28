@@ -1,324 +1,363 @@
 @use "../../../styles/helpers/"as *;
 
 .filtersPanel {
-  position: relative;
-  top: rem(80);
-  padding: rem(24);
-  background: $background-card;
-  border: 1px solid $border-color;
-  border-radius: $radius-lg;
-  height: fit-content;
-  display: flex;
-  flex-direction: column;
-  gap: rem(24);
+    position: relative;
+    top: rem(80);
+    padding: rem(24);
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: rem(20);
+    animation: slideInRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transition: border-color $transition, box-shadow $transition;
 
-  @media (max-width: 1024px) {
-    position: static;
-    margin-bottom: rem(24);
-  }
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 15%;
+        bottom: 15%;
+        width: 2px;
+        background: linear-gradient(to bottom, transparent, $primary, transparent);
+        border-radius: rem(2);
+        opacity: 0;
+        transition: opacity $transition;
+    }
+
+    &:hover {
+        border-color: $border-color-medium;
+        box-shadow: $shadow-sm;
+
+        &::before {
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        position: static;
+        margin-bottom: rem(24);
+        animation: fadeInDown 0.35s ease;
+
+        &::before {
+            display: none;
+        }
+    }
 }
 
 .searchBox {
-  position: relative;
-  width: 100%;
+    position: relative;
+    width: 100%;
+    animation: fadeInDown 0.4s ease 0.05s both;
 }
 
 .searchIcon {
-  position: absolute;
-  left: rem(16);
-  top: 50%;
-  transform: translateY(-50%);
-  color: $text-tertiary;
-  pointer-events: none;
+    position: absolute;
+    left: rem(14);
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-tertiary;
+    pointer-events: none;
+    transition: color $transition, transform $transition;
 }
 
 .searchInput {
-  width: 100%;
-  padding: rem(12) rem(48) rem(12) rem(48);
-  border: 1px solid $border-color;
-  border-radius: $radius-md;
-  font-size: rem(14);
-  font-weight: 500;
-  color: $text-primary;
-  background: $background-tertiary;
-  transition: all $transition;
-  font-family: inherit;
+    width: 100%;
+    padding: rem(11) rem(44) rem(11) rem(44);
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    font-size: rem(14);
+    font-weight: 500;
+    color: $text-primary;
+    background: $background-tertiary;
+    font-family: inherit;
+    transition: border-color $transition, box-shadow $transition, background $transition;
 
-  &::placeholder {
-    color: $text-tertiary;
-  }
+    &::placeholder {
+        color: $text-tertiary;
+    }
 
-  &:focus {
-    outline: none;
-    border-color: $primary;
-    background: rgba(26, 31, 46, 0.8);
-    box-shadow: 0 0 0 rem(3) $primary-light;
-  }
+    &:focus {
+        outline: none;
+        border-color: $primary;
+        background: rgba($background-tertiary, 0.8);
+        box-shadow: 0 0 0 rem(3) rgba($primary, 0.15);
+    }
 
-  &:hover:not(:focus) {
-    border-color: $border-color-medium;
-  }
+    &:focus~.searchIcon,
+    &:focus+.searchIcon {
+        color: $primary;
+    }
+
+    &:hover:not(:focus) {
+        border-color: $border-color-medium;
+    }
+}
+
+.searchBox:focus-within .searchIcon {
+    color: $primary;
+    transform: translateY(-50%) scale(1.1);
 }
 
 .clearButton {
-  position: absolute;
-  right: rem(12);
-  top: 50%;
-  transform: translateY(-50%);
-  padding: rem(6);
-  background: transparent;
-  border: none;
-  color: $text-tertiary;
-  cursor: pointer;
-  border-radius: $radius-sm;
-  transition: all $transition;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    position: absolute;
+    right: rem(10);
+    top: 50%;
+    transform: translateY(-50%);
+    padding: rem(5);
+    background: transparent;
+    border: none;
+    color: $text-tertiary;
+    cursor: pointer;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color $transition, background $transition, transform $transition;
+    animation: scaleInBounce 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: $text-primary;
-  }
+    &:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: $error;
+        transform: translateY(-50%) rotate(90deg) scale(1.1);
+    }
 }
 
 .resetBtn {
-  display: flex;
-  align-items: center;
-  gap: rem(6);
-  padding: rem(8) rem(12);
-  background: rgba($primary, 0.08);
-  border: 1px solid rgba($primary, 0.25);
-  border-radius: $radius-md;
-  color: $primary;
-  font-size: rem(13);
-  font-weight: 600;
-  cursor: pointer;
-  transition: $transition;
-  font-family: inherit;
-  width: 100%;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: rem(6);
+    padding: rem(9) rem(12);
+    background: rgba($primary, 0.07);
+    border: 1px solid rgba($primary, 0.2);
+    border-radius: $radius-md;
+    color: $primary;
+    font-size: rem(13);
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    justify-content: center;
+    transition: background $transition, border-color $transition, box-shadow $transition, transform $transition-fast;
+    animation: scaleInBounce 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  &:hover {
-    background: rgba($primary, 0.15);
-    border-color: $primary;
-  }
-}
+    svg {
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
 
-.loadingText {
-  font-size: rem(13);
-  color: $text-tertiary;
+    &:hover {
+        background: rgba($primary, 0.14);
+        border-color: rgba($primary, 0.5);
+        box-shadow: 0 0 0 rem(3) rgba($primary, 0.08);
+
+        svg {
+            transform: rotate(-200deg);
+        }
+    }
+
+    &:active {
+        transform: scale(0.97);
+    }
 }
 
 .filterSection {
-  display: flex;
-  flex-direction: column;
-  gap: rem(12);
-  padding-top: rem(16);
-  border-top: 1px solid $border-color;
+    display: flex;
+    flex-direction: column;
+    gap: rem(8);
+    padding-top: rem(16);
+    border-top: 1px solid $border-color;
+    animation: fadeInUp 0.4s ease both;
 
-  &:first-of-type {
-    border-top: none;
-    padding-top: 0;
-  }
+    @for $i from 1 through 5 {
+        &:nth-of-type(#{$i}) {
+            animation-delay: #{$i * 0.07}s;
+        }
+    }
 }
 
 .filterTitle {
-  font-size: rem(14);
-  font-weight: 700;
-  color: $text-primary;
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: rem(0.5);
+    font-size: rem(10);
+    font-weight: 700;
+    color: $text-tertiary;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
 }
 
 .checkboxGroup {
-  display: flex;
-  flex-direction: column;
-  gap: rem(10);
-  
-  
+    display: flex;
+    flex-direction: column;
+    gap: rem(2);
 }
 
 .checkboxLabel {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-  user-select: none;
-  padding: rem(8);
-  border-radius: $radius-sm;
-  transition: background $transition;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    padding: rem(8) rem(10);
+    border-radius: $radius-sm;
+    transition: background $transition, transform $transition-fast;
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.03);
-  }
-}
-
-.checkbox {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-
-  &:checked~.checkmark {
-    background: $primary;
-    border-color: $primary;
-
-    &::after {
-      display: block;
+    &:hover {
+        background: rgba(255, 255, 255, 0.03);
+        transform: translateX(3px);
     }
-  }
-}
 
-.checkmark {
-  position: relative;
-  height: rem(20);
-  width: rem(20);
-  background: transparent;
-  border: 2px solid $border-color-medium;
-  border-radius: rem(4);
-  transition: all $transition;
-  flex-shrink: 0;
-
-  &::after {
-    content: "";
-    position: absolute;
-    display: none;
-    left: rem(5);
-    top: rem(2);
-    width: rem(5);
-    height: rem(10);
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-  }
-
-  .checkboxLabel:hover & {
-    border-color: $primary;
-  }
-}
-
-.radioGroup {
-  display: flex;
-  flex-direction: column;
-  gap: rem(10);
-}
-
-.radioLabel {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-  user-select: none;
-  padding: rem(8);
-  border-radius: $radius-sm;
-  transition: background $transition;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.03);
-  }
-}
-
-.radio {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-
-  &:checked~.radioMark {
-    background: $primary;
-    border-color: $primary;
-
-    &::after {
-      display: block;
+    &:active {
+        transform: translateX(1px);
     }
-  }
 }
 
-.radioMark {
-  position: relative;
-  height: rem(20);
-  width: rem(20);
-  background: transparent;
-  border: 2px solid $border-color-medium;
-  border-radius: 50%;
-  transition: all $transition;
-  flex-shrink: 0;
-
-  &::after {
-    content: "";
-    position: absolute;
-    display: none;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: rem(8);
-    height: rem(8);
-    border-radius: 50%;
-    background: white;
-  }
-
-  .radioLabel:hover & {
-    border-color: $primary;
-  }
-}
+.checkmark {}
 
 .labelText {
-  margin-left: rem(12);
-  font-size: rem(14);
-  font-weight: 500;
-  color: $text-secondary;
-  transition: color $transition;
+    margin-left: rem(12);
+    font-size: rem(14);
+    font-weight: 500;
+    color: $text-secondary;
+    transition: color $transition;
+}
 
-  .checkboxLabel:hover &,
-  .radioLabel:hover & {
-    color: $text-primary;
-  }
-
-  .checkbox:checked~.checkmark~&,
-  .radio:checked~.radioMark~& {
-    color: $text-primary;
-  }
+.loadingText {
+    font-size: rem(13);
+    color: $text-tertiary;
+    animation: pulse 1.5s ease-in-out infinite;
 }
 
 .sortGroup {
-  display: flex;
-  flex-direction: column;
-  gap: rem(12);
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
+}
+
+.radioGroup {
+    display: flex;
+    flex-direction: column;
+    gap: rem(2);
+}
+
+.radioLabel {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    padding: rem(8) rem(10);
+    border-radius: $radius-sm;
+    gap: rem(12);
+    transition: background $transition, transform $transition-fast;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.03);
+        transform: translateX(3px);
+
+        .radioMark {
+            border-color: $primary;
+            transform: scale(1.05);
+        }
+
+        .labelText {
+            color: $text-primary;
+        }
+    }
+
+    &:active {
+        transform: translateX(1px);
+    }
+}
+
+.radio {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+
+    &:checked~.radioMark {
+        border-color: $primary;
+        background: $primary;
+        box-shadow: 0 0 0 rem(3) rgba($primary, 0.2);
+
+        &::after {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+    }
+
+    &:checked~.radioMark~.labelText {
+        color: $text-primary;
+        font-weight: 600;
+    }
+}
+
+.radioMark {
+    position: relative;
+    flex-shrink: 0;
+    height: rem(20);
+    width: rem(20);
+    background: transparent;
+    border: 2px solid $border-color-medium;
+    border-radius: 50%;
+    transition: background $transition, border-color $transition, transform $transition-fast, box-shadow $transition;
+
+    &::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        width: rem(8);
+        height: rem(8);
+        border-radius: 50%;
+        background: white;
+        opacity: 0;
+        transition: opacity 0.15s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
 }
 
 .sortOrderButton {
-  display: flex;
-  align-items: center;
-  gap: rem(8);
-  padding: rem(10) rem(16);
-  background: $background-tertiary;
-  border: 1px solid $border-color;
-  border-radius: $radius-md;
-  color: $text-secondary;
-  font-size: rem(14);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all $transition;
-  font-family: inherit;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(10) rem(16);
+    background: $background-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-secondary;
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    justify-content: center;
+    transition:
+        background $transition,
+        border-color $transition,
+        color $transition,
+        transform $transition-fast,
+        box-shadow $transition;
 
-  svg {
-    width: rem(18);
-    height: rem(18);
-    color: $primary;
-  }
+    svg {
+        color: $primary;
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
 
-  &:hover {
-    background: $background-hover;
-    border-color: $primary;
-    color: $text-primary;
-  }
+    &:hover {
+        background: $background-hover;
+        border-color: rgba($primary, 0.45);
+        color: $text-primary;
+        box-shadow: 0 0 0 rem(3) rgba($primary, 0.08);
+        transform: translateY(-1px);
 
-  &:active {
-    transform: translateY(1px);
-  }
+        svg {
+            transform: translateY(-3px) scale(1.15);
+        }
+    }
+
+    &:active {
+        transform: scale(0.97);
+    }
 }

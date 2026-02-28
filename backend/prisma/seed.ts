@@ -72,7 +72,7 @@ async function main() {
 	await prisma.users.deleteMany();
 
 	/* ---------- USER ---------- */
-	const passwordHash = await bcrypt.hash("admin1234", 10);
+	const passwordHash = await bcrypt.hash("Admin1234", 10);
 
 	const user = await prisma.users.create({
 		data: {
@@ -128,6 +128,15 @@ This application provides a set of professional tools designed for daily use. It
 					SCREENSHOTS[i % SCREENSHOTS.length],
 					SCREENSHOTS[(i + 1) % SCREENSHOTS.length],
 					SCREENSHOTS[(i + 2) % SCREENSHOTS.length],
+					SCREENSHOTS[(i + 3) % SCREENSHOTS.length],
+					SCREENSHOTS[(i + 4) % SCREENSHOTS.length],
+					SCREENSHOTS[(i + 5) % SCREENSHOTS.length],
+					SCREENSHOTS[(i + 6) % SCREENSHOTS.length],
+					SCREENSHOTS[(i + 7) % SCREENSHOTS.length],
+					SCREENSHOTS[(i + 8) % SCREENSHOTS.length],
+					SCREENSHOTS[(i + 9) % SCREENSHOTS.length],
+					SCREENSHOTS[(i + 10) % SCREENSHOTS.length],
+					SCREENSHOTS[(i + 11) % SCREENSHOTS.length],
 				],
 				categoryId: categoryList[i % categoryList.length].id,
 				tags: ["software", "tool", baseName.toLowerCase()],
@@ -138,17 +147,12 @@ This application provides a set of professional tools designed for daily use. It
 						: i % 3 === 1
 							? ["WINDOWS", "MAC"]
 							: ["WINDOWS", "MAC", "LINUX"],
-				minVersion: "Windows 10 / macOS 12 / Ubuntu 20.04",
 				downloadUrl: "https://speed.hetzner.de/100MB.bin",
 				sourceUrl: "https://github.com",
 				status: i % 4 === 0 ? "BETA" : "RELEASE",
 				featured: i % 10 === 0,
-				price: i % 5 === 0 ? 0 : 500 + i * 10,
+				price: i % 5 === 0 ? 0 : 5 + i * 0.5,
 				authorId: user.id,
-				publishedAt: new Date(Date.now() - i * 86400000),
-				rating: 3.5 + (i % 5) * 0.3,
-				downloadCount: 100 * i,
-				reviewCount: i % 20,
 			},
 		});
 
@@ -171,29 +175,6 @@ This application provides a set of professional tools designed for daily use. It
 					isStable: true,
 				},
 			],
-		});
-	}
-
-	/* ---------- PURCHASES ---------- */
-	// Get some paid apps for the admin to purchase
-	const paidApps = await prisma.apps.findMany({
-		where: {
-			price: {
-				gt: 0,
-			},
-		},
-		take: 3,
-	});
-
-	// Create purchases for admin
-	for (const app of paidApps) {
-		await prisma.purchases.create({
-			data: {
-				userId: user.id,
-				appId: app.id,
-				price: app.price,
-				status: "COMPLETED",
-			},
 		});
 	}
 

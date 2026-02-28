@@ -9,18 +9,19 @@
     align-items: center;
     gap: rem(12);
     padding: rem(14) rem(16);
-    background: rgba(240, 40, 73, 0.1);
-    border: 1px solid rgba(240, 40, 73, 0.3);
+    background: rgba($error, 0.08);
+    border: 1px solid rgba($error, 0.25);
     border-radius: $radius-md;
     color: $error;
     font-size: rem(14);
     font-weight: 500;
     margin-bottom: rem(24);
-    animation: slideDown 0.3s ease;
+    animation: errorShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
 
-    svg {
-        flex-shrink: 0;
-    }
+.errorIcon {
+    flex-shrink: 0;
+    animation: scaleIn 0.3s ease;
 }
 
 .inputGroup {
@@ -37,21 +38,33 @@
 
 .label {
     display: block;
-    font-size: rem(14);
+    font-size: rem(13);
     font-weight: 600;
-    color: $text-primary;
+    color: $text-secondary;
     margin-bottom: rem(8);
-    letter-spacing: rem(-0.2);
-    transition: $transition;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    transition: color $transition;
+}
 
-    &:hover {
-        transform: translateY(-3px);
-    }
+.inputWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.inputIcon {
+    position: absolute;
+    left: rem(14);
+    color: $text-tertiary;
+    pointer-events: none;
+    transition: color $transition;
+    z-index: 1;
 }
 
 .input {
     width: 100%;
-    padding: rem(14) rem(16);
+    padding: rem(14) rem(16) rem(14) rem(44);
     border: 1px solid $border-color;
     border-radius: $radius-md;
     font-size: rem(15);
@@ -68,24 +81,36 @@
     &:focus {
         outline: none;
         border-color: $primary;
-        background: rgba(26, 31, 46, 0.8);
+        background: rgba(26, 31, 46, 0.9);
         box-shadow: 0 0 0 rem(3) $primary-light;
-        transform: scale(1.03);
     }
 
     &:hover:not(:focus) {
         border-color: $border-color-medium;
-        transform: scale(1.02);
     }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.inputWrapper:focus-within .inputIcon {
+    color: $primary;
 }
 
 .error {
     display: block;
     color: $error;
-    font-size: rem(13);
+    font-size: rem(12);
     font-weight: 500;
     margin-top: rem(6);
     animation: slideDown 0.2s ease;
+
+    &::before {
+        content: "⚠ ";
+        font-size: rem(11);
+    }
 }
 
 .inputGroup:has(.error) .input {
@@ -93,7 +118,7 @@
 
     &:focus {
         border-color: $error;
-        box-shadow: 0 0 0 rem(3) rgba(240, 40, 73, 0.15);
+        box-shadow: 0 0 0 rem(3) rgba($error, 0.15);
     }
 }
 
@@ -132,7 +157,8 @@
 
         &:hover {
             color: $primary-hover;
-            text-decoration: underline;        }
+            text-decoration: underline;
+        }
     }
 }
 
@@ -150,22 +176,36 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: rem(8);
+    gap: rem(10);
     box-shadow: $shadow-glow;
     font-family: inherit;
-    letter-spacing: rem(0.2);
+    letter-spacing: 0.2px;
     animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+    position: relative;
+    overflow: hidden;
 
-    svg {
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, $primary-hover 0%, $primary 100%);
+        opacity: 0;
+        transition: opacity $transition;
+    }
+
+    svg:not(.spinner) {
+        position: relative;
+        z-index: 1;
         transition: transform $transition;
     }
 
     &:hover:not(:disabled) {
         transform: translateY(rem(-2));
         box-shadow: $shadow-glow-strong;
-        background: linear-gradient(135deg, $primary-hover 0%, $primary 100%);
 
-        svg {
+        &::after { opacity: 1; }
+
+        svg:not(.spinner) {
             transform: translateX(rem(4));
         }
     }
@@ -175,7 +215,82 @@
     }
 
     &:disabled {
-        opacity: 0.6;
+        opacity: 0.75;
         cursor: not-allowed;
+    }
+}
+
+.spinner {
+    animation: spinnerRotate 0.8s linear infinite;
+    position: relative;
+    z-index: 1;
+}
+
+.divider {
+    position: relative;
+    text-align: center;
+    margin: rem(24) 0;
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: calc(50% - rem(30));
+        height: 1px;
+        background: $border-color;
+    }
+
+    &::before {
+        left: 0;
+    }
+
+    &::after {
+        right: 0;
+    }
+
+    span {
+        display: inline-block;
+        padding: 0 rem(16);
+        background: $background-secondary;
+        font-size: rem(12);
+        font-weight: 700;
+        color: $text-tertiary;
+        letter-spacing: 1px;
+    }
+}
+
+.googleBtn {
+    width: 100%;
+    padding: rem(14) rem(24);
+    background: white;
+    color: #333;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    font-size: rem(15);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all $transition;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: rem(12);
+    font-family: inherit;
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+
+    &:hover {
+        background: #f8f9fa;
+        border-color: #dadce0;
+        transform: translateY(rem(-2));
+        box-shadow: 0 rem(4) rem(12) rgba(0, 0, 0, 0.15);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    svg {
+        flex-shrink: 0;
     }
 }

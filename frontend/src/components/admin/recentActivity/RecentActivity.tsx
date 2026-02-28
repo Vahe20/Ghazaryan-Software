@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import { Activity } from "@/src/services/admin.service";
+import { Activity } from "@/src/types/Admin";
 import style from "./RecentActivity.module.scss";
 
 interface RecentActivityProps {

@@ -1,0 +1,284 @@
+@use "../../../styles/helpers/" as *;
+
+.carousel {
+    position: relative;
+    margin: rem(24);
+    border-radius: $radius-xl;
+    overflow: hidden;
+    border: 1px solid $border-color;
+    min-height: rem(340);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    animation: fadeIn 0.6s ease both;
+
+    @media (max-width: 768px) {
+        margin: rem(16);
+        min-height: rem(300);
+    }
+}
+
+.skeleton {
+    height: rem(300);
+    background: linear-gradient(90deg, $background-card 25%, $background-tertiary 50%, $background-card 75%);
+    background-size: 400% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border-radius: $radius-xl;
+}
+
+.bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(135deg, rgba(0,132,255,0.06) 0%, rgba(255,0,110,0.06) 100%);
+}
+
+.cover {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.18;
+    transition: opacity $transition-slow;
+    z-index: 0;
+}
+
+.orb {
+    position: absolute;
+    width: rem(700);
+    height: rem(700);
+    border-radius: 50%;
+    filter: blur(100px);
+    pointer-events: none;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: background $transition-slow;
+    animation: orbFloat 10s ease-in-out infinite;
+}
+
+.orb_blue   { background: radial-gradient(circle, rgba(0,132,255,0.22) 0%, transparent 70%); }
+.orb_pink   { background: radial-gradient(circle, rgba(255,0,110,0.2) 0%, transparent 70%); }
+.orb_purple { background: radial-gradient(circle, rgba(124,58,237,0.2) 0%, transparent 70%); }
+.orb_green  { background: radial-gradient(circle, rgba(0,186,136,0.2) 0%, transparent 70%); }
+
+.gridPattern {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 0%, transparent 100%);
+}
+
+.slide {
+    position: relative;
+    z-index: 2;
+    padding: rem(60) rem(24) rem(80);
+    text-align: center;
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+
+    @media (max-width: 768px) {
+        padding: rem(40) rem(16) rem(70);
+    }
+}
+
+.slide_animating {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+}
+
+.slide__inner {
+    max-width: rem(720);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: rem(16);
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(5) rem(14);
+    border-radius: $radius-full;
+    font-size: rem(12);
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    animation: scaleInBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.tag__dot {
+    width: rem(6);
+    height: rem(6);
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.tag_blue   { background: rgba($primary,0.12); border: 1px solid rgba($primary,0.3); color: $primary; .tag__dot { background: $primary; } }
+.tag_pink   { background: rgba(255,0,110,0.12); border: 1px solid rgba(255,0,110,0.3); color: #ff006e; .tag__dot { background: #ff006e; } }
+.tag_purple { background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.3); color: #a855f7; .tag__dot { background: #a855f7; } }
+.tag_green  { background: rgba(0,186,136,0.12); border: 1px solid rgba(0,186,136,0.3); color: $success; .tag__dot { background: $success; } }
+
+.date {
+    font-size: rem(13);
+    color: $text-tertiary;
+    font-weight: 500;
+    animation: fadeInUp 0.5s ease 0.05s both;
+}
+
+.title {
+    font-size: rem(48);
+    font-weight: 800;
+    color: $text-primary;
+    margin: 0;
+    line-height: 1.15;
+    letter-spacing: -1.5px;
+    animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+
+    @media (max-width: 768px) {
+        font-size: rem(30);
+        letter-spacing: -0.5px;
+    }
+}
+
+.description {
+    font-size: rem(17);
+    color: $text-secondary;
+    line-height: 1.65;
+    margin: 0;
+    max-width: rem(580);
+    animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.13s both;
+
+    @media (max-width: 768px) {
+        font-size: rem(15);
+    }
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    gap: rem(8);
+    padding: rem(13) rem(28);
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+    background-size: 200% auto;
+    color: white;
+    border-radius: $radius-md;
+    font-weight: 700;
+    font-size: rem(15);
+    text-decoration: none;
+    box-shadow: 0 4px 20px rgba($primary, 0.35);
+    transition: transform $transition, box-shadow $transition, background-position $transition-slow;
+    margin-top: rem(8);
+    animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(255,255,255,0.1);
+        opacity: 0;
+        transition: opacity $transition-fast;
+    }
+
+    svg { transition: transform $transition; }
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 32px rgba($primary, 0.5);
+        background-position: right center;
+        color: white;
+        &::after { opacity: 1; }
+        svg { transform: translateX(5px); }
+    }
+
+    &:active { transform: translateY(-1px); }
+}
+
+.controls {
+    position: absolute;
+    bottom: rem(24);
+    left: 50%;
+    translate: -50%;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: rem(16);
+    animation: fadeInUp 0.5s ease 0.25s both;
+}
+
+.arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: rem(36);
+    height: rem(36);
+    border-radius: 50%;
+    background: $background-card;
+    border: 1px solid $border-color-medium;
+    color: $text-secondary;
+    cursor: pointer;
+    transition: background $transition, border-color $transition, color $transition, transform $transition-fast, box-shadow $transition;
+    backdrop-filter: blur(12px);
+
+    &:hover {
+        background: rgba($primary, 0.15);
+        border-color: rgba($primary, 0.4);
+        color: $primary;
+        transform: scale(1.15);
+        box-shadow: 0 0 12px rgba($primary, 0.25);
+    }
+
+    &:active { transform: scale(0.95); }
+}
+
+.dots { display: flex; align-items: center; gap: rem(8); }
+
+.dot {
+    width: rem(8);
+    height: rem(8);
+    border-radius: $radius-full;
+    background: $border-color-medium;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background $transition, width $transition, box-shadow $transition;
+
+    &:hover { background: $text-tertiary; transform: scale(1.2); }
+}
+
+.dot_active {
+    background: $primary;
+    width: rem(24);
+    box-shadow: 0 0 10px rgba($primary, 0.55);
+}
+
+.progressBar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: rem(3);
+    background: $border-color-light;
+    z-index: 3;
+}
+
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, $primary 0%, $accent 100%);
+    animation: progress 5s linear forwards;
+    border-radius: 0 rem(2) rem(2) 0;
+    box-shadow: 0 0 8px rgba($primary, 0.5);
+}
+
+@keyframes progress {
+    from { width: 0%; }
+    to   { width: 100%; }
+}
+

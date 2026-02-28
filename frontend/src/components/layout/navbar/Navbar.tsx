@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuthStore } from "@/src/store/AuthStore";
+import { useAppSelector } from "@/src/app/hooks";
 import { Role } from "@/src/types/Role";
 import style from "./Navbar.module.scss";
 
 export function Navbar() {
   const pathname = usePathname();
-  const user = useAuthStore(state => state.user);
+  const user = useAppSelector(s => s.auth.user);
   const isAdmin = user?.role === Role.ADMIN;
 
   return (

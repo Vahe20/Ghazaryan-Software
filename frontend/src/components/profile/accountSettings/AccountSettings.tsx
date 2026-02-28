@@ -1,9 +1,10 @@
-import { User } from '@/src/types/user.types';
+import { User } from '@/src/types/Entities';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAuthStore } from '@/src/store/AuthStore';
-import { AuthService } from '@/src/services/auth.service';
-import { useAsyncAction } from '@/src/hooks/useAsyncAction';
+import { useAppDispatch } from '@/src/app/hooks';
+import { useChangePasswordMutation, useDeleteAccountMutation } from '@/src/features/api/authApi';
+import { logout } from '@/src/features/slices/authSlice';
+import { extractErrorMessage } from '@/src/lib/utils';
 import BaseModal from '@/src/components/shared/BaseModal/BaseModal';
 import style from './AccountSettings.module.scss';
 
@@ -23,12 +24,17 @@ interface AccountSettingsProps {
 }
 
 export default function AccountSettings({ user }: AccountSettingsProps) {
-    const { logout } = useAuthStore();
+    const dispatch = useAppDispatch();
     const [passwordSuccess, setPasswordSuccess] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-    const { loading: passwordLoading, error: passwordError, run: runPassword } = useAsyncAction("Failed to change password");
-    const { loading: deleteLoading, error: deleteError, run: runDelete } = useAsyncAction("Failed to delete account");
+    const [changePassword, { isLoading: passwordLoading, error: passwordError }] = useChangePasswordMutation();
+    const [deleteAccount, { isLoading: deleteLoading, error: deleteError }] = useDeleteAccountMutation();
+    const passwordErrorMessage = passwordError
+        ? extractErrorMessage(passwordError, "Failed to change password")
+        : null;
+    const deleteErrorMessage = deleteError
+        ? extractErrorMessage(deleteError, "Failed to delete account")
+        : null;
 
     const {
         register: regPassword,
@@ -46,17 +52,24 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
     } = useForm<DeleteFormData>();
 
     const onPasswordSubmit = async (data: PasswordFormData) => {
-        await runPassword(() => AuthService.changePassword(data.currentPassword, data.newPassword));
-        if (!passwordError) {
+        try {
+            await changePassword({
+                currentPassword: data.currentPassword,
+                newPassword: data.newPassword,
+            }).unwrap();
             setPasswordSuccess(true);
             resetPassword();
             setTimeout(() => setPasswordSuccess(false), 3000);
+        } catch {
         }
     };
 
     const onDeleteSubmit = async (data: DeleteFormData) => {
-        await runDelete(() => AuthService.deleteAccount(data.password));
-        if (!deleteError) await logout();
+        try {
+            await deleteAccount({ password: data.password }).unwrap();
+            dispatch(logout());
+        } catch {
+        }
     };
 
     const handleCloseDeleteModal = () => {
@@ -86,13 +99,13 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                         </div>
                     )}
 
-                    {passwordError && (
+                    {passwordErrorMessage && (
                         <div className={style.errorBanner}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
                                 <path d="M12 8v4m0 4h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                             </svg>
-                            {passwordError}
+                            {passwordErrorMessage}
                         </div>
                     )}
 
@@ -142,7 +155,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                 </div>
 
                 <div className={style.actions}>
-                    <button className={style.logoutBtn} onClick={logout}>
+                    <button className={style.logoutBtn} onClick={() => dispatch(logout())}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                             <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                             <path d="M16 17L21 12L16 7M21 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -188,13 +201,13 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                 <p className={style.modalDesc}>
                     This action is <strong>permanent</strong> and cannot be undone. All your data, purchases and reviews will be lost.
                 </p>
-                {deleteError && (
+                {deleteErrorMessage && (
                     <div className={style.errorBanner}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
                             <path d="M12 8v4m0 4h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                         </svg>
-                        {deleteError}
+                        {deleteErrorMessage}
                     </div>
                 )}
                 <form id="delete-account-form" onSubmit={handleDeleteSubmit(onDeleteSubmit)} className={style.deleteForm}>

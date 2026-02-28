@@ -1,6 +1,6 @@
 "use client"
 
-import { useAuthStore } from '@/src/store/AuthStore';
+import { useAppSelector } from "@/src/app/hooks";
 import { useState } from 'react';
 import ProfileHeader from '@/src/components/profile/profileHeader/ProfileHeader';
 import StatsGrid from '@/src/components/profile/statsGrid/StatsGrid';
@@ -9,7 +9,8 @@ import TopUpModal from '@/src/components/profile/topUpModal/TopUpModal';
 import style from './page.module.scss';
 
 export default function Profile() {
-    const { user, loading } = useAuthStore();
+    const user = useAppSelector(s => s.auth.user);
+    const loading = useAppSelector(s => s.auth.loading);
     const [showTopUpModal, setShowTopUpModal] = useState(false);
 
     if (loading) {

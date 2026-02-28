@@ -1,27 +1,41 @@
 {
+	// Visit https://aka.ms/tsconfig to read more about this file
 	"compilerOptions": {
 		"rootDir": "./src",
 		"outDir": "./dist",
 
-		"target": "es2020",
-		"module": "node16",
-		"lib": ["ES2017", "ESNext.AsyncIterable"],
-		"moduleResolution": "node16",
-		"esModuleInterop": true,
-		"strict": true,
+		// Environment Settings
+		"module": "nodenext",
+		"target": "esnext",
+		"types": [],
+		"lib": ["esnext"],
 		"types": ["node"],
-		"typeRoots": ["node_modules/@types"],
-		"skipLibCheck": true,
+
+		// Other Outputs
 		"sourceMap": true,
-		"resolveJsonModule": true,
-		"forceConsistentCasingInFileNames": true,
-		"allowSyntheticDefaultImports": true,
-		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true,
-		"pretty": true,
 		"declaration": true,
-		"allowJs": true,
-		"noEmit": false,
+		"declarationMap": true,
+
+		// Stricter Typechecking Options
+		"noUncheckedIndexedAccess": true,
+		// "exactOptionalPropertyTypes": true,
+
+		// Style Options
+		// "noImplicitReturns": true,
+		// "noImplicitOverride": true,
+		// "noUnusedLocals": true,
+		// "noUnusedParameters": true,
+		// "noFallthroughCasesInSwitch": true,
+		// "noPropertyAccessFromIndexSignature": true,
+
+		// Recommended Options
+		"strict": true,
+		"jsx": "react-jsx",
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+		"noUncheckedSideEffectImports": true,
+		"moduleDetection": "force",
+		"skipLibCheck": true
 	},
 	"include": ["src/**/*.ts"],
 	"exclude": ["node_modules", "dist"]

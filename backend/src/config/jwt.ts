@@ -1,5 +1,5 @@
-import config from "./env";
-import * as jwt from 'jsonwebtoken';
+import config from "./env.js";
+import jwt from 'jsonwebtoken';
 
 export const jwtConfig = {
 	accessSecret: config.JWT_ACCESS_SECRET,

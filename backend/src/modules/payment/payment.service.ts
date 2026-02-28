@@ -1,5 +1,5 @@
-import { prisma } from "../../config/prisma";
-import { DatabaseError, NotFoundError, ApiError } from "../../utils/errors";
+import { prisma } from "../../config/prisma.js";
+import { DatabaseError, NotFoundError, ApiError } from "../../utils/errors.js";
 
 export async function topUpBalance(userId: string, amount: number) {
 	try {

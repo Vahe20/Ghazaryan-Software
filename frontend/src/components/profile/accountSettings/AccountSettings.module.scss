@@ -3,14 +3,31 @@
 .dangerZone {
     background: $background-card;
     backdrop-filter: blur(20px);
-    border: 1px solid rgba($error, 0.2);
+    border: 1px solid rgba($error, 0.18);
     border-radius: $radius-lg;
     padding: rem(28);
-    transition: $transition;
+    animation: cardEntrance 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+    position: relative;
+    overflow: hidden;
+    transition: border-color $transition, box-shadow $transition;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba($error, 0.5), transparent);
+        opacity: 0;
+        transition: opacity $transition;
+    }
 
     &:hover {
         border-color: rgba($error, 0.3);
-        box-shadow: 0 0 20px rgba($error, 0.1);
+        box-shadow: 0 0 24px rgba($error, 0.08);
+
+        &::before { opacity: 1; }
     }
 }
 
@@ -19,24 +36,29 @@
     align-items: center;
     gap: rem(10);
     font-size: rem(18);
-    font-weight: 600;
+    font-weight: 700;
     color: $text-primary;
-    margin-bottom: rem(20);
+    margin-bottom: rem(24);
     padding-bottom: rem(16);
     border-bottom: 1px solid $border-color-light;
+    animation: fadeInDown 0.4s ease 0.1s both;
 
-    svg { color: $error; }
+    svg {
+        color: $error;
+        animation: pulse 3s ease-in-out infinite;
+    }
 }
 
 .settingItem {
     margin-bottom: rem(24);
+    animation: fadeInUp 0.4s ease 0.15s both;
 }
 
 .settingLabel {
     font-size: rem(15);
-    font-weight: 500;
+    font-weight: 600;
     color: $text-primary;
-    margin-bottom: rem(12);
+    margin-bottom: rem(14);
 }
 
 .successBanner,
@@ -44,23 +66,27 @@
     display: flex;
     align-items: center;
     gap: rem(8);
-    padding: rem(10) rem(14);
+    padding: rem(11) rem(14);
     border-radius: $radius-md;
     font-size: rem(13);
-    font-weight: 500;
-    margin-bottom: rem(12);
+    font-weight: 600;
+    margin-bottom: rem(14);
+
+    svg { flex-shrink: 0; }
 }
 
 .successBanner {
-    background: rgba(#22c55e, 0.1);
-    border: 1px solid rgba(#22c55e, 0.3);
-    color: #22c55e;
+    background: rgba($success, 0.1);
+    border: 1px solid rgba($success, 0.3);
+    color: $success;
+    animation: scaleInBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .errorBanner {
-    background: rgba($error, 0.1);
-    border: 1px solid rgba($error, 0.3);
+    background: rgba($error, 0.08);
+    border: 1px solid rgba($error, 0.25);
     color: $error;
+    animation: errorShake 0.4s ease, slideDown 0.3s ease;
 }
 
 .passwordForm,
@@ -73,7 +99,12 @@
 .inputWrap {
     display: flex;
     flex-direction: column;
-    gap: rem(4);
+    gap: rem(5);
+    animation: fadeInUp 0.35s ease both;
+
+    @for $i from 1 through 4 {
+        &:nth-child(#{$i}) { animation-delay: #{$i * 0.06}s; }
+    }
 }
 
 .inputField {
@@ -84,18 +115,24 @@
     border-radius: $radius-md;
     color: $text-primary;
     font-size: rem(14);
-    transition: $transition;
+    font-family: inherit;
+    transition: border-color $transition, box-shadow $transition, background $transition;
+
+    &::placeholder { color: $text-tertiary; }
 
     &:focus {
         outline: none;
         border-color: $primary;
-        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+        box-shadow: 0 0 0 3px rgba($primary, 0.12);
+        background: rgba($background-tertiary, 0.8);
     }
 
-    &::placeholder { color: $text-tertiary; }
+    &:hover:not(:focus):not(:disabled) {
+        border-color: $border-color-medium;
+    }
 
     &:disabled {
-        opacity: 0.5;
+        opacity: 0.45;
         cursor: not-allowed;
     }
 }
@@ -103,6 +140,10 @@
 .error {
     color: $error;
     font-size: rem(12);
+    font-weight: 500;
+    animation: slideDown 0.2s ease;
+
+    &::before { content: "⚠ "; font-size: rem(10); }
 }
 
 .changePasswordBtn {
@@ -111,34 +152,34 @@
     justify-content: center;
     gap: rem(8);
     padding: rem(12) rem(20);
-    background: $primary;
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+    background-size: 200% auto;
     border: none;
     border-radius: $radius-md;
     color: white;
     font-size: rem(14);
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: $transition;
+    font-family: inherit;
+    transition: transform $transition, box-shadow $transition, background-position $transition-slow;
+    box-shadow: 0 4px 14px rgba($primary, 0.3);
     margin-top: rem(4);
 
     &:hover:not(:disabled) {
-        background: $primary-hover;
-        transform: translateY(-2px);
-        box-shadow: $shadow-md;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 24px rgba($primary, 0.45);
+        background-position: right center;
     }
 
-    &:active:not(:disabled) { transform: translateY(0); }
-
-    &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
+    &:active:not(:disabled) { transform: translateY(-1px); }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .actions {
     display: flex;
     gap: rem(12);
     padding-top: rem(4);
+    animation: fadeInUp 0.4s ease 0.25s both;
 }
 
 .logoutBtn,
@@ -147,113 +188,86 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: rem(10);
+    gap: rem(9);
     padding: rem(13) rem(20);
     border-radius: $radius-md;
     font-size: rem(14);
     font-weight: 600;
     cursor: pointer;
-    transition: $transition;
+    font-family: inherit;
+    transition:
+        background $transition,
+        border-color $transition,
+        color $transition,
+        transform $transition-fast,
+        box-shadow $transition;
 
-    svg { transition: $transition; }
+    svg { transition: transform $transition; }
 }
 
 .logoutBtn {
-    background: rgba($error, 0.08);
-    border: 1px solid rgba($error, 0.25);
+    background: rgba($error, 0.07);
+    border: 1px solid rgba($error, 0.22);
     color: $error;
 
     &:hover {
         background: $error;
         color: white;
         border-color: $error;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba($error, 0.3);
-
-        svg { transform: translateX(3px); }
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba($error, 0.35);
+        svg { transform: translateX(4px); }
     }
 
-    &:active { transform: translateY(0); }
+    &:active { transform: translateY(-1px); }
 }
 
 .deleteBtn {
     background: transparent;
     border: 1px solid $border-color;
-    color: $text-secondary;
+    color: $text-tertiary;
 
     &:hover {
-        background: rgba($error, 0.08);
-        border-color: rgba($error, 0.4);
+        background: rgba($error, 0.07);
+        border-color: rgba($error, 0.35);
         color: $error;
-        transform: translateY(-2px);
+        transform: translateY(-3px);
+        svg { transform: scale(1.1) rotate(-5deg); }
     }
 
-    &:active { transform: translateY(0); }
-}
-
-.modalOverlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: rem(20);
-    animation: fadeIn 0.2s ease-out;
-}
-
-.modal {
-    background: $background-card;
-    border: 1px solid rgba($error, 0.3);
-    border-radius: $radius-xl;
-    padding: rem(32) rem(28);
-    max-width: 440px;
-    width: 100%;
-    box-shadow: $shadow-xl;
-    animation: slideUp 0.25s ease-out;
+    &:active { transform: translateY(-1px); }
 }
 
 .modalIcon {
-    width: rem(60);
-    height: rem(60);
+    width: rem(64);
+    height: rem(64);
     border-radius: 50%;
-    background: rgba($error, 0.1);
-    border: 1px solid rgba($error, 0.25);
+    background: rgba($error, 0.08);
+    border: 1px solid rgba($error, 0.22);
     display: flex;
     align-items: center;
     justify-content: center;
     color: $error;
-    margin: 0 auto rem(16);
-}
+    margin: 0 auto rem(18);
+    animation: scaleInBounce 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
 
-.modalTitle {
-    font-size: rem(20);
-    font-weight: 700;
-    color: $text-primary;
-    text-align: center;
-    margin: 0 0 rem(8);
+    svg { animation: errorShake 0.5s ease 0.4s; }
 }
 
 .modalDesc {
     font-size: rem(14);
     color: $text-secondary;
     text-align: center;
-    line-height: 1.5;
+    line-height: 1.6;
     margin: 0 0 rem(20);
+    animation: fadeInUp 0.35s ease 0.15s both;
 
-    strong { color: $error; }
-}
-
-.deleteForm {
-    margin-top: rem(4);
+    strong { color: $error; font-weight: 700; }
 }
 
 .modalActions {
     display: flex;
     gap: rem(10);
-    margin-top: rem(4);
 }
 
 .cancelBtn {
@@ -266,10 +280,16 @@
     font-size: rem(14);
     font-weight: 600;
     cursor: pointer;
-    transition: $transition;
+    font-family: inherit;
+    transition: background $transition, border-color $transition, transform $transition-fast;
 
-    &:hover:not(:disabled) { background: $background-secondary; }
-    &:disabled { opacity: 0.5; cursor: not-allowed; }
+    &:hover:not(:disabled) {
+        background: $background-hover;
+        border-color: $border-color-medium;
+        transform: translateY(-1px);
+    }
+    &:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 
 .confirmDeleteBtn {
@@ -284,22 +304,19 @@
     border-radius: $radius-md;
     color: white;
     font-size: rem(14);
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: $transition;
+    font-family: inherit;
+    transition: filter $transition, transform $transition-fast, box-shadow $transition;
+    box-shadow: 0 4px 14px rgba($error, 0.3);
 
     &:hover:not(:disabled) {
-        filter: brightness(1.1);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba($error, 0.35);
+        filter: brightness(1.12);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba($error, 0.45);
     }
-
-    &:active:not(:disabled) { transform: translateY(0); }
-
-    &:disabled {
-        opacity: 0.45;
-        cursor: not-allowed;
-    }
+    &:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 
 .spinner {
@@ -312,3 +329,4 @@
     animation: spin 0.7s linear infinite;
     flex-shrink: 0;
 }
+

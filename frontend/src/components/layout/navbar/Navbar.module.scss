@@ -1,85 +1,95 @@
 @use "../../../styles/helpers" as *;
 
 .navbar__links {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeInDown 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
 
-  @media (max-width: 768px) {
-    display: none;
-  }
+    @media (max-width: 768px) {
+        display: none;
+    }
 }
 
 .navbar__links_list {
-  display: flex;
-  gap: rem(8);
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    gap: rem(4);
+    justify-content: center;
+    align-items: center;
 }
 
 .navbar__links_item {
-  position: relative;
-
-  a {
-    display: block;
-    padding: rem(10) rem(20);
-    color: $text-secondary;
-    font-weight: 500;
-    border-radius: $radius-md;
-    transition: all $transition;
     position: relative;
-    overflow: hidden;
+    animation: navLinkFade 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 
-    &::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: $background-hover;
-      opacity: 0;
-      transition: $transition;
-      border-radius: $radius-md;
+    &:nth-child(1) { animation-delay: 0.15s; }
+    &:nth-child(2) { animation-delay: 0.20s; }
+    &:nth-child(3) { animation-delay: 0.25s; }
+    &:nth-child(4) { animation-delay: 0.30s; }
+
+    a {
+        display: block;
+        padding: rem(9) rem(18);
+        color: $text-secondary;
+        font-size: rem(14);
+        font-weight: 600;
+        border-radius: $radius-md;
+        transition:
+            color $transition,
+            background $transition,
+            transform $transition-fast,
+            box-shadow $transition;
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: $background-hover;
+            opacity: 0;
+            transition: opacity $transition;
+            border-radius: $radius-md;
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, $primary, transparent);
+            border-radius: $radius-full;
+            transition: width $transition;
+        }
+
+        &:hover {
+            color: $text-primary;
+            transform: translateY(-2px);
+
+            &::before { opacity: 1; }
+            &::after  { width: 55%; }
+        }
+
+        &:active {
+            transform: translateY(0) scale(0.97);
+        }
+
+        &.active {
+            color: $primary;
+            font-weight: 700;
+            background: $primary-light;
+
+            &::before { opacity: 1; background: $primary-light; }
+            &::after  { width: 75%; animation: underlineGrow 0.4s ease; }
+
+            &:hover {
+                box-shadow: 0 0 0 rem(3) rgba($primary, 0.12);
+            }
+        }
     }
-
-    &::after {
-      content: "";
-      position: absolute;
-      transition: $transition;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, $primary, transparent);
-      border-radius: $radius-full;
-    }
-
-    &:hover {
-      color: $text-primary;
-      transform: translateY(-2px);
-
-      &::before {
-        opacity: 1;
-      }
-
-      &::after {
-        width: 60%;
-      }
-    }
-
-    &.active {
-      color: $primary;
-      font-weight: 600;
-      background: $primary-light;
-
-      &::before {
-        opacity: 1;
-        background: $primary-light;
-      }
-
-      &::after {
-        width: 80%;
-      }
-    }
-  }
 }
+

@@ -43,11 +43,11 @@ export default function AppsTable({ apps, onEdit, onDelete }: AppsTableProps) {
                         </td>
                         <td className={table.tableTd}>{app.category?.name ?? "—"}</td>
                         <td className={table.tableTd}>
-                            <span className={`${badges.badge} ${(app as any).status === "RELEASE" ? badges.badgeRelease : badges.badgeBeta}`}>
-                                {(app as any).status ?? "BETA"}
+                            <span className={`${badges.badge} ${app.status === "RELEASE" ? badges.badgeRelease : badges.badgeBeta}`}>
+                                {app.status ?? "BETA"}
                             </span>
                         </td>
-                        <td className={table.tableTd}>{Number(app.price) === 0 ? "Free" : `${Number(app.price).toLocaleString()} AMD`}</td>
+                        <td className={table.tableTd}>{Number(app.price) === 0 ? "Free" : `${Number(app.price).toLocaleString()} USD`}</td>
                         <td className={table.tableTd}>⭐ {app.rating.toFixed(1)}</td>
                         <td className={table.tableTd}>{app.downloadCount.toLocaleString()}</td>
                         <td className={table.tableTd}>{formatSize(app.size)}</td>

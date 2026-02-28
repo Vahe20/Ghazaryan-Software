@@ -1,0 +1,55 @@
+@use "../../../../styles/helpers/" as *;
+
+.coverSection {
+    margin-bottom: rem(20);
+    display: flex;
+    flex-direction: column;
+    gap: rem(8);
+}
+
+.coverPreview {
+    width: 100%;
+    height: rem(160);
+    background: $background-tertiary;
+    border: 2px dashed $border-color-medium;
+    border-radius: $radius-md;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    transition: border-color $transition;
+
+    &:hover {
+        border-color: $primary;
+    }
+}
+
+.coverPlaceholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: rem(10);
+    color: $text-tertiary;
+    font-size: rem(13);
+    text-align: center;
+    padding: rem(16);
+    pointer-events: none;
+}
+
+.removeCover {
+    background: none;
+    border: none;
+    color: $error;
+    font-size: rem(13);
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    align-self: flex-start;
+    transition: opacity $transition;
+
+    &:hover { opacity: 0.75; }
+}
+

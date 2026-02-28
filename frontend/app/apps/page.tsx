@@ -2,12 +2,13 @@
 
 import { useCallback, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useApps } from "@/src/hooks/queries/useApps";
 import { AppsFilters, AppsFiltersState } from "@/src/components/apps/appsFilters/AppsFilters";
+import type { PlatformType, StatusType } from "@/src/types/Entities";
 import { AppsGrid } from "@/src/components/apps/appsGrid/AppsGrid";
 import { AppsPagination } from "@/src/components/apps/appsPagination/AppsPagination";
 import { useDebounce } from "@/src/hooks/useDebounce";
 import { usePagination } from "@/src/hooks/usePagination";
+import { useGetAppsQuery } from "@/src/features/api/appsApi";
 import style from "./page.module.scss";
 
 export default function AppsPage() {
@@ -15,18 +16,24 @@ export default function AppsPage() {
 
   const { currentPage, goToPage, resetPage } = usePagination(1);
 
+  const platformParam = searchParams.get("platform");
+  const statusParam = searchParams.get("status");
+
+  const platform = isPlatformType(platformParam) ? platformParam : "";
+  const status = isStatusType(statusParam) ? statusParam : "";
+
   const [filters, setFilters] = useState<AppsFiltersState>({
     searchQuery: searchParams.get("search") ?? "",
     sortBy: (searchParams.get("sortBy") as AppsFiltersState["sortBy"]) ?? "downloadCount",
     order: (searchParams.get("order") as "asc" | "desc") ?? "desc",
     categoryId: searchParams.get("categoryId") ?? "",
-    platform: searchParams.get("platform") ?? "",
-    status: searchParams.get("status") ?? "",
+    platform,
+    status,
   });
 
   const debouncedSearch = useDebounce(filters.searchQuery, 400);
 
-  const { data, isLoading, error } = useApps({
+  const { data, isLoading, error } = useGetAppsQuery({
     page: currentPage,
     limit: 20,
     search: debouncedSearch || undefined,
@@ -61,7 +68,7 @@ export default function AppsPage() {
           <AppsGrid
             apps={data?.apps ?? []}
             loading={isLoading}
-            error={error?.message ?? null}
+            error={typeof error === "object" && error !== null ? "error" in error ? error.error : null : null}
           />
 
           {data?.pagination && (
@@ -81,3 +88,12 @@ export default function AppsPage() {
     </div>
   );
 }
+
+const PLATFORM_VALUES: PlatformType[] = ["WINDOWS", "MAC", "LINUX", "ANDROID", "IOS"];
+const STATUS_VALUES: StatusType[] = ["BETA", "RELEASE"];
+
+const isPlatformType = (value: string | null): value is PlatformType =>
+  value !== null && PLATFORM_VALUES.includes(value as PlatformType);
+
+const isStatusType = (value: string | null): value is StatusType =>
+  value !== null && STATUS_VALUES.includes(value as StatusType);

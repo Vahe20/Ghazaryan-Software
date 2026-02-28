@@ -1,10 +1,9 @@
-import { Response, NextFunction } from "express";
+import type { Response, NextFunction, Request } from "express";
 import jwt from "jsonwebtoken";
-import config from "../config/env";
-import { AuthRequest } from "../types";
+import config from "../config/env.js";
 
 const authMiddleware = (
-	req: AuthRequest,
+	req: Request,
 	res: Response,
 	next: NextFunction,
 ) => {
@@ -15,7 +14,11 @@ const authMiddleware = (
 			return res.status(401).json({ error: "No token provided" });
 		}
 
-		req.user = jwt.verify(token, config.JWT_ACCESS_SECRET) as any;
+		const decoded = jwt.verify(token, config.JWT_ACCESS_SECRET as string) as any;
+		req.user = {
+			userId: decoded.userId,
+			role: decoded.role,
+		};
 
 		next();
 	} catch {
@@ -24,3 +27,4 @@ const authMiddleware = (
 };
 
 export default authMiddleware;
+
