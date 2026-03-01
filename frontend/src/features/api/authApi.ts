@@ -1,71 +1,54 @@
 import { api } from "./baseApi";
-import { User } from "@/src/types/Entities";
+import type { User } from "@/src/types/Entities";
 
 interface AuthResponse {
-	user: User;
-	accessToken: string;
-}
-
-interface ChangePasswordRequest {
-	currentPassword: string;
-	newPassword: string;
+    user: User;
+    accessToken: string;
 }
 
 interface MessageResponse {
-	message: string;
+    message: string;
+}
+
+interface AvatarResponse {
+    id: string;
+    avatarUrl: string;
 }
 
 export const authApi = api.injectEndpoints({
-	endpoints: (builder) => ({
-		getMe: builder.query<User, void>({
-			query: () => "/auth/me",
-		}),
+    endpoints: (builder) => ({
+        getMe: builder.query<User, void>({
+            query: () => "/auth/me",
+        }),
 
-		login: builder.mutation<
-			AuthResponse,
-			{ email: string; password: string }
-		>({
-			query: (credentials) => ({
-				url: "/auth/login",
-				method: "POST",
-				body: credentials,
-			}),
-		}),
+        login: builder.mutation<AuthResponse, { email: string; password: string }>({
+            query: (credentials) => ({ url: "/auth/login", method: "POST", body: credentials }),
+        }),
 
-		register: builder.mutation<
-			AuthResponse,
-			{ userName: string; email: string; password: string }
-		>({
-			query: (data) => ({
-				url: "/auth/register",
-				method: "POST",
-				body: data,
-			}),
-		}),
+        register: builder.mutation<AuthResponse, { userName: string; email: string; password: string }>({
+            query: (data) => ({ url: "/auth/register", method: "POST", body: data }),
+        }),
 
-		changePassword: builder.mutation<MessageResponse, ChangePasswordRequest>({
-			query: (data) => ({
-				url: "/auth/password",
-				method: "PATCH",
-				body: data,
-			}),
-		}),
+        changePassword: builder.mutation<MessageResponse, { currentPassword: string; newPassword: string }>({
+            query: (data) => ({ url: "/auth/password", method: "PATCH", body: data }),
+        }),
 
-		deleteAccount: builder.mutation<MessageResponse, { password: string }>({
-			query: (data) => ({
-				url: "/auth/account",
-				method: "DELETE",
-				body: data,
-			}),
-		}),
-	}),
+        changeAvatar: builder.mutation<AvatarResponse, FormData>({
+            query: (formData) => ({ url: "/auth/avatar", method: "PATCH", body: formData }),
+        }),
+
+        deleteAccount: builder.mutation<MessageResponse, { password: string }>({
+            query: (data) => ({ url: "/auth/account", method: "DELETE", body: data }),
+        }),
+    }),
 });
 
 export const {
-	useGetMeQuery,
-	useLazyGetMeQuery,
-	useLoginMutation,
-	useRegisterMutation,
-	useChangePasswordMutation,
-	useDeleteAccountMutation,
+    useGetMeQuery,
+    useLazyGetMeQuery,
+    useLoginMutation,
+    useRegisterMutation,
+    useChangePasswordMutation,
+    useChangeAvatarMutation,
+    useDeleteAccountMutation,
 } = authApi;

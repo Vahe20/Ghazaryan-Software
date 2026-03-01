@@ -44,6 +44,11 @@ app.use(cors({
 	},
 }));
 
+app.use("/api/payment/webhook", express.raw({ type: "application/json" }), async (req, res, next) => {
+	const { handleStripeWebhook } = await import("./modules/payment/payment.controller.js");
+	return handleStripeWebhook(req, res, next);
+});
+
 app.use(express.json());
 
 configurePassport();

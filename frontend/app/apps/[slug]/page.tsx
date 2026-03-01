@@ -4,8 +4,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from "@/src/app/hooks";
-import { api } from "@/src/features/api/baseApi";
-import { useGetAppBySlugQuery, usePurchaseAppMutation, useCreateReviewMutation } from "@/src/features/api/appsApi";
+import { useGetAppBySlugQuery, useCreateReviewMutation } from "@/src/features/api/appsApi";
+import { usePurchaseAppMutation } from "@/src/features/api/paymentApi";
 import { formatDate, formatSize, extractErrorMessage } from "@/src/lib/utils";
 import { setUser } from "@/src/features/slices/authSlice";
 import style from "./page.module.scss";
@@ -106,7 +106,6 @@ export default function AppPage() {
 
     return (
         <div className={style.page}>
-
             <div className={style.hero}>
                 <div className={style.heroBg}>
                     {app.coverUrl && <img src={app.coverUrl} alt="" aria-hidden />}

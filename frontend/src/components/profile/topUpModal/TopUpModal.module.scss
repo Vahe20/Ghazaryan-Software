@@ -49,6 +49,14 @@
     }
 }
 
+.errorText {
+    display: block;
+    margin-top: rem(8);
+    font-size: rem(12);
+    color: $error;
+    font-weight: 500;
+}
+
 .amountInput {
     width: 100%;
     padding: rem(14) rem(16);
@@ -196,3 +204,27 @@
     animation: spin 0.8s linear infinite;
 }
 
+.paymentInfo {
+    display: flex;
+    align-items: flex-start;
+    gap: rem(10);
+    padding: rem(14) rem(16);
+    margin-top: rem(20);
+    background: rgba($primary, 0.06);
+    border: 1px solid rgba($primary, 0.15);
+    border-radius: $radius-md;
+    font-size: rem(13);
+    color: $text-secondary;
+    line-height: 1.5;
+    animation: fadeInUp 0.4s ease 0.2s both;
+
+    svg {
+        flex-shrink: 0;
+        color: $primary;
+        margin-top: rem(2);
+    }
+
+    span {
+        flex: 1;
+    }
+}
