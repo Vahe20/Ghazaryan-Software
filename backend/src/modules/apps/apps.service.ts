@@ -1,12 +1,15 @@
-import { prisma } from "../../config/prisma.js";
-import type { CreateAppInput, UpdateAppInput, GetAppsQuery } from "./apps.types.js";
+import type { CreateAppInput, UpdateAppInput, GetAppsQuery, CreateVersionData } from "./apps.types.js";
 import { slugGenerator } from "../../utils/slugGenerator.js";
+import { sanitizeSearchQuery, sanitizeNumericInput } from "../../utils/sanitizer.js";
+import { getCached, setCached, deleteCachedByPattern, hashObject, withCache } from "../../utils/cache.js";
 import type { DownloadMetadata, Platform, AppStatus } from "../../types/index.js";
 import {
 	NotFoundError,
 	ConflictError,
 	DatabaseError,
 } from "../../utils/errors.js";
+import { appRepository } from "../../repositories/app.repository.js";
+import { prisma } from "../../config/prisma.js";
 
 export async function getAllApps(query: GetAppsQuery) {
 	try {
@@ -21,8 +24,29 @@ export async function getAllApps(query: GetAppsQuery) {
 			order = "desc",
 		} = query;
 
-		const limitNum = typeof limit === "number" ? limit : Number(limit);
-		const pageNum = typeof page === "number" ? page : Number(page);
+		const sanitizedSearch = sanitizeSearchQuery(search);
+		const limitNum = sanitizeNumericInput(limit, 20, 1, 100);
+		const pageNum = sanitizeNumericInput(page, 1, 1, 1000);
+
+		// Создаем кеш-ключ из параметров запроса
+		const cacheKey = `apps:list:${hashObject({
+			search: sanitizedSearch,
+			categoryId,
+			status,
+			platform,
+			sortBy,
+			order,
+			page: pageNum,
+			limit: limitNum,
+		})}`;
+
+		// Проверяем кеш (TTL: 5 минут)
+		const cached = await getCached(cacheKey);
+		if (cached) {
+			console.log(`✅ Cache hit for ${cacheKey}`);
+			return cached;
+		}
+
 		const skip = (pageNum - 1) * limitNum;
 
 		interface WhereCondition {
@@ -40,12 +64,12 @@ export async function getAllApps(query: GetAppsQuery) {
 
 		const where: WhereCondition = { deletedAt: null };
 
-		if (search) {
+		if (sanitizedSearch) {
 			where.OR = [
-				{ name: { contains: search, mode: "insensitive" } },
-				{ shortDesc: { contains: search, mode: "insensitive" } },
-				{ description: { contains: search, mode: "insensitive" } },
-				{ tags: { hasSome: [search] } },
+				{ name: { contains: sanitizedSearch, mode: "insensitive" } },
+				{ shortDesc: { contains: sanitizedSearch, mode: "insensitive" } },
+				{ description: { contains: sanitizedSearch, mode: "insensitive" } },
+				{ tags: { hasSome: [sanitizedSearch] } },
 			];
 		}
 
@@ -61,15 +85,21 @@ export async function getAllApps(query: GetAppsQuery) {
 			where.platform = { has: platform };
 		}
 
-		const total = await prisma.apps.count({ where });
+		const total = await appRepository.count(where);
 
-		const apps = await prisma.apps.findMany({
+		const apps = await appRepository.findMany({
 			where,
 			skip,
 			take: limitNum,
 			orderBy: { [sortBy]: order },
 			include: {
-				category: true,
+				category: {
+					select: {
+						id: true,
+						name: true,
+						slug: true,
+					},
+				},
 				_count: {
 					select: {
 						reviews: true,
@@ -79,7 +109,7 @@ export async function getAllApps(query: GetAppsQuery) {
 			},
 		});
 
-		return {
+		const result = {
 			apps,
 			pagination: {
 				page: pageNum,
@@ -88,42 +118,63 @@ export async function getAllApps(query: GetAppsQuery) {
 				totalPages: Math.ceil(total / limitNum),
 			},
 		};
+
+		// Сохраняем в кеш на 5 минут
+		await setCached(cacheKey, result, 300);
+
+		return result;
 	} catch (error) {
 		throw new DatabaseError("Failed to fetch apps", error);
 	}
 }
-
-export async function getAppById(id: string) {
+// Version management functions
+export async function addVersion(
+	appId: string,
+	data: CreateVersionData,
+	file: Express.Multer.File,
+) {
 	try {
-		return await prisma.apps.findFirst({
-			where: { id },
-			include: {
-				category: true,
-				versions: {
-					orderBy: { releaseDate: "desc" },
-					take: 5,
-				},
-				reviews: {
-					orderBy: { createdAt: "desc" },
-					take: 10,
-					include: {
-						user: {
-							select: {
-								id: true,
-								userName: true,
-								avatarUrl: true,
-							},
-						},
-					},
-				},
-				_count: {
-					select: {
-						reviews: true,
-						downloads: true,
-					},
-				},
+		const app = await appRepository.findById(appId);
+
+		if (!app) {
+			throw new NotFoundError("App", appId);
+		}
+
+		return prisma.appsVersion.create({
+			data: {
+				appId,
+				version: data.version,
+				changelog: data.changelog,
+				isStable: data.isStable,
+				downloadUrl: `/uploads/versions/${file.filename}`,
+				size: file.size,
 			},
 		});
+	} catch (error) {
+		if (error instanceof NotFoundError) {
+			throw error;
+		}
+		throw new DatabaseError("Failed to create version", error);
+	}
+}
+
+export async function getVersions(appId: string) {
+	try {
+		return prisma.appsVersion.findMany({
+			where: { appId },
+			orderBy: { releaseDate: "desc" },
+		});
+	} catch (error) {
+		throw new DatabaseError("Failed to fetch versions", error);
+	}
+}
+export async function getAppById(id: string) {
+	try {
+		// Кешируем на 10 минут (приложения редко меняются)
+		const cacheKey = `app:${id}`;
+		return await withCache(cacheKey, async () => {
+			return await appRepository.findByIdWithDetails(id);
+		}, 600);
 	} catch (error) {
 		throw new DatabaseError("Failed to fetch app", error);
 	}
@@ -131,37 +182,13 @@ export async function getAppById(id: string) {
 
 export async function getAppBySlug(slug: string) {
 	try {
-		return await prisma.apps.findFirst({
-			where: { slug, deletedAt: null },
-			include: {
-				category: true,
-				versions: {
-					orderBy: { releaseDate: "desc" },
-					take: 5,
-				},
-				reviews: {
-					orderBy: { createdAt: "desc" },
-					take: 10,
-					include: {
-						user: {
-							select: {
-								id: true,
-								userName: true,
-								avatarUrl: true,
-							},
-						},
-					},
-				},
-				_count: {
-					select: {
-						reviews: true,
-						downloads: true,
-					},
-				},
-			},
-		});
+		// Кешируем на 10 минут
+		const cacheKey = `app:slug:${slug}`;
+		return await withCache(cacheKey, async () => {
+			return await appRepository.findBySlug(slug);
+		}, 600);
 	} catch (error) {
-		throw new DatabaseError("Failed to fetch app", error);
+		throw new DatabaseError("Failed to fetch app by slug", error);
 	}
 }
 
@@ -236,7 +263,7 @@ export async function updateAppById(id: string, data: UpdateAppInput) {
 			}
 		}
 
-		return await prisma.apps.update({
+		const updatedApp = await prisma.apps.update({
 			where: { id },
 			data: {
 				...data,
@@ -249,6 +276,12 @@ export async function updateAppById(id: string, data: UpdateAppInput) {
 				category: true,
 			},
 		});
+
+		// Инвалидируем кеш
+		await deleteCachedByPattern(`app:${id}*`);
+		await deleteCachedByPattern("apps:list:*");
+
+		return updatedApp;
 	} catch (error) {
 		if (error instanceof NotFoundError || error instanceof ConflictError) {
 			throw error;
@@ -259,18 +292,19 @@ export async function updateAppById(id: string, data: UpdateAppInput) {
 
 export async function deleteAppById(id: string) {
 	try {
-		const app = await prisma.apps.findUnique({
-			where: { id },
-		});
+		const app = await appRepository.findById(id);
 
 		if (!app) {
 			throw new NotFoundError("App", id);
 		}
 
-		return await prisma.apps.update({
-			where: { id },
-			data: { deletedAt: new Date() },
-		});
+		const deletedApp = await appRepository.delete(id);
+
+		// Инвалидируем кеш
+		await deleteCachedByPattern(`app:${id}*`);
+		await deleteCachedByPattern("apps:list:*");
+
+		return deletedApp;
 	} catch (error) {
 		if (error instanceof NotFoundError) {
 			throw error;
@@ -285,9 +319,7 @@ export async function recordDownload(
 	metadata?: DownloadMetadata,
 ): Promise<void> {
 	try {
-		const app = await prisma.apps.findFirst({
-			where: { id: appId },
-		});
+		const app = await appRepository.findById(appId);
 
 		if (!app) {
 			throw new NotFoundError("App", appId);
@@ -321,40 +353,9 @@ export async function recordDownload(
 	}
 }
 
-export async function getPopularApps(limit: number = 10) {
-	try {
-		return await prisma.apps.findMany({
-			where: {
-				status: "RELEASE",
-				deletedAt: null,
-			},
-			take: limit,
-			orderBy: [{ downloadCount: "desc" }, { rating: "desc" }],
-			include: {
-				category: true,
-				_count: {
-					select: {
-						reviews: true,
-						downloads: true,
-					},
-				},
-			},
-		});
-	} catch (error) {
-		throw new DatabaseError("Failed to fetch popular apps", error);
-	}
-}
-
 export async function incrementViewCount(appId: string): Promise<void> {
 	try {
-		await prisma.apps.update({
-			where: { id: appId },
-			data: {
-				viewCount: {
-					increment: 1,
-				},
-			},
-		});
+		await appRepository.incrementViewCount(appId);
 	} catch (error) {
 		throw new DatabaseError("Failed to increment view count", error);
 	}

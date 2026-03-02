@@ -8,6 +8,9 @@ CREATE TYPE "UserRole" AS ENUM ('USER', 'DEVELOPER', 'ADMIN');
 CREATE TYPE "AppStatus" AS ENUM ('BETA', 'RELEASE');
 
 -- CreateEnum
+CREATE TYPE "DeveloperRequestStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
+
+-- CreateEnum
 CREATE TYPE "TagColor" AS ENUM ('BLUE', 'PINK', 'PURPLE', 'GREEN');
 
 -- CreateEnum
@@ -72,6 +75,53 @@ CREATE TABLE "apps" (
 );
 
 -- CreateTable
+CREATE TABLE "appedition" (
+    "id" TEXT NOT NULL,
+    "appId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "price" DECIMAL(10,2) NOT NULL,
+    "downloadUrl" TEXT NOT NULL,
+    "features" TEXT[],
+    "isDefault" BOOLEAN NOT NULL DEFAULT false,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "appedition_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "apppromotion" (
+    "id" TEXT NOT NULL,
+    "appId" TEXT NOT NULL,
+    "editionId" TEXT,
+    "discountAmount" DECIMAL(10,2),
+    "discountPercent" INTEGER,
+    "label" TEXT,
+    "startsAt" TIMESTAMP(3) NOT NULL,
+    "endsAt" TIMESTAMP(3) NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "apppromotion_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "developerrequest" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "reason" TEXT NOT NULL,
+    "portfolio" TEXT,
+    "status" "DeveloperRequestStatus" NOT NULL DEFAULT 'PENDING',
+    "reviewedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "developerrequest_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "appscategory" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -129,6 +179,7 @@ CREATE TABLE "purchases" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "appId" TEXT NOT NULL,
+    "editionId" TEXT,
     "price" DECIMAL(10,2) NOT NULL,
     "paymentMethod" TEXT,
     "transactionId" TEXT,
@@ -155,6 +206,18 @@ CREATE TABLE "news" (
     CONSTRAINT "news_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "webhookevents" (
+    "id" TEXT NOT NULL,
+    "eventId" TEXT NOT NULL,
+    "eventType" TEXT NOT NULL,
+    "payload" TEXT NOT NULL,
+    "processed" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "webhookevents_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
@@ -175,6 +238,21 @@ CREATE INDEX "apps_categoryId_idx" ON "apps"("categoryId");
 
 -- CreateIndex
 CREATE INDEX "apps_status_idx" ON "apps"("status");
+
+-- CreateIndex
+CREATE INDEX "appedition_appId_idx" ON "appedition"("appId");
+
+-- CreateIndex
+CREATE INDEX "apppromotion_appId_idx" ON "apppromotion"("appId");
+
+-- CreateIndex
+CREATE INDEX "apppromotion_editionId_idx" ON "apppromotion"("editionId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "developerrequest_userId_key" ON "developerrequest"("userId");
+
+-- CreateIndex
+CREATE INDEX "developerrequest_status_idx" ON "developerrequest"("status");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "appscategory_name_key" ON "appscategory"("name");
@@ -227,11 +305,32 @@ CREATE UNIQUE INDEX "purchases_userId_appId_key" ON "purchases"("userId", "appId
 -- CreateIndex
 CREATE INDEX "news_publishedAt_idx" ON "news"("publishedAt");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "webhookevents_eventId_key" ON "webhookevents"("eventId");
+
+-- CreateIndex
+CREATE INDEX "webhookevents_eventId_idx" ON "webhookevents"("eventId");
+
+-- CreateIndex
+CREATE INDEX "webhookevents_processed_idx" ON "webhookevents"("processed");
+
 -- AddForeignKey
 ALTER TABLE "apps" ADD CONSTRAINT "apps_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "appscategory"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "apps" ADD CONSTRAINT "apps_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "appedition" ADD CONSTRAINT "appedition_appId_fkey" FOREIGN KEY ("appId") REFERENCES "apps"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "apppromotion" ADD CONSTRAINT "apppromotion_appId_fkey" FOREIGN KEY ("appId") REFERENCES "apps"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "apppromotion" ADD CONSTRAINT "apppromotion_editionId_fkey" FOREIGN KEY ("editionId") REFERENCES "appedition"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "developerrequest" ADD CONSTRAINT "developerrequest_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "appsversion" ADD CONSTRAINT "appsversion_appId_fkey" FOREIGN KEY ("appId") REFERENCES "apps"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -253,3 +352,6 @@ ALTER TABLE "purchases" ADD CONSTRAINT "purchases_userId_fkey" FOREIGN KEY ("use
 
 -- AddForeignKey
 ALTER TABLE "purchases" ADD CONSTRAINT "purchases_appId_fkey" FOREIGN KEY ("appId") REFERENCES "apps"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "purchases" ADD CONSTRAINT "purchases_editionId_fkey" FOREIGN KEY ("editionId") REFERENCES "appedition"("id") ON DELETE SET NULL ON UPDATE CASCADE;

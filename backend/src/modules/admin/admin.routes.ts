@@ -1,11 +1,11 @@
 import { Router } from "express";
 import * as adminController from "./admin.controller.js";
 import authMiddleware from "../../middlewares/auth.middleware.js";
-import { requireRole } from "../../middlewares/role.middleware.js";
+import { requireAdmin } from "../../middlewares/role.middleware.js";
 
 const router = Router();
 
-router.use(authMiddleware, requireRole("ADMIN"));
+router.use(authMiddleware, requireAdmin());
 
 router.get("/stats", adminController.getDashboardStats);
 router.get("/activity", adminController.getRecentActivity);

@@ -3,6 +3,8 @@ import { DatabaseError, NotFoundError, ApiError } from "../../utils/errors.js";
 import stripe from "../../config/stripe.js";
 import env from "../../config/env.js";
 import type Stripe from "stripe";
+import { webhookRepository } from "../../repositories/webhook.repository.js";
+import { userRepository } from "../../repositories/user.repository.js";
 
 export async function purchaseApp(userId: string, appId: string) {
 	try {
@@ -58,11 +60,7 @@ export async function purchaseApp(userId: string, appId: string) {
 					},
 				},
 			}),
-			prisma.users.update({
-				where: { id: userId },
-				data: { balance: { decrement: price } },
-				select: { id: true, balance: true },
-			}),
+			userRepository.decrementBalance(userId, price),
 		]);
 
 		return { purchase, balance: updatedUser.balance };
@@ -225,6 +223,20 @@ export async function createAppPurchaseSession(userId: string, appId: string) {
 
 export async function handleWebhookEvent(event: Stripe.Event) {
 	try {
+		const existingEvent = await webhookRepository.findByEventId(event.id);
+
+		if (existingEvent) {
+			if (existingEvent.processed) {
+				return;
+			}
+		} else {
+			await webhookRepository.create({
+				eventId: event.id,
+				eventType: event.type,
+				payload: JSON.stringify(event),
+			});
+		}
+
 		switch (event.type) {
 			case "checkout.session.completed": {
 				const session = event.data.object as Stripe.Checkout.Session;
@@ -239,6 +251,8 @@ export async function handleWebhookEvent(event: Stripe.Event) {
 			default:
 				console.log(`Unhandled event type: ${event.type}`);
 		}
+
+		await webhookRepository.markAsProcessed(event.id);
 	} catch (error) {
 		console.error("Error handling webhook event:", error);
 		throw error;
@@ -257,14 +271,7 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
 			throw new Error("Missing amount in metadata");
 		}
 
-		await prisma.users.update({
-			where: { id: userId },
-			data: {
-				balance: {
-					increment: Number(amount),
-				},
-			},
-		});
+		await userRepository.incrementBalance(userId, Number(amount));
 	} else if (type === "app_purchase") {
 		if (!appId) {
 			throw new Error("Missing appId in metadata");

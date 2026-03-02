@@ -17,7 +17,7 @@ export type Platform = "WINDOWS" | "MAC" | "LINUX" | "ANDROID" | "IOS";
 
 
 export interface AuthRequest extends Request {
-	user: Express.User | undefined;
+	user?: Express.User;
 	file?: Express.Multer.File;
 }
 

@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { prisma } from "../../config/prisma.js";
 import { jwtConfig } from "../../config/jwt.js";
 import type { UserCreateData, LoginInput } from "./auth.types.js";
 import {
@@ -9,26 +8,11 @@ import {
 	AuthenticationError,
 	DatabaseError,
 } from "../../utils/errors.js";
+import { userRepository } from "../../repositories/user.repository.js";
 
 export async function getUserById(id: string) {
 	try {
-		const user = await prisma.users.findUnique({
-			where: { id },
-			select: {
-				id: true,
-				email: true,
-				userName: true,
-				role: true,
-				balance: true,
-				blockedTime: true,
-				attempt: true,
-				avatarUrl: true,
-				reviews: true,
-				downloads: true,
-				purchases: true,
-				authoredApps: true,
-			},
-		});
+		const user = await userRepository.findByIdWithRelations(id);
 
 		if (!user) {
 			throw new NotFoundError("User", id);
@@ -45,11 +29,10 @@ export async function getUserById(id: string) {
 
 export async function registerUser(data: UserCreateData) {
 	try {
-		const existing = await prisma.users.findFirst({
-			where: {
-				OR: [{ email: data.email }, { userName: data.userName }],
-			},
-		});
+		const existing = await userRepository.findByEmailOrUsername(
+			data.email,
+			data.userName,
+		);
 
 		if (existing) {
 			const field =
@@ -59,12 +42,10 @@ export async function registerUser(data: UserCreateData) {
 
 		const passwordHash = await bcrypt.hash(data.password, 10);
 
-		const user = await prisma.users.create({
-			data: {
-				email: data.email,
-				userName: data.userName,
-				passwordHash,
-			},
+		const user = await userRepository.create({
+			email: data.email,
+			userName: data.userName,
+			passwordHash,
 		});
 
 		return user;
@@ -82,7 +63,7 @@ export async function changeUserPassword(
 	newPassword: string,
 ) {
 	try {
-		const user = await prisma.users.findUnique({ where: { id: userId } });
+		const user = await userRepository.findById(userId);
 
 		if (!user) {
 			throw new NotFoundError("User", userId);
@@ -96,10 +77,7 @@ export async function changeUserPassword(
 
 		const passwordHash = await bcrypt.hash(newPassword, 10);
 
-		await prisma.users.update({
-			where: { id: userId },
-			data: { passwordHash },
-		});
+		await userRepository.update(userId, { passwordHash });
 	} catch (error) {
 		if (
 			error instanceof NotFoundError ||
@@ -113,7 +91,7 @@ export async function changeUserPassword(
 
 export async function deleteUserAccount(userId: string, password: string) {
 	try {
-		const user = await prisma.users.findUnique({ where: { id: userId } });
+		const user = await userRepository.findById(userId);
 
 		if (!user) {
 			throw new NotFoundError("User", userId);
@@ -125,7 +103,7 @@ export async function deleteUserAccount(userId: string, password: string) {
 			throw new AuthenticationError("Password is incorrect");
 		}
 
-		await prisma.users.delete({ where: { id: userId } });
+		await userRepository.delete(userId);
 	} catch (error) {
 		if (
 			error instanceof NotFoundError ||
@@ -144,28 +122,7 @@ export async function loginUser(data: LoginInput) {
 	try {
 		const { email, password } = data;
 
-		const user = await prisma.users.findUnique({
-			where: { email },
-			select: {
-				id: true,
-				email: true,
-				userName: true,
-				role: true,
-				balance: true,
-				blockedTime: true,
-				attempt: true,
-				avatarUrl: true,
-				reviews: true,
-				downloads: true,
-				purchases: true,
-				authoredApps: true,
-				passwordHash: true,
-				lastLoginAt: true,
-				googleId: true,
-				createdAt: true,
-				updatedAt: true,
-			},
-		});
+		const user = await userRepository.findByEmailWithPassword(email);
 
 		if (!user) {
 			throw new AuthenticationError("Invalid credentials");
@@ -187,16 +144,13 @@ export async function loginUser(data: LoginInput) {
 		if (!isValid) {
 			const attempts = user.attempt + 1;
 
-			await prisma.users.update({
-				where: { id: user.id },
-				data: {
-					attempt: attempts,
-					blockedTime:
-						attempts >= MAX_ATTEMPTS
-							? new Date(now.getTime() + BLOCK_TIME_MS)
-							: null,
-				},
-			});
+			await userRepository.updateAttempts(
+				user.id,
+				attempts,
+				attempts >= MAX_ATTEMPTS
+					? new Date(now.getTime() + BLOCK_TIME_MS)
+					: null,
+			);
 
 			if (attempts >= MAX_ATTEMPTS) {
 				throw new AuthenticationError(
@@ -207,14 +161,7 @@ export async function loginUser(data: LoginInput) {
 			throw new AuthenticationError("Invalid credentials");
 		}
 
-		await prisma.users.update({
-			where: { id: user.id },
-			data: {
-				attempt: 0,
-				blockedTime: null,
-				lastLoginAt: new Date(),
-			},
-		});
+		await userRepository.resetAttempts(user.id);
 
 		const accessToken = jwt.sign(
 			{ userId: user.id, role: user.role },
@@ -255,43 +202,31 @@ export async function findOrCreateGoogleUser(profile: {
 	avatarUrl?: string;
 }) {
 	try {
-		let user = await prisma.users.findUnique({
-			where: { googleId: profile.googleId },
-		});
+		let user = await userRepository.findByGoogleId(profile.googleId);
 
 		if (user) {
-			await prisma.users.update({
-				where: { id: user.id },
-				data: { lastLoginAt: new Date() },
-			});
+			await userRepository.update(user.id, { lastLoginAt: new Date() });
 			return user;
 		}
 
-		user = await prisma.users.findUnique({
-			where: { email: profile.email },
-		});
+		user = await userRepository.findByEmail(profile.email);
 
 		if (user) {
-			user = await prisma.users.update({
-				where: { id: user.id },
-				data: {
-					googleId: profile.googleId,
-					avatarUrl: profile.avatarUrl || user.avatarUrl,
-					lastLoginAt: new Date(),
-				},
+			user = await userRepository.update(user.id, {
+				googleId: profile.googleId,
+				avatarUrl: profile.avatarUrl || user.avatarUrl,
+				lastLoginAt: new Date(),
 			});
 			return user;
 		}
 
 		const userName = profile.displayName ?? profile.email.split("@")[0];
-		user = await prisma.users.create({
-			data: {
-				email: profile.email,
-				userName,
-				passwordHash: "",
-				googleId: profile.googleId,
-				avatarUrl: profile.avatarUrl,
-			},
+		user = await userRepository.create({
+			email: profile.email,
+			userName,
+			passwordHash: "",
+			googleId: profile.googleId,
+			avatarUrl: profile.avatarUrl,
 		});
 
 		return user;

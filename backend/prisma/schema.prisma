@@ -102,7 +102,7 @@ model AppEdition {
   app         Apps    @relation(fields: [appId], references: [id], onDelete: Cascade)
   appId       String
   name        String
-  description String? @db.Text
+  description String @db.Text
   price       Decimal @db.Decimal(10, 2)
   downloadUrl String
   features    String[]
@@ -311,4 +311,17 @@ enum Platform {
   LINUX
   ANDROID
   IOS
+}
+
+model WebhookEvents {
+  id        String   @id @default(uuid())
+  eventId   String   @unique
+  eventType String
+  payload   String   @db.Text
+  processed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([eventId])
+  @@index([processed])
+  @@map("webhookevents")
 }

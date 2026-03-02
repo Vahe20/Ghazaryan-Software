@@ -6,7 +6,7 @@ import type {
     FetchBaseQueryMeta,
 } from "@reduxjs/toolkit/query";
 
-const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"}/api`;
+const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1`;
 
 const rawBaseQuery = fetchBaseQuery({
     baseUrl: apiBaseUrl,

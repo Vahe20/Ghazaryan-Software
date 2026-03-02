@@ -9,13 +9,15 @@ import {
 	createAppSchema,
 	updateAppSchema,
 	getAppsQuerySchema,
+	createAppVersionSchema,
 } from "./apps.types.js";
-import { requireRole } from "../../middlewares/role.middleware.js";
+import { requireAdmin } from "../../middlewares/role.middleware.js";
 import {
 	readLimiter,
 	writeLimiter,
 	downloadLimiter,
 } from "../../middlewares/rateLimit/index.js";
+import { upload } from "../../middlewares/upload.middleware.js";
 
 const router = Router();
 
@@ -44,7 +46,7 @@ router.post(
 	"/",
 	writeLimiter,
 	authMiddleware,
-	requireRole("ADMIN"),
+	requireAdmin(),
 	validate(createAppSchema),
 	appsController.createApp,
 );
@@ -53,7 +55,7 @@ router.put(
 	"/:id",
 	writeLimiter,
 	authMiddleware,
-	requireRole("ADMIN"),
+	requireAdmin(),
 	validate(updateAppSchema),
 	appsController.updateApp,
 );
@@ -62,8 +64,21 @@ router.delete(
 	"/:id",
 	writeLimiter,
 	authMiddleware,
-	requireRole("ADMIN"),
+	requireAdmin(),
 	appsController.deleteApp,
+);
+
+// Version management routes
+router.get("/:appId/versions", readLimiter, appsController.listVersions);
+
+router.post(
+	"/:appId/versions",
+	writeLimiter,
+	authMiddleware,
+	requireAdmin(),
+	upload.single("file"),
+	validate(createAppVersionSchema),
+	appsController.createVersion,
 );
 
 export default router;

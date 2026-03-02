@@ -1,6 +1,7 @@
 import type { Response, NextFunction, Request } from "express";
 import jwt from "jsonwebtoken";
 import config from "../config/env.js";
+import type { UserRole } from "../generated/prisma/index.js";
 
 const authMiddleware = (
 	req: Request,
@@ -14,7 +15,7 @@ const authMiddleware = (
 			return res.status(401).json({ error: "No token provided" });
 		}
 
-		const decoded = jwt.verify(token, config.JWT_ACCESS_SECRET as string) as any;
+		const decoded = jwt.verify(token, config.JWT_ACCESS_SECRET) as { userId: string; role: UserRole };
 		req.user = {
 			userId: decoded.userId,
 			role: decoded.role,

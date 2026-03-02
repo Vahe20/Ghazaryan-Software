@@ -2,7 +2,6 @@ import type { Response } from "express";
 import type { AuthRequest } from "../../types/index.js";
 import * as adminService from "./admin.service.js";
 import { asyncHandler } from "../../middlewares/error.middleware.js";
-import { array } from "zod";
 
 export const getUsers = asyncHandler(
 	async (req: AuthRequest, res: Response) => {

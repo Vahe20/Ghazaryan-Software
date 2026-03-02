@@ -44,7 +44,7 @@ export default function AppPage() {
     const isFree = !app?.price || Number(app.price) === 0;
 
     const handlePurchase = async () => {
-        if (!user) { router.push("/auth/login"); return; }
+        if (!user) { router.push("/auth"); return; }
         if (!app) return;
         try {
             const result = await purchaseApp(app.id).unwrap();

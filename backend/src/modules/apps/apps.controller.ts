@@ -92,16 +92,6 @@ export const downloadApp = asyncHandler(async (req: AuthRequest, res: Response) 
 	res.json({ message: "Download recorded successfully" });
 });
 
-export const getPopularApps = asyncHandler(async (req: Request, res: Response) => {
-	const limitParam = req.query.limit as string;
-	const limit =
-		limitParam && !Array.isArray(limitParam)
-			? parseInt(limitParam)
-			: undefined;
-	const apps = await appsService.getPopularApps(limit);
-	res.json(apps);
-});
-
 export const getUserLibrary = asyncHandler(async (req: AuthRequest, res: Response) => {
 	if (!req.user) {
 		throw ApiError.unauthorized("Authentication required");
@@ -112,4 +102,34 @@ export const getUserLibrary = asyncHandler(async (req: AuthRequest, res: Respons
 		req.query as unknown as GetAppsQuery,
 	);
 	res.json(result);
+});
+
+// Version management controllers
+export const createVersion = asyncHandler(async (req: AuthRequest, res: Response) => {
+	if (!req.file) {
+		throw new ValidationError("File required");
+	}
+
+	if (!req.params.appId || Array.isArray(req.params.appId)) {
+		throw new ValidationError("Invalid appId parameter");
+	}
+
+	const version = await appsService.addVersion(
+		req.params.appId,
+		req.body,
+		req.file,
+	);
+
+	res.status(201).json(version);
+});
+
+export const listVersions = asyncHandler(async (req: Request, res: Response) => {
+	const { appId } = req.params;
+
+	if (!appId || Array.isArray(appId)) {
+		throw new ValidationError("Invalid appId parameter");
+	}
+
+	const versions = await appsService.getVersions(appId);
+	res.json(versions);
 });
