@@ -8,6 +8,10 @@
     justify-content: center;
     overflow: hidden;
     animation: fadeIn 0.5s ease;
+
+    @include mobile {
+        min-height: calc(100vh - 80px - rem(84));
+    }
 }
 
 .gate__orb {
@@ -65,12 +69,22 @@
     grid-template-columns: 360px 1fr;
     height: calc(100vh - 80px);
     overflow: hidden;
+    min-width: 0;
+    width: 100%;
+    max-width: 100vw;
 
     @include laptop {
         grid-template-columns: 320px 1fr;
     }
 
     @include tablet {
+        grid-template-columns: 1fr;
+        height: auto;
+        overflow: visible;
+        grid-auto-rows: auto;
+    }
+
+    @include mobile {
         grid-template-columns: 1fr;
         height: auto;
         overflow: visible;
@@ -82,17 +96,28 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    min-width: 0;
     animation: slideInLeft 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 
     @include tablet {
         border-right: none;
         border-bottom: 1px solid $border-color;
-        max-height: 50vh;
+        max-height: 42vh;
+    }
+
+    @include mobile {
+        max-height: 38vh;
+        border-right: none;
+        border-bottom: 1px solid $border-color;
     }
 }
 
 .shell__stage {
     overflow-y: auto;
+    overflow-x: hidden;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
     animation: fadeIn 0.5s ease 0.1s both;
 
     &::-webkit-scrollbar {
@@ -111,5 +136,12 @@
     @include tablet {
         overflow: visible;
         min-height: 60vh;
+        padding-bottom: rem(8);
+    }
+
+    @include mobile {
+        overflow: visible;
+        min-height: calc(100vh - 80px - rem(84));
+        padding-bottom: rem(8);
     }
 }

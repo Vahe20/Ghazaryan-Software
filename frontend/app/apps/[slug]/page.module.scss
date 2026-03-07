@@ -68,6 +68,40 @@
     }
 }
 
+.topBar {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: rem(1180);
+    margin: 0 auto;
+}
+
+.backNavBtn {
+    position: absolute;
+    top: rem(20);
+    left: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: rem(7);
+    background: rgba($background-tertiary, 0.7);
+    border: 1px solid $border-color;
+    border-radius: $radius-full;
+    color: $text-secondary;
+    font-size: rem(13);
+    font-weight: 600;
+    padding: rem(7) rem(14);
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: background $transition, color $transition, border-color $transition, transform $transition;
+
+    &:hover {
+        background: rgba($background-tertiary, 1);
+        color: $text-primary;
+        border-color: $border-color-medium;
+        transform: translateX(-2px);
+    }
+}
+
 .hero {
     position: relative;
     overflow: hidden;
@@ -303,6 +337,13 @@
 .discountLabel {
     font-size: rem(11);
     color: rgba(#4ade80, 0.8);
+}
+
+.discountExpiry {
+    font-size: rem(10);
+    color: rgba(#4ade80, 0.65);
+    border-left: 1px solid rgba(#4ade80, 0.3);
+    padding-left: rem(6);
 }
 
 .priceRow {
@@ -693,6 +734,8 @@
     color: $text-secondary;
     line-height: 1.8;
     white-space: pre-line;
+    overflow: hidden;
+    overflow-wrap: break-word;
     font-size: rem(15);
 }
 
@@ -867,6 +910,7 @@
     width: rem(36);
     height: rem(36);
     border-radius: 50%;
+    overflow: hidden;
     background: linear-gradient(135deg, $primary, $accent);
     display: flex;
     align-items: center;
@@ -985,12 +1029,12 @@
 
 @include mobile {
     .hero {
-        min-height: rem(360);
+        min-height: rem(320);
     }
 
     .heroContent {
         grid-template-columns: rem(64) 1fr;
-        padding: rem(24) rem(16) rem(32);
+        padding: rem(20) rem(16) rem(28);
         gap: rem(12);
     }
 
@@ -1001,7 +1045,16 @@
     }
 
     .heroTitle {
-        font-size: rem(26);
+        font-size: rem(22);
+    }
+
+    .heroDesc {
+        font-size: rem(13);
+    }
+
+    .heroStats {
+        flex-wrap: wrap;
+        gap: rem(8);
     }
 
     .heroPurchase {
@@ -1018,16 +1071,25 @@
     }
 
     .newPrice {
-        font-size: rem(28);
+        font-size: rem(26);
+    }
+
+    .buyBtn {
+        padding: rem(12) rem(20);
+        font-size: rem(14);
     }
 
     .appContent {
-        padding: rem(20) rem(16) rem(40);
-        gap: rem(20);
+        padding: rem(16) rem(12) rem(40);
+        gap: rem(16);
     }
 
     .section {
-        padding: rem(20) rem(16);
+        padding: rem(18) rem(14);
+    }
+
+    .sectionTitle {
+        font-size: rem(16);
     }
 
     .screenshotThumbs {
@@ -1035,8 +1097,8 @@
     }
 
     .ssThumbnail {
-        width: rem(96);
-        height: rem(58);
+        width: rem(88);
+        height: rem(52);
     }
 
     .editionCard {
@@ -1056,5 +1118,13 @@
     .timelineItem {
         grid-template-columns: rem(10) rem(1) 1fr;
         gap: 0 rem(12);
+    }
+
+    .reviewsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .reviewFormSubmit {
+        align-self: stretch;
     }
 }

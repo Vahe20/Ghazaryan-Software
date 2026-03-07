@@ -6,7 +6,7 @@ import type {
     FetchBaseQueryMeta,
 } from "@reduxjs/toolkit/query";
 
-const apiBaseUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1`;
+const apiBaseUrl = (process.env.BACKEND_URL ?? "").replace(/\/$/, "");
 
 const rawBaseQuery = fetchBaseQuery({
     baseUrl: apiBaseUrl,

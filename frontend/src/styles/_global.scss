@@ -143,6 +143,14 @@ ul, ol {
 
 main {
     min-height: calc(100vh - 80px);
+
+    @include tablet {
+        padding-bottom: calc(rem(84) + env(safe-area-inset-bottom));
+    }
+
+    @include mobile {
+        padding-bottom: calc(rem(84) + env(safe-area-inset-bottom));
+    }
 }
 
 ::-webkit-scrollbar {

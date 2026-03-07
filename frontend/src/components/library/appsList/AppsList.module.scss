@@ -1,8 +1,5 @@
 @use "../../../styles/helpers/" as *;
 
-/* ══════════════════════════════
-   RAIL wrapper
-══════════════════════════════ */
 .rail {
     display: flex;
     flex-direction: column;
@@ -11,9 +8,6 @@
     background: $background-secondary;
 }
 
-/* ══════════════════════════════
-   HEAD — sticky top section
-══════════════════════════════ */
 .head {
     padding: rem(20) rem(16) rem(12);
     display: flex;
@@ -59,7 +53,6 @@
     transition: all $transition;
 }
 
-/* ── Search ── */
 .search {
     position: relative;
     display: flex;
@@ -89,16 +82,13 @@
     font-weight: 500;
     transition: all $transition;
 
-    &::placeholder {
-        color: $text-muted;
-    }
+    &::placeholder { color: $text-muted; }
 
     &:focus {
         outline: none;
         border-color: rgba($primary, 0.5);
         background: rgba($background-tertiary, 0.9);
         box-shadow: 0 0 0 3px rgba($primary, 0.08);
-
         ~ .search__ico { color: $primary; }
     }
 }
@@ -118,18 +108,11 @@
     cursor: pointer;
     transition: all $transition;
 
-    svg {
-        width: rem(10);
-        height: rem(10);
-    }
+    svg { width: rem(10); height: rem(10); }
 
-    &:hover {
-        color: $text-primary;
-        background: $border-color;
-    }
+    &:hover { color: $text-primary; background: $border-color; }
 }
 
-/* ── Sort tabs ── */
 .tabs {
     display: flex;
     gap: rem(4);
@@ -152,9 +135,7 @@
     transition: all $transition;
     white-space: nowrap;
 
-    &:hover {
-        color: $text-secondary;
-    }
+    &:hover { color: $text-secondary; }
 
     &_active {
         background: $background-tertiary;
@@ -163,32 +144,19 @@
     }
 }
 
-/* ══════════════════════════════
-   LIST — scrollable area
-══════════════════════════════ */
 .list {
     flex: 1;
     overflow-y: auto;
-    padding: rem(10) rem(10);
+    padding: rem(10);
     display: flex;
     flex-direction: column;
     gap: rem(4);
 
-    &::-webkit-scrollbar {
-        width: 4px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: $border-color-medium;
-        border-radius: $radius-full;
-    }
+    &::-webkit-scrollbar { width: 4px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb { background: $border-color-medium; border-radius: $radius-full; }
 }
 
-/* ── App card row ── */
 .card {
     all: unset;
     display: flex;
@@ -205,27 +173,15 @@
     &:hover {
         background: rgba($background-tertiary, 0.6);
         border-color: $border-color;
-
-        .card__img {
-            transform: scale(1.06);
-        }
-
-        .card__name {
-            color: $text-primary;
-        }
+        .card__img { transform: scale(1.06); }
+        .card__name { color: $text-primary; }
     }
 
     &_active {
         background: rgba($primary, 0.08);
         border-color: rgba($primary, 0.2);
-
-        .card__name {
-            color: $primary;
-        }
-
-        .card__thumb {
-            box-shadow: 0 0 0 2px rgba($primary, 0.35), $shadow-sm;
-        }
+        .card__name { color: $primary; }
+        .card__thumb { box-shadow: 0 0 0 2px rgba($primary, 0.35), $shadow-sm; }
     }
 }
 
@@ -281,11 +237,7 @@
     font-size: rem(11);
     color: $text-muted;
     font-weight: 500;
-
-    &::before {
-        content: '·';
-        margin-right: rem(6);
-    }
+    &::before { content: '·'; margin-right: rem(6); }
 }
 
 .card__dot {
@@ -298,9 +250,6 @@
     animation: scaleIn 0.2s ease;
 }
 
-/* ══════════════════════════════
-   LOADING SKELETONS
-══════════════════════════════ */
 .skeletons {
     display: flex;
     flex-direction: column;
@@ -321,9 +270,6 @@
     animation: shimmer 1.8s ease-in-out infinite;
 }
 
-/* ══════════════════════════════
-   EMPTY STATE
-══════════════════════════════ */
 .empty {
     flex: 1;
     display: flex;

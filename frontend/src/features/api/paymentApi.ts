@@ -25,7 +25,11 @@ export const paymentApi = api.injectEndpoints({
 
         purchaseApp: builder.mutation<PurchaseResponse, string>({
             query: (appId) => ({ url: "/payment/purchase", method: "POST", body: { appId } }),
-            invalidatesTags: [{ type: "Apps", id: "LIBRARY" }, { type: "Purchases", id: "LIST" }],
+            invalidatesTags: (_, __, appId) => [
+                { type: "Apps", id: "LIBRARY" },
+                { type: "Purchases", id: "LIST" },
+                { type: "Apps", id: appId },
+            ],
         }),
 
         getPaymentHistory: builder.query<{ purchases: Purchase[] }, void>({

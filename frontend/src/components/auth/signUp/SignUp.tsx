@@ -27,6 +27,10 @@ export const SignUp = () => {
         defaultValues: { userName: "", email: "", password: "", confirmPassword: "", agreeToTerms: false }
     });
 
+    const googleAuthUrl = process.env.BACKEND_URL
+        ? `${process.env.BACKEND_URL}/auth/google`
+        : "/auth/google";
+
     const onSignUp = async (data: SignUpFormData) => {
         try {
             setRegError(null);
@@ -183,7 +187,7 @@ export const SignUp = () => {
                 type="button"
                 className={style.googleBtn}
                 onClick={() => {
-                    window.location.href = `http://localhost:4000/api/auth/google`;
+                    window.location.href = googleAuthUrl;
                 }}
             >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">

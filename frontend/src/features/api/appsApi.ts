@@ -96,6 +96,7 @@ export const appsApi = api.injectEndpoints({
 
         recordDownload: builder.mutation<void, { id: string; version?: string; platform?: string }>({
             query: ({ id, ...body }) => ({ url: `/apps/${id}/download`, method: "POST", body }),
+            invalidatesTags: (_, __, { id }) => [{ type: "Apps", id }],
         }),
 
         uploadFile: builder.mutation<
@@ -130,7 +131,9 @@ export const appsApi = api.injectEndpoints({
 
         createReview: builder.mutation<Review, { appId: string; rating: number; title?: string; comment: string }>({
             query: ({ appId, ...data }) => ({ url: `/apps/${appId}/reviews`, method: "POST", body: data }),
-            invalidatesTags: (_, __, { appId }) => [{ type: "Reviews", id: appId }, { type: "Apps", id: appId }],
+            invalidatesTags: (result, __, { appId }) => result
+                ? [{ type: "Reviews", id: appId }, { type: "Apps", id: appId }, { type: "Apps", id: "LIST" }]
+                : [],
         }),
 
         updateReview: builder.mutation<Review, { reviewId: string; appId: string; rating?: number; title?: string; comment?: string }>({

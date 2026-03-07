@@ -1,7 +1,7 @@
 import type { CreateAppInput, UpdateAppInput, GetAppsQuery, CreateVersionData } from "./apps.types.js";
 import { slugGenerator } from "../../utils/slugGenerator.js";
 import { sanitizeSearchQuery, sanitizeNumericInput } from "../../utils/sanitizer.js";
-import { getCached, setCached, deleteCachedByPattern, hashObject, withCache } from "../../utils/cache.js";
+import { getCached, setCached, deleteCached, deleteCachedByPattern, hashObject, withCache } from "../../utils/cache.js";
 import type { DownloadMetadata, Platform, AppStatus } from "../../types/index.js";
 import { NotFoundError, ConflictError, DatabaseError } from "../../utils/errors.js";
 import { appRepository } from "../../repositories/app.repository.js";
@@ -365,18 +365,13 @@ export async function recordDownload(
 ): Promise<void> {
 	try {
 		const app = await appRepository.findById(appId);
-
-		if (!app) {
-			throw new NotFoundError("App", appId);
-		}
-
-		const version = metadata?.version ?? "unknown";
+		if (!app) throw new NotFoundError("App", appId);
 
 		await prisma.downloads.create({
 			data: {
 				appId,
 				userId: userId ?? null,
-				version,
+				version: metadata?.version ?? "unknown",
 				platform: metadata?.platform as Platform,
 				ipAddress: metadata?.ipAddress ?? null,
 				userAgent: metadata?.userAgent ?? null,
@@ -386,16 +381,14 @@ export async function recordDownload(
 
 		await prisma.apps.update({
 			where: { id: appId },
-			data: {
-				downloadCount: {
-					increment: 1,
-				},
-			},
+			data: { downloadCount: { increment: 1 } },
 		});
+
+		await deleteCachedByPattern(`app:${appId}*`);
+		await deleteCached(`app:slug:${app.slug}`);
+		await deleteCachedByPattern("apps:list:*");
 	} catch (error) {
-		if (error instanceof NotFoundError) {
-			throw error;
-		}
+		if (error instanceof NotFoundError) throw error;
 		throw new DatabaseError("Failed to record download", error);
 	}
 }

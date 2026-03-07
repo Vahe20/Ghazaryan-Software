@@ -86,3 +86,22 @@
     animation: slideInRight 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
 }
 
+.navbar__desktopNav {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    min-width: 0;
+
+    @include tablet {
+        display: none;
+    }
+}
+
+.navbar__mobileDock {
+    display: none;
+
+    @include tablet {
+        display: block;
+    }
+}
+

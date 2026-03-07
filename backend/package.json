@@ -12,10 +12,7 @@
 		"prisma:migrate": "prisma migrate dev",
 		"prisma:deploy": "prisma migrate deploy",
 		"prisma:studio": "prisma studio --browser none",
-		"prisma:reset": "prisma migrate reset",
-		"docker:up": "cd ../docker && docker compose up -d",
-		"docker:down": "cd ../docker && docker compose down",
-		"docker:logs": "cd ../docker && docker compose logs -f backend"
+		"prisma:reset": "prisma migrate reset"
 	},
 	"keywords": [],
 	"author": "",

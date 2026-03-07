@@ -49,7 +49,6 @@ export const createApp = asyncHandler(async (req: AuthRequest, res: Response) =>
 		throw ApiError.unauthorized("Authentication required");
 	}
 
-	// Автоматически устанавливаем authorId из текущего пользователя
 	const appData = {
 		...req.body,
 		authorId: req.user.id,
@@ -70,14 +69,12 @@ export const updateApp = asyncHandler(async (req: AuthRequest, res: Response) =>
 		throw ApiError.unauthorized("Authentication required");
 	}
 
-	// Получаем приложение для проверки автора
 	const existingApp = await appsService.getAppById(id);
 
 	if (!existingApp) {
 		throw new NotFoundError("App", id);
 	}
 
-	// Проверяем права: только автор или админ могут обновлять
 	const isAuthor = existingApp.authorId === req.user.id;
 	const isAdmin = req.user.role === "ADMIN";
 
@@ -100,14 +97,12 @@ export const deleteApp = asyncHandler(async (req: AuthRequest, res: Response) =>
 		throw ApiError.unauthorized("Authentication required");
 	}
 
-	// Получаем приложение для проверки автора
 	const existingApp = await appsService.getAppById(id);
 
 	if (!existingApp) {
 		throw new NotFoundError("App", id);
 	}
 
-	// Проверяем права: только автор или админ могут удалять
 	const isAuthor = existingApp.authorId === req.user.id;
 	const isAdmin = req.user.role === "ADMIN";
 
@@ -152,7 +147,6 @@ export const getUserLibrary = asyncHandler(async (req: AuthRequest, res: Respons
 	res.json(result);
 });
 
-// Version management controllers
 export const createVersion = asyncHandler(async (req: AuthRequest, res: Response) => {
 	if (!req.params.appId || Array.isArray(req.params.appId)) {
 		throw new ValidationError("Invalid appId parameter");
@@ -162,14 +156,12 @@ export const createVersion = asyncHandler(async (req: AuthRequest, res: Response
 		throw ApiError.unauthorized("Authentication required");
 	}
 
-	// Получаем приложение для проверки автора
 	const existingApp = await appsService.getAppById(req.params.appId);
 
 	if (!existingApp) {
 		throw new NotFoundError("App", req.params.appId);
 	}
 
-	// Проверяем права: только автор или админ могут создавать версии
 	const isAuthor = existingApp.authorId === req.user.id;
 	const isAdmin = req.user.role === "ADMIN";
 
