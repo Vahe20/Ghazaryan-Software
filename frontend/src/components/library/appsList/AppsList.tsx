@@ -4,8 +4,8 @@ import { useState, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "@/src/app/hooks";
 import { setSelectedApp } from "@/src/features/slices/librarySlice";
 import { useDebounce } from "@/src/hooks/useDebounce";
-import style from "./AppsList.module.scss";
 import { useGetUserLibraryQuery } from "@/src/features/api/appsApi";
+import style from "./AppsList.module.scss";
 
 type FilterType = "date" | "name" | "size";
 
@@ -112,11 +112,16 @@ export const AppsList = () => {
                 ) : (
                     apps.map((app, i) => {
                         const isActive = selectedAppId === app.id;
+                        const latestVersion = app.versions?.[0]?.version;
                         return (
                             <button
                                 key={app.id}
                                 className={`${style.card} ${isActive ? style.card_active : ""}`}
-                                onClick={() => dispatch(setSelectedApp(app.id))}
+                                onClick={() => {
+                                    if (app.id) {
+                                        dispatch(setSelectedApp(app.id));
+                                    }
+                                }}
                                 style={{ animationDelay: `${i * 25}ms` }}
                             >
                                 <div className={style.card__thumb}>
@@ -125,7 +130,7 @@ export const AppsList = () => {
                                 <div className={style.card__body}>
                                     <span className={style.card__name}>{app.name}</span>
                                     <div className={style.card__row}>
-                                        <span className={style.card__ver}>v{app.version}</span>
+                                        <span className={style.card__ver}>{latestVersion ? `v${latestVersion}` : "No version"}</span>
                                         {app.size && (
                                             <span className={style.card__size}>
                                                 {(app.size / 1024 / 1024).toFixed(1)} MB

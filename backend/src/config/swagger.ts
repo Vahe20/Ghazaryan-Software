@@ -22,7 +22,7 @@ const options: swaggerJsdoc.Options = {
             version: "1.0.0",
             description: "Full REST API documentation",
         },
-        servers: [{ url: "/api" }],
+        servers: [{ url: "/api/v1" }],
         components: {
             securitySchemes: {
                 bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
@@ -124,7 +124,7 @@ const options: swaggerJsdoc.Options = {
                         changelog: { type: "string" },
                         downloadUrl: { type: "string" },
                         size: { type: "integer" },
-                        isStable: { type: "boolean" },
+                        status: { type: "string", enum: ["BETA", "RELEASE"], default: "BETA" },
                         releaseDate: { type: "string", format: "date-time" },
                     },
                 },
@@ -635,7 +635,7 @@ const options: swaggerJsdoc.Options = {
                                         file: { type: "string", format: "binary" },
                                         version: { type: "string", example: "1.2.0", description: "Format X.Y.Z" },
                                         changelog: { type: "string", minLength: 10 },
-                                        isStable: { type: "boolean", default: true },
+                                        status: { type: "string", enum: ["BETA", "RELEASE"], default: "BETA" },
                                     },
                                 },
                             },

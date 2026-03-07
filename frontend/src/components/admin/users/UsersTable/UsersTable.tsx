@@ -39,23 +39,16 @@ export default function UsersTable({ users, onEditRole, onDelete }: UsersTablePr
                     <tr
                         key={user.id}
                         className={table.tableTr}
-                        onClick={() => router.push(`/admin/users/${user.id}`)}
                         style={{ cursor: "pointer" }}
                     >
                         <td className={table.tableTd}>
-                            <Link
-                                href={`/admin/users/${user.id}`}
-                                className={s.userCellLink}
-                                onClick={e => e.stopPropagation()}
-                            >
-                                <div className={s.userCell}>
-                                    <UserAvatar user={user} />
-                                    <div>
-                                        <p className={s.userName}>{user.userName}</p>
-                                        <p className={s.userEmail}>{user.email}</p>
-                                    </div>
+                            <div className={s.userCell}>
+                                <UserAvatar user={user} />
+                                <div>
+                                    <p className={s.userName}>{user.userName}</p>
+                                    <p className={s.userEmail}>{user.email}</p>
                                 </div>
-                            </Link>
+                            </div>
                         </td>
                         <td className={table.tableTd}><RoleBadge role={user.role} /></td>
                         <td className={table.tableTd}>{Number(user.balance).toLocaleString()} USD</td>

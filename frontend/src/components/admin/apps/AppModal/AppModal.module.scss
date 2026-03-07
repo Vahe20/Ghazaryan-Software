@@ -1,4 +1,4 @@
-@use "../../../../styles/helpers/" as *;
+@use "../../../../styles/helpers/"as *;
 
 
 
@@ -10,6 +10,15 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
 
-    &:not(:first-child) { margin-top: rem(20); }
+    &:not(:first-child) {
+        margin-top: rem(20);
+    }
 }
 
+.filePreviewThumb {
+    width: rem(60);
+    height: rem(60);
+    object-fit: cover;
+    border-radius: rem(4);
+    margin-right: rem(12);
+}

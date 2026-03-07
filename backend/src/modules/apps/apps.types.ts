@@ -23,8 +23,6 @@ export const createAppSchema = z.object({
 		.string()
 		.min(50, "Description must be at least 50 characters")
 		.max(10000, "Description must be at most 10000 characters"),
-	version: z.string().regex(/^\d+\.\d+\.\d+$/, "Version must be in format X.Y.Z (e.g., 1.0.0)"),
-	changelog: z.string().max(5000, "Changelog must be at most 5000 characters").optional(),
 	iconUrl: z.string().url("Invalid icon URL"),
 	coverUrl: z.string().url("Invalid cover URL").optional(),
 	screenshots: z.array(z.string().url("Invalid screenshot URL")).max(10, "Maximum 10 screenshots allowed"),
@@ -43,6 +41,7 @@ export const createAppSchema = z.object({
 	documentationUrl: z.string().url("Invalid documentation URL").or(z.literal("")).optional(),
 	status: appStatusSchema.default("BETA"),
 	price: z.number().min(0, "Price must be 0 or greater").default(0),
+	authorId: z.string().uuid("Invalid author ID").optional(),
 });
 
 export const updateAppSchema = z.object({
@@ -67,8 +66,6 @@ export const updateAppSchema = z.object({
 		.min(50, "Description must be at least 50 characters")
 		.max(10000, "Description must be at most 10000 characters")
 		.optional(),
-	version: z.string().regex(/^\d+\.\d+\.\d+$/, "Version must be in format X.Y.Z (e.g., 1.0.0)").optional(),
-	changelog: z.string().max(5000, "Changelog must be at most 5000 characters").optional(),
 	iconUrl: z.string().url("Invalid icon URL").optional(),
 	coverUrl: z.string().url("Invalid cover URL").optional(),
 	screenshots: z.array(z.string().url("Invalid screenshot URL")).max(10, "Maximum 10 screenshots allowed").optional(),
@@ -84,7 +81,6 @@ export const updateAppSchema = z.object({
 		.max(5, "Maximum 5 platforms allowed")
 		.optional(),
 	minVersion: z.string().optional(),
-	downloadUrl: z.string().url("Invalid download URL").optional(),
 	sourceUrl: z.string().url("Invalid source URL").or(z.literal("")).optional(),
 	documentationUrl: z.string().url("Invalid documentation URL").or(z.literal("")).optional(),
 	status: appStatusSchema.optional(),
@@ -102,31 +98,25 @@ export const getAppsQuerySchema = z.object({
 	order: z.enum(["asc", "desc"]).default("desc"),
 });
 
-// App schemas and types
 export const createAppVersionSchema = z.object({
-	version: z.string().regex(/^\d+\.\d+\.\d+$/, "Version must be in format X.Y.Z (e.g., 1.0.0)"),
-	changelog: z
-		.string()
-		.min(10, "Changelog must be at least 10 characters")
-		.max(5000, "Changelog must be at most 5000 characters"),
-	isStable: z.boolean().default(true),
+	version: z.string().min(1, "Version is required").max(50, "Version is too long"),
+	changelog: z.string().max(10000, "Changelog is too long").optional(),
+	status: appStatusSchema.default("BETA"),
+	downloadUrl: z.string().url("Invalid download URL"),
 });
 
 export const updateAppVersionSchema = z.object({
-	changelog: z
-		.string()
-		.min(10, "Changelog must be at least 10 characters")
-		.max(5000, "Changelog must be at most 5000 characters")
-		.optional(),
-	isStable: z.boolean().optional(),
+	version: z.string().min(1, "Version is required").max(50, "Version is too long").optional(),
+	changelog: z.string().max(10000, "Changelog is too long").optional(),
+	status: appStatusSchema.optional(),
 });
 
 export const getVersionsQuerySchema = z.object({
 	page: z.coerce.number().int().positive().default(1),
 	limit: z.coerce.number().int().positive().max(100).default(20),
 	appId: z.string().uuid("Invalid app ID"),
-	isStable: z.coerce.boolean().optional(),
-	sortBy: z.enum(["releaseDate", "version"]).default("releaseDate"),
+	status: appStatusSchema.optional(),
+	sortBy: z.enum(["releaseDate"]).default("releaseDate"),
 	order: z.enum(["asc", "desc"]).default("desc"),
 });
 
@@ -143,7 +133,6 @@ export interface AppWithRelations {
 	slug: string;
 	shortDesc: string;
 	description: string;
-	version: string;
 	iconUrl: string;
 	coverUrl?: string | null;
 	rating: number;
@@ -164,17 +153,16 @@ export interface AppVersion {
 	id: string;
 	appId: string;
 	version: string;
-	changelog: string;
-	downloadUrl: string;
-	size: number;
-	isStable: boolean;
+	changelog?: string | null;
+	status: AppStatus;
 	releaseDate: Date;
 }
 
 export interface CreateVersionData {
 	version: string;
-	changelog: string;
-	isStable: boolean;
+	changelog?: string;
+	status?: AppStatus;
+	downloadUrl: string;
 }
 
 export interface AppFilters {

@@ -26,10 +26,9 @@ export class AppRepository extends BaseRepository<Apps> {
                         id: true,
                         version: true,
                         changelog: true,
-                        isStable: true,
-                        releaseDate: true,
+                        status: true,
                         downloadUrl: true,
-                        size: true,
+                        releaseDate: true,
                     },
                 },
                 reviews: {
@@ -49,6 +48,15 @@ export class AppRepository extends BaseRepository<Apps> {
                                 avatarUrl: true,
                             },
                         },
+                    },
+                },
+                editions: {
+                    orderBy: { createdAt: "desc" },
+                    select: {
+                        id: true,
+                        name: true,
+                        price: true,
+                        createdAt: true,
                     },
                 },
                 _count: {
@@ -72,6 +80,13 @@ export class AppRepository extends BaseRepository<Apps> {
                         slug: true,
                     },
                 },
+                author: {
+                    select: {
+                        id: true,
+                        userName: true,
+                        avatarUrl: true,
+                    },
+                },
                 versions: {
                     orderBy: { releaseDate: "desc" },
                     take: 5,
@@ -79,10 +94,9 @@ export class AppRepository extends BaseRepository<Apps> {
                         id: true,
                         version: true,
                         changelog: true,
-                        isStable: true,
-                        releaseDate: true,
                         downloadUrl: true,
-                        size: true,
+                        status: true,
+                        releaseDate: true,
                     },
                 },
                 reviews: {
@@ -102,6 +116,15 @@ export class AppRepository extends BaseRepository<Apps> {
                                 avatarUrl: true,
                             },
                         },
+                    },
+                },
+                editions: {
+                    orderBy: { createdAt: "desc" },
+                    select: {
+                        id: true,
+                        name: true,
+                        price: true,
+                        createdAt: true,
                     },
                 },
                 _count: {

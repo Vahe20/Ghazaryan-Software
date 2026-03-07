@@ -46,9 +46,6 @@ model Apps {
   shortDesc   String @db.VarChar(200)
   description String @db.Text
 
-  version   String
-  changelog String? @db.Text
-
   iconUrl     String
   coverUrl    String?
   screenshots String[]
@@ -61,7 +58,6 @@ model Apps {
   platform   Platform[]
   minVersion String?
 
-  downloadUrl      String
   sourceUrl        String?
   documentationUrl String?
 
@@ -86,46 +82,27 @@ model Apps {
   downloads  Downloads[]
   versions   AppsVersion[]
   purchases  Purchases[]
-  editions   AppEdition[]
   promotions AppPromotion[]
+
+  parentApp   Apps?  @relation("AppEditions", fields: [parentAppId], references: [id], onDelete: SetNull)
+  parentAppId String?
+  editions    Apps[] @relation("AppEditions")
 
   price Decimal @default(0) @db.Decimal(10, 2)
 
   @@index([slug])
   @@index([categoryId])
   @@index([status])
+  @@index([parentAppId])
   @@map("apps")
 }
 
-model AppEdition {
-  id          String  @id @default(uuid())
-  app         Apps    @relation(fields: [appId], references: [id], onDelete: Cascade)
-  appId       String
-  name        String
-  description String @db.Text
-  price       Decimal @db.Decimal(10, 2)
-  downloadUrl String
-  features    String[]
-  isDefault   Boolean @default(false)
-  isActive    Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  purchases  Purchases[]
-  promotions AppPromotion[]
-
-  @@index([appId])
-  @@map("appedition")
-}
 
 model AppPromotion {
   id String @id @default(uuid())
 
   app       Apps   @relation(fields: [appId], references: [id], onDelete: Cascade)
   appId     String
-  edition   AppEdition? @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  editionId String?
 
   discountAmount  Decimal? @db.Decimal(10, 2)
   discountPercent Int?
@@ -138,7 +115,6 @@ model AppPromotion {
   createdAt DateTime @default(now())
 
   @@index([appId])
-  @@index([editionId])
   @@map("apppromotion")
 }
 
@@ -176,14 +152,12 @@ model AppsVersion {
   appId String
 
   version     String
-  changelog   String @db.Text
-  downloadUrl String
-  size        Int
-
-  isStable    Boolean  @default(true)
+  changelog   String? @db.Text
+  status       AppStatus @default(BETA)
+  downloadUrl     String
+  
   releaseDate DateTime @default(now())
 
-  @@unique([appId, version])
   @@index([appId])
   @@map("appsversion")
 }
@@ -238,9 +212,6 @@ model Purchases {
   userId String
   app    Apps   @relation(fields: [appId], references: [id], onDelete: Restrict)
   appId  String
-
-  edition   AppEdition? @relation(fields: [editionId], references: [id])
-  editionId String?
 
   price         Decimal @db.Decimal(10, 2)
   paymentMethod String?

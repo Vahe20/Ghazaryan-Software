@@ -107,74 +107,101 @@ async function main() {
 
 	const categoryList = await prisma.appsCategory.findMany();
 
+	if (categoryList.length === 0) {
+		console.error("❌ No categories found!");
+		process.exit(1);
+	}
+
 	/* ---------- APPS ---------- */
+	const createdAppIds: string[] = [];
+
 	for (let i = 0; i < APP_TOTAL; i++) {
 		const baseName = APP_NAMES[i % APP_NAMES.length];
 		const name = `${baseName} ${i + 1}`;
 
-		const app = await prisma.apps.create({
-			data: {
-				name,
-				slug: name.toLowerCase().replace(/\s+/g, "-"),
-				shortDesc: DESCRIPTIONS[i % DESCRIPTIONS.length],
-				description: `${DESCRIPTIONS[i % DESCRIPTIONS.length]}
+		try {
+			const app = await prisma.apps.create({
+				data: {
+					name,
+					slug: name.toLowerCase().replace(/\s+/g, "-"),
+					shortDesc: DESCRIPTIONS[i % DESCRIPTIONS.length],
+					description: `${DESCRIPTIONS[i % DESCRIPTIONS.length]}
 
 This application provides a set of professional tools designed for daily use. It focuses on stability, performance, and usability.`,
-				version: `1.${i % 5}.0`,
-				changelog: "Initial stable release",
-				iconUrl: ICONS[i % ICONS.length],
-				coverUrl: COVERS[i % COVERS.length],
-				screenshots: [
-					SCREENSHOTS[i % SCREENSHOTS.length],
-					SCREENSHOTS[(i + 1) % SCREENSHOTS.length],
-					SCREENSHOTS[(i + 2) % SCREENSHOTS.length],
-					SCREENSHOTS[(i + 3) % SCREENSHOTS.length],
-					SCREENSHOTS[(i + 4) % SCREENSHOTS.length],
-					SCREENSHOTS[(i + 5) % SCREENSHOTS.length],
-					SCREENSHOTS[(i + 6) % SCREENSHOTS.length],
-					SCREENSHOTS[(i + 7) % SCREENSHOTS.length],
-					SCREENSHOTS[(i + 8) % SCREENSHOTS.length],
-					SCREENSHOTS[(i + 9) % SCREENSHOTS.length],
-					SCREENSHOTS[(i + 10) % SCREENSHOTS.length],
-					SCREENSHOTS[(i + 11) % SCREENSHOTS.length],
-				],
-				categoryId: categoryList[i % categoryList.length].id,
-				tags: ["software", "tool", baseName.toLowerCase()],
-				size: 50_000_000 + i * 1_000_000,
-				platform:
-					i % 3 === 0
-						? ["WINDOWS"]
-						: i % 3 === 1
-							? ["WINDOWS", "MAC"]
-							: ["WINDOWS", "MAC", "LINUX"],
-				downloadUrl: "https://speed.hetzner.de/100MB.bin",
-				sourceUrl: "https://github.com",
-				status: i % 4 === 0 ? "BETA" : "RELEASE",
-				featured: i % 10 === 0,
-				price: i % 5 === 0 ? 0 : 5 + i * 0.5,
-				authorId: user.id,
-			},
-		});
+					iconUrl: ICONS[i % ICONS.length],
+					coverUrl: COVERS[i % COVERS.length],
+					screenshots: [
+						SCREENSHOTS[i % SCREENSHOTS.length],
+						SCREENSHOTS[(i + 1) % SCREENSHOTS.length],
+						SCREENSHOTS[(i + 2) % SCREENSHOTS.length],
+						SCREENSHOTS[(i + 3) % SCREENSHOTS.length],
+						SCREENSHOTS[(i + 4) % SCREENSHOTS.length],
+						SCREENSHOTS[(i + 5) % SCREENSHOTS.length],
+						SCREENSHOTS[(i + 6) % SCREENSHOTS.length],
+						SCREENSHOTS[(i + 7) % SCREENSHOTS.length],
+						SCREENSHOTS[(i + 8) % SCREENSHOTS.length],
+						SCREENSHOTS[(i + 9) % SCREENSHOTS.length],
+						SCREENSHOTS[(i + 10) % SCREENSHOTS.length],
+						SCREENSHOTS[(i + 11) % SCREENSHOTS.length],
+					],
+					categoryId: categoryList[i % categoryList.length].id,
+					tags: ["software", "tool", baseName.toLowerCase()],
+					size: 50_000_000 + i * 1_000_000,
+					price: 0.99 + (i % 5) * 0.99,
+					platform:
+						i % 3 === 0
+							? ["WINDOWS"]
+							: i % 3 === 1
+								? ["WINDOWS", "MAC"]
+								: ["WINDOWS", "MAC", "LINUX"],
+					sourceUrl: "https://github.com",
+					status: i % 4 === 0 ? "BETA" : "RELEASE",
+					featured: i % 10 === 0,
+					authorId: user.id,
+				},
+			});
 
-		await prisma.appsVersion.createMany({
-			data: [
-				{
-					appId: app.id,
-					version: `0.${i}.0`,
-					changelog: "Beta version",
-					downloadUrl: "https://speed.hetzner.de/100MB.bin",
-					size: 45_000_000,
-					isStable: false,
+			await prisma.appsVersion.createMany({
+				data: [
+					{
+						appId: app.id,
+						version: "0.9.0",
+						changelog: "Initial beta release",
+						downloadUrl: "https://example.com/download/v0.9.0",
+						status: "BETA",
+					},
+					{
+						appId: app.id,
+						version: "1.0.0",
+						changelog: "First stable release",
+						downloadUrl: "https://example.com/download/v1.0.0",
+						status: "RELEASE",
+					},
+				],
+			});
+
+			createdAppIds.push(app.id);
+		} catch (error) {
+			console.error(`❌ Error creating app ${i}:`, error);
+			throw error;
+		}
+	}
+
+	/* ---------- EDITIONS (self-relation in Apps) ---------- */
+	for (let i = 0; i + 2 < createdAppIds.length; i += 3) {
+		const parentAppId = createdAppIds[i];
+		const editionOneId = createdAppIds[i + 1];
+		const editionTwoId = createdAppIds[i + 2];
+
+		await prisma.apps.updateMany({
+			where: {
+				id: {
+					in: [editionOneId, editionTwoId],
 				},
-				{
-					appId: app.id,
-					version: `1.${i % 5}.0`,
-					changelog: "Stable release",
-					downloadUrl: "https://speed.hetzner.de/100MB.bin",
-					size: 55_000_000,
-					isStable: true,
-				},
-			],
+			},
+			data: {
+				parentAppId,
+			},
 		});
 	}
 

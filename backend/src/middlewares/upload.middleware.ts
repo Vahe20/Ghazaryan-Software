@@ -64,13 +64,13 @@ const ALLOWED_MIME_TYPES_BY_TYPE: Record<UploadType, string[]> = {
 	news: ["image/png", "image/jpeg", "image/webp"],
 
 	mods: ["application/zip", "application/x-zip-compressed", "application/x-zip", "application/octet-stream"],
-	archives: ["application/zip", "application/x-zip-compressed", "application/x-zip", "application/octet-stream"],
+	archives: ["application/zip", "application/x-zip-compressed", "application/x-zip", "application/octet-stream", "application/rar", "application/x-rar-compressed"],
 };
 
 export const upload = multer({
 	storage,
 	limits: {
-		fileSize: 50 * 1024 * 1024,
+		fileSize: 2 * 1024 * 1024 * 1024, // 2gb
 		files: 1,
 	},
 	fileFilter: (

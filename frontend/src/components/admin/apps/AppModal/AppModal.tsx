@@ -24,16 +24,14 @@ interface AppFormData {
     slug: string;
     shortDesc: string;
     description: string;
-    version: string;
-    changelog: string;
-    iconUrl: string;
-    coverUrl: string;
-    screenshots: { value: string }[];
+    iconUrl: string | null;
+    coverUrl: string | null;
+    screenshots: { value: string | null }[];
     categoryId: string;
     tags: string[];
     size: string;
     platform: Platform[];
-    downloadUrl: string;
+    downloadUrl: string | null;
     sourceUrl: string;
     documentationUrl: string;
     status: Status;
@@ -49,16 +47,14 @@ function appToForm(app: App): AppFormData {
         slug: app.slug,
         shortDesc: app.shortDesc,
         description: app.description,
-        version: app.version,
-        changelog: app.changelog ?? "",
-        iconUrl: app.iconUrl,
-        coverUrl: app.coverUrl ?? "",
-        screenshots: app.screenshots?.length ? app.screenshots.map(v => ({ value: v })) : [{ value: "" }],
+        iconUrl: app.iconUrl ?? null,
+        coverUrl: app.coverUrl ?? null,
+        screenshots: app.screenshots?.length ? app.screenshots.map(v => ({ value: v })) : [{ value: null }],
         categoryId: app.categoryId,
         tags: app.tags ?? [],
         size: String(app.size),
         platform: platforms,
-        downloadUrl: app.downloadUrl,
+        downloadUrl: app.versions?.[0]?.downloadUrl ?? "",
         sourceUrl: app.sourceUrl ?? "",
         documentationUrl: app.documentationUrl ?? "",
         status: app.status ?? "BETA",
@@ -68,10 +64,10 @@ function appToForm(app: App): AppFormData {
 
 const EMPTY_FORM: AppFormData = {
     name: "", slug: "", shortDesc: "", description: "",
-    version: "1.0.0", changelog: "", iconUrl: "", coverUrl: "",
-    screenshots: [{ value: "" }], categoryId: "", tags: [],
-    size: "", platform: [], downloadUrl: "",
-    sourceUrl: "", documentationUrl: "",
+    iconUrl: null, coverUrl: null,
+    screenshots: [{ value: null }], categoryId: "", tags: [],
+    size: "", platform: [],
+    downloadUrl: null, sourceUrl: "", documentationUrl: "",
     status: "BETA", price: "0",
 };
 
@@ -93,14 +89,14 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
 
     const [iconFile, setIconFile] = useState<File | null>(null);
     const [coverFile, setCoverFile] = useState<File | null>(null);
-    const [archiveFile, setArchiveFile] = useState<File | null>(null);
+    const [downloadFile, setDownloadFile] = useState<File | null>(null);
     const [iconPreview, setIconPreview] = useState<string>("");
     const [coverPreview, setCoverPreview] = useState<string>("");
     const [uploadingFiles, setUploadingFiles] = useState(false);
 
     const iconRef = useRef<HTMLInputElement>(null);
     const coverRef = useRef<HTMLInputElement>(null);
-    const archiveRef = useRef<HTMLInputElement>(null);
+    const downloadRef = useRef<HTMLInputElement>(null);
 
     const { register, handleSubmit, control, reset, setValue, watch, formState: { errors } } = useForm<AppFormData>({
         defaultValues: app ? appToForm(app) : EMPTY_FORM,
@@ -112,13 +108,12 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
     });
 
     const watchedPlatforms = watch("platform");
-    const watchedTags = watch("tags");
 
     useEffect(() => {
         reset(app ? appToForm(app) : EMPTY_FORM);
         setIconFile(null);
         setCoverFile(null);
-        setArchiveFile(null);
+        setDownloadFile(null);
         setIconPreview(app?.iconUrl ?? "");
         setCoverPreview(app?.coverUrl ?? "");
     }, [app, isOpen, reset]);
@@ -146,10 +141,10 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
         setCoverPreview(URL.createObjectURL(file));
     };
 
-    const handleArchiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleDownloadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        setArchiveFile(file);
+        setDownloadFile(file);
     };
 
     const onSubmit = async (data: AppFormData) => {
@@ -170,26 +165,45 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
                 coverUrl = res.url;
             }
 
-            if (archiveFile) {
-                const res = await uploadFile({ type: "archives", file: archiveFile }).unwrap();
+            if (downloadFile) {
+                const res = await uploadFile({ type: "archives", file: downloadFile }).unwrap();
                 downloadUrl = res.url;
+            }
+
+            if (!app && !downloadUrl) {
+                throw new Error("Download URL or file is required for new apps");
+            }
+
+            if (!app && !iconUrl) {
+                throw new Error("Icon is required for new apps");
             }
 
             setUploadingFiles(false);
 
-            const payload = {
-                ...data,
-                iconUrl,
-                coverUrl: coverUrl || undefined,
-                downloadUrl,
+            const payload: Partial<App> & { downloadUrl?: string } = {
+                name: data.name,
+                shortDesc: data.shortDesc,
+                description: data.description,
+                categoryId: data.categoryId,
                 size: Number(data.size),
-                price: Number(data.price),
-                screenshots: data.screenshots.map(s => s.value).filter(Boolean),
-                slug: data.slug || undefined,
-                sourceUrl: data.sourceUrl || undefined,
-                documentationUrl: data.documentationUrl || undefined,
-                changelog: data.changelog || undefined,
+                platform: data.platform || [],
+                status: data.status || "BETA",
+                tags: data.tags || [],
+                screenshots: data.screenshots
+                    .map(s => s.value)
+                    .filter((url): url is string => Boolean(url && url.trim())),
+                price: parseFloat(data.price || "0") || 0,
             };
+
+            if (data.slug) payload.slug = data.slug;
+            if (iconUrl) payload.iconUrl = iconUrl;
+            if (coverUrl) payload.coverUrl = coverUrl;
+            if (data.sourceUrl) payload.sourceUrl = data.sourceUrl;
+            if (data.documentationUrl) payload.documentationUrl = data.documentationUrl;
+
+            if (!app && downloadUrl) {
+                payload.downloadUrl = downloadUrl;
+            }
 
             if (app) {
                 await updateApp({ id: app.id, data: payload }).unwrap();
@@ -287,20 +301,8 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
                 <p className={s.sectionTitle}>Meta</p>
                 <div className={form.formGrid}>
                     <div className={form.formGroup}>
-                        <label className={form.formLabel}>Version * (X.Y.Z)</label>
-                        <input
-                            className={form.formInput}
-                            placeholder="1.0.0"
-                            {...register("version", {
-                                required: "Version required",
-                                pattern: { value: /^\d+\.\d+\.\d+$/, message: "Format: X.Y.Z" },
-                            })}
-                        />
-                        {errors.version && <span className={form.formError}>{errors.version.message}</span>}
-                    </div>
-                    <div className={form.formGroup}>
                         <label className={form.formLabel}>Price (USD)</label>
-                        <input className={form.formInput} type="number" min="0" {...register("price")} />
+                        <input className={form.formInput} type="number" step="0.01" min="0" {...register("price")} />
                     </div>
                     <div className={form.formGroup}>
                         <label className={form.formLabel}>Category *</label>
@@ -360,7 +362,7 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
                     ))}
                 </div>
 
-                <p className={s.sectionTitle}>Files & Images</p>
+                <p className={s.sectionTitle}>Images</p>
                 <div className={form.formGrid}>
                     <div className={form.formGroup}>
                         <label className={form.formLabel}>Icon Image *</label>
@@ -404,28 +406,36 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
                             />
                         )}
                     </div>
-
-                    <div className={`${form.formGroup} ${form.span2}`}>
-                        <label className={form.formLabel}>App Archive (zip) *</label>
-                        <div className={s.fileUploadRow}>
-                            <button type="button" className={btns.btnSecondary} onClick={() => archiveRef.current?.click()}>
-                                {archiveFile ? `Selected: ${archiveFile.name}` : "Upload .zip"}
-                            </button>
-                            <input ref={archiveRef} type="file" accept="application/zip" style={{ display: "none" }} onChange={handleArchiveChange} />
-                        </div>
-                        {!archiveFile && (
-                            <input
-                                className={form.formInput}
-                                style={{ marginTop: 6 }}
-                                placeholder="Or paste download URL"
-                                {...register("downloadUrl")}
-                            />
-                        )}
-                    </div>
                 </div>
 
                 <p className={s.sectionTitle}>Additional URLs</p>
                 <div className={form.formGrid}>
+                    <div className={`${form.formGroup} ${form.span2}`}>
+                        <label className={form.formLabel}>App File {!app && "*"} (Upload or enter URL)</label>
+                        <div className={s.fileUploadRow}>
+                            {downloadFile && <span className={form.formHint}>📦 {downloadFile.name}</span>}
+                            <button type="button" className={btns.btnSecondary} onClick={() => downloadRef.current?.click()}>
+                                {downloadFile ? "Change File" : "Upload Archive"}
+                            </button>
+                            <input
+                                ref={downloadRef}
+                                type="file"
+                                accept=".zip,.rar,.7z,.exe,.msi,.dmg,.pkg,.tar,.gz,.deb,.rpm"
+                                style={{ display: "none" }}
+                                onChange={handleDownloadChange}
+                            />
+                        </div>
+                        {!downloadFile && (
+                            <input
+                                className={form.formInput}
+                                style={{ marginTop: 6 }}
+                                type="url"
+                                placeholder="Or paste direct download URL"
+                                {...register("downloadUrl", !app ? { required: "Download URL is required for new apps" } : {})}
+                            />
+                        )}
+                        {errors.downloadUrl && <span className={form.formError}>{errors.downloadUrl.message}</span>}
+                    </div>
                     <div className={form.formGroup}>
                         <label className={form.formLabel}>Source URL</label>
                         <input className={form.formInput} type="url" placeholder="https://github.com/..." {...register("sourceUrl")} />
@@ -443,7 +453,7 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
                             <input
                                 className={`${form.formInput} ${form.screenshotInput}`}
                                 type="url"
-                                placeholder={`Screenshot ${i + 1} URL`}
+                                placeholder="https://example.com/screenshot.png"
                                 {...register(`screenshots.${i}.value`)}
                             />
                             {screenshotFields.length > 1 && (
@@ -463,15 +473,10 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
                             Add Screenshot
                         </button>
                     )}
+                    {screenshotFields.length >= 10 && (
+                        <p className={form.formHint} style={{ color: "#9CA3AF", marginTop: 8 }}>Maximum 10 screenshots</p>
+                    )}
                 </div>
-
-                <p className={s.sectionTitle}>Changelog</p>
-                <textarea
-                    className={form.formTextarea}
-                    rows={3}
-                    placeholder="What's new in this version..."
-                    {...register("changelog")}
-                />
             </form>
         </BaseModal>
     );

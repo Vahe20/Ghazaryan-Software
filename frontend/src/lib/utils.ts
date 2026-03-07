@@ -1,3 +1,13 @@
+import { AppPromotion } from "@/src/types/Entities";
+
+export function calculateFinalPrice(basePrice: number, promotion?: AppPromotion | null): number {
+    const price = Number(basePrice);
+    if (!promotion) return price;
+    if (promotion.discountAmount) return Math.max(0, price - Number(promotion.discountAmount));
+    if (promotion.discountPercent) return price * (1 - promotion.discountPercent / 100);
+    return price;
+}
+
 export function formatDate(d?: string | Date, withTime = false): string {
     if (!d) return "—";
     return new Intl.DateTimeFormat("en-US", {

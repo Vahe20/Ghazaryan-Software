@@ -1,0 +1,234 @@
+@use "../../../../styles/helpers/" as *;
+
+.container {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: rem(24);
+  padding-bottom: rem(16);
+  border-bottom: 1px solid $border-color;
+}
+
+.subtitle {
+  color: $text-secondary;
+  font-size: rem(14);
+}
+
+// Form
+.form {
+  background: $background-tertiary;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  padding: rem(24);
+  margin-bottom: rem(24);
+}
+
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: rem(20);
+  
+  h3 {
+    font-size: rem(18);
+    font-weight: 600;
+    color: $text-primary;
+  }
+}
+
+.required {
+  color: $error;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: rem(32);
+  color: $text-secondary;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  width: rem(32);
+  height: rem(32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: rem(4);
+  transition: $transition;
+  
+  &:hover {
+    background: $background-hover;
+    color: $text-primary;
+  }
+}
+
+.formActions {
+  display: flex;
+  gap: rem(12);
+  justify-content: flex-end;
+  margin-top: rem(24);
+}
+
+// Editions List
+.editionsList {
+  display: flex;
+  flex-direction: column;
+  gap: rem(16);
+}
+
+.loading,
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: rem(60) rem(20);
+  color: $text-secondary;
+  
+  svg {
+    margin-bottom: rem(16);
+    opacity: 0.5;
+  }
+  
+  p {
+    font-size: rem(15);
+  }
+}
+
+.editionCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: rem(20);
+  background: $background-tertiary;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  transition: $transition;
+  
+  &:hover {
+    border-color: $primary;
+    box-shadow: $shadow-sm;
+  }
+}
+
+.editionInfo {
+  flex: 1;
+}
+
+.editionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: rem(8);
+  
+  h4 {
+    font-size: rem(16);
+    font-weight: 600;
+    color: $text-primary;
+  }
+}
+
+.editionBadges {
+  display: flex;
+  gap: rem(8);
+}
+
+.statusBadge {
+  padding: rem(4) rem(10);
+  border-radius: rem(4);
+  font-size: rem(11);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  &.release {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+  }
+  
+  &.beta {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+  }
+}
+
+.priceBadge {
+  padding: rem(4) rem(10);
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  border-radius: rem(4);
+  font-size: rem(13);
+  font-weight: 700;
+}
+
+.editionDesc {
+  color: $text-secondary;
+  font-size: rem(14);
+  margin-bottom: rem(4);
+}
+
+.editionSlug {
+  color: $text-tertiary;
+  font-size: rem(13);
+  font-family: 'Monaco', 'Courier New', monospace;
+  margin-bottom: rem(8);
+}
+
+.editionMeta {
+  display: flex;
+  gap: rem(16);
+  font-size: rem(12);
+  color: $text-tertiary;
+}
+
+.editionActions {
+  display: flex;
+  gap: rem(8);
+}
+
+.editBtn,
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  gap: rem(6);
+  padding: rem(8) rem(14);
+  border: 1px solid $border-color;
+  background: $background-primary;
+  border-radius: rem(6);
+  font-size: rem(13);
+  font-weight: 500;
+  cursor: pointer;
+  transition: $transition;
+  
+  svg {
+    flex-shrink: 0;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.editBtn {
+  color: $primary;
+  
+  &:hover:not(:disabled) {
+    background: $primary-light;
+    border-color: $primary;
+  }
+}
+
+.deleteBtn {
+  color: $error;
+  
+  &:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: $error;
+  }
+}

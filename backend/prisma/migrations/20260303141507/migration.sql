@@ -45,8 +45,6 @@ CREATE TABLE "apps" (
     "slug" TEXT NOT NULL,
     "shortDesc" VARCHAR(200) NOT NULL,
     "description" TEXT NOT NULL,
-    "version" TEXT NOT NULL,
-    "changelog" TEXT,
     "iconUrl" TEXT NOT NULL,
     "coverUrl" TEXT,
     "screenshots" TEXT[],
@@ -55,7 +53,6 @@ CREATE TABLE "apps" (
     "size" INTEGER NOT NULL,
     "platform" "Platform"[],
     "minVersion" TEXT,
-    "downloadUrl" TEXT NOT NULL,
     "sourceUrl" TEXT,
     "documentationUrl" TEXT,
     "downloadCount" INTEGER NOT NULL DEFAULT 0,
@@ -69,33 +66,16 @@ CREATE TABLE "apps" (
     "publishedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
+    "parentAppId" TEXT,
     "price" DECIMAL(10,2) NOT NULL DEFAULT 0,
 
     CONSTRAINT "apps_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "appedition" (
-    "id" TEXT NOT NULL,
-    "appId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-    "price" DECIMAL(10,2) NOT NULL,
-    "downloadUrl" TEXT NOT NULL,
-    "features" TEXT[],
-    "isDefault" BOOLEAN NOT NULL DEFAULT false,
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "appedition_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "apppromotion" (
     "id" TEXT NOT NULL,
     "appId" TEXT NOT NULL,
-    "editionId" TEXT,
     "discountAmount" DECIMAL(10,2),
     "discountPercent" INTEGER,
     "label" TEXT,
@@ -135,10 +115,8 @@ CREATE TABLE "appsversion" (
     "id" TEXT NOT NULL,
     "appId" TEXT NOT NULL,
     "version" TEXT NOT NULL,
-    "changelog" TEXT NOT NULL,
-    "downloadUrl" TEXT NOT NULL,
-    "size" INTEGER NOT NULL,
-    "isStable" BOOLEAN NOT NULL DEFAULT true,
+    "changelog" TEXT,
+    "status" "AppStatus" NOT NULL DEFAULT 'BETA',
     "releaseDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "appsversion_pkey" PRIMARY KEY ("id")
@@ -179,7 +157,6 @@ CREATE TABLE "purchases" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "appId" TEXT NOT NULL,
-    "editionId" TEXT,
     "price" DECIMAL(10,2) NOT NULL,
     "paymentMethod" TEXT,
     "transactionId" TEXT,
@@ -240,13 +217,10 @@ CREATE INDEX "apps_categoryId_idx" ON "apps"("categoryId");
 CREATE INDEX "apps_status_idx" ON "apps"("status");
 
 -- CreateIndex
-CREATE INDEX "appedition_appId_idx" ON "appedition"("appId");
+CREATE INDEX "apps_parentAppId_idx" ON "apps"("parentAppId");
 
 -- CreateIndex
 CREATE INDEX "apppromotion_appId_idx" ON "apppromotion"("appId");
-
--- CreateIndex
-CREATE INDEX "apppromotion_editionId_idx" ON "apppromotion"("editionId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "developerrequest_userId_key" ON "developerrequest"("userId");
@@ -265,9 +239,6 @@ CREATE INDEX "appscategory_slug_idx" ON "appscategory"("slug");
 
 -- CreateIndex
 CREATE INDEX "appsversion_appId_idx" ON "appsversion"("appId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "appsversion_appId_version_key" ON "appsversion"("appId", "version");
 
 -- CreateIndex
 CREATE INDEX "reviews_appId_idx" ON "reviews"("appId");
@@ -321,13 +292,10 @@ ALTER TABLE "apps" ADD CONSTRAINT "apps_categoryId_fkey" FOREIGN KEY ("categoryI
 ALTER TABLE "apps" ADD CONSTRAINT "apps_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "appedition" ADD CONSTRAINT "appedition_appId_fkey" FOREIGN KEY ("appId") REFERENCES "apps"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "apps" ADD CONSTRAINT "apps_parentAppId_fkey" FOREIGN KEY ("parentAppId") REFERENCES "apps"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "apppromotion" ADD CONSTRAINT "apppromotion_appId_fkey" FOREIGN KEY ("appId") REFERENCES "apps"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "apppromotion" ADD CONSTRAINT "apppromotion_editionId_fkey" FOREIGN KEY ("editionId") REFERENCES "appedition"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "developerrequest" ADD CONSTRAINT "developerrequest_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -352,6 +320,3 @@ ALTER TABLE "purchases" ADD CONSTRAINT "purchases_userId_fkey" FOREIGN KEY ("use
 
 -- AddForeignKey
 ALTER TABLE "purchases" ADD CONSTRAINT "purchases_appId_fkey" FOREIGN KEY ("appId") REFERENCES "apps"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "purchases" ADD CONSTRAINT "purchases_editionId_fkey" FOREIGN KEY ("editionId") REFERENCES "appedition"("id") ON DELETE SET NULL ON UPDATE CASCADE;

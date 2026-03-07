@@ -24,29 +24,34 @@ interface ReviewsResponse {
 
 interface CreateEditionInput {
     name: string;
-    description?: string;
+    slug?: string;
+    shortDesc?: string;
     price: number;
-    downloadUrl: string;
-    features?: string[];
-    isDefault?: boolean;
-    isActive?: boolean;
+    status?: "BETA" | "RELEASE";
+}
+
+interface UpdateEditionInput {
+    name?: string;
+    slug?: string;
+    shortDesc?: string;
+    price?: number;
+    status?: "BETA" | "RELEASE";
 }
 
 interface CreatePromotionInput {
-    editionId?: string;
-    discountAmount?: number;
-    discountPercent?: number;
-    label?: string;
-    startsAt: string;
-    endsAt: string;
+    discountAmount?: number | null;
+    discountPercent?: number | null;
+    label?: string | null;
+    startsAt: string | Date;
+    endsAt: string | Date;
     isActive?: boolean;
 }
 
 interface CreateVersionInput {
-    file: File;
     version: string;
-    changelog: string;
-    isStable?: boolean;
+    changelog?: string;
+    status?: "BETA" | "RELEASE";
+    downloadUrl: string;
 }
 
 export const appsApi = api.injectEndpoints({
@@ -110,14 +115,11 @@ export const appsApi = api.injectEndpoints({
         }),
 
         createAppVersion: builder.mutation<AppVersion, { appId: string } & CreateVersionInput>({
-            query: ({ appId, file, ...rest }) => {
-                const formData = new FormData();
-                formData.append("file", file);
-                formData.append("version", rest.version);
-                formData.append("changelog", rest.changelog);
-                if (rest.isStable !== undefined) formData.append("isStable", String(rest.isStable));
-                return { url: `/apps/${appId}/versions`, method: "POST", body: formData };
-            },
+            query: ({ appId, ...rest }) => ({
+                url: `/apps/${appId}/versions`,
+                method: "POST",
+                body: rest,
+            }),
             invalidatesTags: (_, __, { appId }) => [{ type: "Versions", id: appId }, { type: "Apps", id: appId }],
         }),
 
@@ -151,7 +153,7 @@ export const appsApi = api.injectEndpoints({
             invalidatesTags: (_, __, { appId }) => [{ type: "Editions", id: appId }],
         }),
 
-        updateEdition: builder.mutation<AppEdition, { appId: string; editionId: string; data: Partial<CreateEditionInput> }>({
+        updateEdition: builder.mutation<AppEdition, { appId: string; editionId: string; data: UpdateEditionInput }>({
             query: ({ appId, editionId, data }) => ({ url: `/apps/${appId}/editions/${editionId}`, method: "PATCH", body: data }),
             invalidatesTags: (_, __, { appId }) => [{ type: "Editions", id: appId }],
         }),

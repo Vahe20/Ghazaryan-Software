@@ -238,6 +238,7 @@
     }
 }
 
+.downloadBtn,
 .btn {
     display: inline-flex;
     align-items: center;
@@ -285,6 +286,20 @@
             border-color: transparent;
             box-shadow: 0 6px 20px rgba($primary, 0.5);
         }
+    }
+}
+
+.downloadBtn {
+    background: $primary;
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 14px rgba($primary, 0.35);
+
+    &:hover {
+        background: $primary-hover;
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 6px 20px rgba($primary, 0.5);
     }
 }
 

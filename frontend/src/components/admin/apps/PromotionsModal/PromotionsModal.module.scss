@@ -1,0 +1,393 @@
+@use "../../../../styles/helpers/" as *;
+
+.container {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: rem(24);
+  padding-bottom: rem(16);
+  border-bottom: 1px solid $border-color;
+}
+
+.subtitle {
+  color: $text-secondary;
+  font-size: rem(14);
+  margin-bottom: rem(8);
+}
+
+.currentPrice {
+  color: $text-secondary;
+  font-size: rem(14);
+  
+  strong {
+    color: $primary;
+    font-size: rem(16);
+  }
+}
+
+.form {
+  background: $background-tertiary;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  padding: rem(24);
+  margin-bottom: rem(24);
+}
+
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: rem(20);
+  
+  h3 {
+    font-size: rem(18);
+    font-weight: 600;
+    color: $text-primary;
+  }
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: rem(32);
+  color: $text-secondary;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  width: rem(32);
+  height: rem(32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: rem(4);
+  transition: $transition;
+  
+  &:hover {
+    background: $background-hover;
+    color: $text-primary;
+  }
+}
+
+.radioGroup {
+  display: flex;
+  gap: rem(16);
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: rem(8);
+  padding: rem(12) rem(16);
+  background: $background-primary;
+  border: 2px solid $border-color;
+  border-radius: rem(6);
+  cursor: pointer;
+  transition: $transition;
+  
+  input[type="radio"] {
+    margin: 0;
+    cursor: pointer;
+  }
+  
+  span {
+    font-size: rem(14);
+    color: $text-primary;
+    font-weight: 500;
+  }
+  
+  &:has(input:checked) {
+    border-color: $primary;
+    background: rgba(59, 130, 246, 0.05);
+  }
+  
+  &:hover {
+    border-color: $primary;
+  }
+}
+
+.inputWithPrefix,
+.inputWithSuffix {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.prefix,
+.suffix {
+  position: absolute;
+  color: $text-secondary;
+  font-weight: 600;
+  font-size: rem(15);
+}
+
+.prefix {
+  left: rem(12);
+}
+
+.suffix {
+  right: rem(12);
+}
+
+.inputWithPrefix input {
+  padding-left: rem(32);
+}
+
+.inputWithSuffix input {
+  padding-right: rem(40);
+}
+
+.formActions {
+  display: flex;
+  gap: rem(12);
+  justify-content: flex-end;
+  margin-top: rem(24);
+}
+
+.promotionsList {
+  display: flex;
+  flex-direction: column;
+  gap: rem(16);
+}
+
+.loading,
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: rem(60) rem(20);
+  color: $text-secondary;
+  
+  svg {
+    margin-bottom: rem(16);
+    opacity: 0.5;
+  }
+  
+  p {
+    font-size: rem(15);
+  }
+}
+
+.promotionCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: rem(24);
+  background: $background-tertiary;
+  border: 2px solid $border-color;
+  border-radius: $radius-md;
+  transition: $transition;
+  position: relative;
+  overflow: hidden;
+  
+  &:hover {
+    border-color: $primary;
+    box-shadow: $shadow-md;
+  }
+  
+  &.active {
+    border-color: #22c55e;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, $background-tertiary 100%);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+    }
+  }
+
+  &.inactive {
+    border-color: rgba(212, 0, 0, 0.45);
+    background: linear-gradient(135deg, rgba(148, 163, 184, 0.08) 0%, $background-tertiary 100%);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.promotionInfo {
+  flex: 1;
+}
+
+.promotionHeader {
+  display: flex;
+  gap: rem(12);
+  align-items: center;
+  margin-bottom: rem(16);
+}
+
+.discountBadge {
+  padding: rem(8) rem(16);
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border-radius: rem(6);
+  font-size: rem(20);
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.labelBadge {
+  padding: rem(6) rem(12);
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border-radius: rem(6);
+  font-size: rem(12);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.priceComparison {
+  display: flex;
+  gap: rem(12);
+  align-items: center;
+  margin-bottom: rem(16);
+  padding: rem(16);
+  background: $background-primary;
+  border-radius: rem(6);
+}
+
+.originalPrice {
+  font-size: rem(18);
+  color: $text-secondary;
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.arrow {
+  color: $text-tertiary;
+  font-size: rem(20);
+}
+
+.discountedPrice {
+  font-size: rem(24);
+  font-weight: 800;
+  color: #22c55e;
+}
+
+.savings {
+  color: #22c55e;
+  font-size: rem(14);
+  font-weight: 600;
+}
+
+.promotionDates {
+  display: flex;
+  gap: rem(24);
+  margin-bottom: rem(12);
+  padding: rem(12) 0;
+  border-top: 1px solid $border-color;
+  border-bottom: 1px solid $border-color;
+  
+  div {
+    color: $text-secondary;
+    font-size: rem(13);
+    
+    strong {
+      color: $text-primary;
+      font-weight: 600;
+    }
+  }
+}
+
+.statusRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: rem(12);
+  margin-top: rem(12);
+  padding-top: rem(12);
+  border-top: 1px dashed $border-color;
+}
+
+.stateBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: rem(6) rem(10);
+  border-radius: rem(999);
+  font-size: rem(11);
+  font-weight: 800;
+  letter-spacing: 0.4px;
+}
+
+.stateActive {
+  color: #19bb5a;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.22) 0%, rgba(34, 197, 94, 0.12) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.55);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.stateInactive {
+  color: #c70101;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+}
+
+.createdAt {
+  font-size: rem(12);
+  color: $text-tertiary;
+}
+
+.promotionActions {
+  display: flex;
+  gap: rem(8);
+  margin-left: rem(16);
+}
+
+.editBtn,
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  gap: rem(6);
+  padding: rem(8) rem(14);
+  border: 1px solid $border-color;
+  background: $background-primary;
+  border-radius: rem(6);
+  font-size: rem(13);
+  font-weight: 500;
+  cursor: pointer;
+  transition: $transition;
+  
+  svg {
+    flex-shrink: 0;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.editBtn {
+  color: $primary;
+  
+  &:hover:not(:disabled) {
+    background: $primary-light;
+    border-color: $primary;
+  }
+}
+
+.deleteBtn {
+  color: $error;
+  
+  &:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: $error;
+  }
+}

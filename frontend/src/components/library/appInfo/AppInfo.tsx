@@ -10,7 +10,12 @@ import style from "./AppInfo.module.scss";
 
 export const AppInfo = () => {
     const selectedAppId = useAppSelector(s => s.library.selectedAppId);
-    const { data: app, isLoading } = useGetAppByIdQuery(selectedAppId || "");
+    const isValidSelectedAppId = Boolean(
+        selectedAppId && selectedAppId !== "undefined" && selectedAppId !== "null"
+    );
+    const { data: app, isLoading } = useGetAppByIdQuery(selectedAppId ?? "", {
+        skip: !isValidSelectedAppId,
+    });
     const [recordDownload] = useRecordDownloadMutation();
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -41,7 +46,7 @@ export const AppInfo = () => {
         return () => window.removeEventListener("keydown", onKey);
     }, [modalIsOpen, goToNext, goToPrev, closeModal]);
 
-    if (!selectedAppId) {
+    if (!isValidSelectedAppId) {
         return (
             <div className={style.placeholder}>
                 <div className={style.placeholder__canvas}>
@@ -76,6 +81,8 @@ export const AppInfo = () => {
         );
     }
 
+    const downloadUrl = app.versions?.[0]?.downloadUrl;
+
     return (
         <div className={style.view} key={app.id}>
             <div className={style.hero}>
@@ -90,7 +97,9 @@ export const AppInfo = () => {
                     <div className={style.hero__info}>
                         <div className={style.hero__nameLine}>
                             <h1 className={style.hero__name}>{app.name}</h1>
-                            <span className={style.hero__ver}>v{app.version}</span>
+                            <span className={`${style.hero__status} ${app.status === "BETA" ? style.hero__status_beta : style.hero__status_release}`}>
+                                {app.status === "BETA" ? "Beta" : "Release"}
+                            </span>
                         </div>
 
                         {app.shortDesc && (
@@ -113,16 +122,11 @@ export const AppInfo = () => {
             </div>
 
             <div className={style.actions}>
-                {app.downloadUrl && (
-                    <a
-                        href={app.downloadUrl}
-                        download
-                        className={`${style.btn} ${style.btn_primary}`}
-                        onClick={() => recordDownload({ id: app.id, version: app.version })}
-                    >
+                {downloadUrl && (
+                    <a href={downloadUrl} target="_blank" rel="noopener noreferrer" className={style.downloadBtn} onClick={() => recordDownload({ id: app.id })}>
                         <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M12 3v13M12 16l-4-4.5M12 16l4-4.5M20 17v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"
-                                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M12 3v12M8 15l4 4 4-4M5 19h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"
+                                stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                         Download
                     </a>
@@ -145,13 +149,15 @@ export const AppInfo = () => {
                         Docs
                     </a>
                 )}
-                <Link href={`/apps/${app.slug}`} className={style.btn}>
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8"/>
-                        <path d="M12 8v4l3 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-                    </svg>
-                    View in Store
-                </Link>
+                {app.slug && (
+                    <Link href={`/apps/${app.slug}`} className={style.btn}>
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8"/>
+                            <path d="M12 8v4l3 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                        </svg>
+                        View in Store
+                    </Link>
+                )}
             </div>
 
             {app.description && (
@@ -191,18 +197,6 @@ export const AppInfo = () => {
                             </button>
                         ))}
                     </div>
-                </section>
-            )}
-
-            {app.changelog && (
-                <section className={style.block}>
-                    <h2 className={style.block__title}>
-                        <svg viewBox="0 0 20 20" fill="none">
-                            <path d="M4 10h12M4 6h8M4 14h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-                        </svg>
-                        What's New
-                    </h2>
-                    <div className={style.changelog}>{app.changelog}</div>
                 </section>
             )}
 

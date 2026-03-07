@@ -28,8 +28,6 @@ export interface App {
     slug: string;
     shortDesc: string;
     description: string;
-    version: string;
-    changelog: string | null;
     iconUrl: string;
     coverUrl: string | null;
     screenshots: string[];
@@ -39,15 +37,24 @@ export interface App {
     size: number;
     status: StatusType;
     platform: PlatformType[];
-    downloadUrl: string;
+    minVersion: string | null;
     sourceUrl: string | null;
     documentationUrl: string | null;
-    rating: number;
-    viewCount: number;
-    reviews: Review[];
-    reviewCount: number;
     downloadCount: number;
+    viewCount: number;
+    rating: number;
+    reviewCount: number;
+    featured: boolean;
+    authorId: string | null;
+    author?: {
+        id: string;
+        userName: string;
+        avatarUrl: string | null;
+    };
+    publishedAt: Date | null;
+    deletedAt: Date | null;
     price: number;
+    reviews?: Review[];
     editions?: AppEdition[];
     versions?: AppVersion[];
     promotions?: AppPromotion[];
@@ -57,24 +64,19 @@ export interface App {
 
 export interface AppEdition {
     id: string;
-    appId: string;
     name: string;
-    description: string | null;
+    slug?: string;
+    shortDesc?: string;
     price: number;
-    downloadUrl: string;
-    features: string[];
-    isDefault: boolean;
-    isActive: boolean;
-    promotions?: AppPromotion[];
+    status?: StatusType;
+    parentAppId?: string | null;
     createdAt: Date;
-    updatedAt: Date;
+    updatedAt?: Date;
 }
 
 export interface AppPromotion {
     id: string;
     appId: string;
-    editionId: string | null;
-    edition?: AppEdition | null;
     discountAmount: number | null;
     discountPercent: number | null;
     label: string | null;
@@ -88,10 +90,9 @@ export interface AppVersion {
     id: string;
     appId: string;
     version: string;
-    changelog: string;
+    changelog: string | null;
+    status: StatusType;
     downloadUrl: string;
-    size: number;
-    isStable: boolean;
     releaseDate: Date;
 }
 
@@ -118,10 +119,13 @@ export interface Review {
 
 export interface Download {
     id: string;
-    userId: string;
+    userId: string | null;
     appId: string;
     version: string;
     platform: PlatformType;
+    ipAddress: string | null;
+    userAgent: string | null;
+    country: string | null;
     downloadedAt: Date;
 }
 
@@ -131,11 +135,11 @@ export interface NewsItem {
     description: string;
     tag: string;
     tagColor: TagColor;
-    coverUrl?: string | null;
-    link?: string | null;
-    publishedAt: string;
-    createdAt: string;
-    updatedAt: string;
+    coverUrl: string | null;
+    link: string | null;
+    publishedAt: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface Purchase {
@@ -144,8 +148,6 @@ export interface Purchase {
     userId: string;
     app: App;
     appId: string;
-    editionId: string | null;
-    edition?: AppEdition | null;
     price: number;
     status: PurchaseStatus;
     paymentMethod: string | null;

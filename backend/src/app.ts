@@ -49,18 +49,11 @@ app.use("/api/v1/payment/webhook", express.raw({ type: "application/json" }), as
 	return handleStripeWebhook(req, res, next);
 });
 
-// Legacy webhook endpoint (redirect не работает, так как Stripe не ожидает редиректа)
-app.use("/api/payment/webhook", express.raw({ type: "application/json" }), async (req, res, next) => {
-	const { handleStripeWebhook } = await import("./modules/payment/payment.controller.js");
-	return handleStripeWebhook(req, res, next);
-});
-
 app.use(express.json());
 
 configurePassport();
 app.use(passport.initialize());
 
-// Middleware для определения версии API
 app.use(apiVersionMiddleware);
 
 const rateLimitConfig = getCurrentRateLimitConfig();
@@ -68,7 +61,7 @@ if (rateLimitConfig.enabled) app.use("/api/", apiLimiter);
 
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 	customSiteTitle: "Ghazaryan Software API",
 	customCss: ".swagger-ui .topbar { display: none }",
 }));
@@ -86,16 +79,6 @@ app.use("/api/v1", reviewRoutes);
 app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/news", newsRoutes);
 app.use("/api/v1/developer-requests", developerRequestRoutes);
-
-// Legacy routes (redirect to v1)
-app.use("/api/auth", (req, res) => res.redirect(308, `/api/v1${req.originalUrl.replace("/api", "")}`));
-app.use("/api/upload", (req, res) => res.redirect(308, `/api/v1${req.originalUrl.replace("/api", "")}`));
-app.use("/api/apps", (req, res) => res.redirect(308, `/api/v1${req.originalUrl.replace("/api", "")}`));
-app.use("/api/categories", (req, res) => res.redirect(308, `/api/v1${req.originalUrl.replace("/api", "")}`));
-app.use("/api/admin", (req, res) => res.redirect(308, `/api/v1${req.originalUrl.replace("/api", "")}`));
-app.use("/api/payment", (req, res) => res.redirect(308, `/api/v1${req.originalUrl.replace("/api", "")}`));
-app.use("/api/news", (req, res) => res.redirect(308, `/api/v1${req.originalUrl.replace("/api", "")}`));
-app.use("/api/developer-requests", (req, res) => res.redirect(308, `/api/v1${req.originalUrl.replace("/api", "")}`));
 
 app.get("/auth/callback", (req, res) => {
 	const queryIndex = req.originalUrl.indexOf("?");

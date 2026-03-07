@@ -44,27 +44,75 @@ export const getAppBySlug = asyncHandler(async (req: Request, res: Response) => 
 	res.json(app);
 });
 
-export const createApp = asyncHandler(async (req: Request, res: Response) => {
-	const app = await appsService.addApp(req.body);
+export const createApp = asyncHandler(async (req: AuthRequest, res: Response) => {
+	if (!req.user) {
+		throw ApiError.unauthorized("Authentication required");
+	}
+
+	// Автоматически устанавливаем authorId из текущего пользователя
+	const appData = {
+		...req.body,
+		authorId: req.user.id,
+	};
+
+	const app = await appsService.addApp(appData);
 	res.status(201).json(app);
 });
 
-export const updateApp = asyncHandler(async (req: Request, res: Response) => {
+export const updateApp = asyncHandler(async (req: AuthRequest, res: Response) => {
 	const { id } = req.params;
 
 	if (!id || Array.isArray(id)) {
 		throw new ValidationError("Invalid ID parameter");
 	}
 
+	if (!req.user) {
+		throw ApiError.unauthorized("Authentication required");
+	}
+
+	// Получаем приложение для проверки автора
+	const existingApp = await appsService.getAppById(id);
+
+	if (!existingApp) {
+		throw new NotFoundError("App", id);
+	}
+
+	// Проверяем права: только автор или админ могут обновлять
+	const isAuthor = existingApp.authorId === req.user.id;
+	const isAdmin = req.user.role === "ADMIN";
+
+	if (!isAuthor && !isAdmin) {
+		throw ApiError.forbidden("Only the app author or admin can update this app");
+	}
+
 	const app = await appsService.updateAppById(id, req.body);
 	res.json(app);
 });
 
-export const deleteApp = asyncHandler(async (req: Request, res: Response) => {
+export const deleteApp = asyncHandler(async (req: AuthRequest, res: Response) => {
 	const { id } = req.params;
 
 	if (!id || Array.isArray(id)) {
 		throw new ValidationError("Invalid ID parameter");
+	}
+
+	if (!req.user) {
+		throw ApiError.unauthorized("Authentication required");
+	}
+
+	// Получаем приложение для проверки автора
+	const existingApp = await appsService.getAppById(id);
+
+	if (!existingApp) {
+		throw new NotFoundError("App", id);
+	}
+
+	// Проверяем права: только автор или админ могут удалять
+	const isAuthor = existingApp.authorId === req.user.id;
+	const isAdmin = req.user.role === "ADMIN";
+
+	if (!isAuthor && !isAdmin) {
+		throw ApiError.forbidden("Only the app author or admin can delete this app");
 	}
 
 	const app = await appsService.deleteAppById(id);
@@ -106,18 +154,32 @@ export const getUserLibrary = asyncHandler(async (req: AuthRequest, res: Respons
 
 // Version management controllers
 export const createVersion = asyncHandler(async (req: AuthRequest, res: Response) => {
-	if (!req.file) {
-		throw new ValidationError("File required");
-	}
-
 	if (!req.params.appId || Array.isArray(req.params.appId)) {
 		throw new ValidationError("Invalid appId parameter");
+	}
+
+	if (!req.user) {
+		throw ApiError.unauthorized("Authentication required");
+	}
+
+	// Получаем приложение для проверки автора
+	const existingApp = await appsService.getAppById(req.params.appId);
+
+	if (!existingApp) {
+		throw new NotFoundError("App", req.params.appId);
+	}
+
+	// Проверяем права: только автор или админ могут создавать версии
+	const isAuthor = existingApp.authorId === req.user.id;
+	const isAdmin = req.user.role === "ADMIN";
+
+	if (!isAuthor && !isAdmin) {
+		throw ApiError.forbidden("Only the app author or admin can create versions");
 	}
 
 	const version = await appsService.addVersion(
 		req.params.appId,
 		req.body,
-		req.file,
 	);
 
 	res.status(201).json(version);

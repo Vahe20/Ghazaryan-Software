@@ -3,11 +3,7 @@ import { slugGenerator } from "../../utils/slugGenerator.js";
 import { sanitizeSearchQuery, sanitizeNumericInput } from "../../utils/sanitizer.js";
 import { getCached, setCached, deleteCachedByPattern, hashObject, withCache } from "../../utils/cache.js";
 import type { DownloadMetadata, Platform, AppStatus } from "../../types/index.js";
-import {
-	NotFoundError,
-	ConflictError,
-	DatabaseError,
-} from "../../utils/errors.js";
+import { NotFoundError, ConflictError, DatabaseError } from "../../utils/errors.js";
 import { appRepository } from "../../repositories/app.repository.js";
 import { prisma } from "../../config/prisma.js";
 
@@ -28,7 +24,6 @@ export async function getAllApps(query: GetAppsQuery) {
 		const limitNum = sanitizeNumericInput(limit, 20, 1, 100);
 		const pageNum = sanitizeNumericInput(page, 1, 1, 1000);
 
-		// Создаем кеш-ключ из параметров запроса
 		const cacheKey = `apps:list:${hashObject({
 			search: sanitizedSearch,
 			categoryId,
@@ -40,12 +35,8 @@ export async function getAllApps(query: GetAppsQuery) {
 			limit: limitNum,
 		})}`;
 
-		// Проверяем кеш (TTL: 5 минут)
 		const cached = await getCached(cacheKey);
-		if (cached) {
-			console.log(`✅ Cache hit for ${cacheKey}`);
-			return cached;
-		}
+		if (cached) return cached;
 
 		const skip = (pageNum - 1) * limitNum;
 
@@ -100,6 +91,23 @@ export async function getAllApps(query: GetAppsQuery) {
 						slug: true,
 					},
 				},
+				promotions: {
+					select: {
+						id: true,
+						discountAmount: true,
+						discountPercent: true,
+						startsAt: true,
+						endsAt: true,
+						isActive: true,
+					}
+				},
+				author: {
+					select: {
+						id: true,
+						userName: true,
+						avatarUrl: true,
+					},
+				},
 				_count: {
 					select: {
 						reviews: true,
@@ -119,7 +127,6 @@ export async function getAllApps(query: GetAppsQuery) {
 			},
 		};
 
-		// Сохраняем в кеш на 5 минут
 		await setCached(cacheKey, result, 300);
 
 		return result;
@@ -127,11 +134,9 @@ export async function getAllApps(query: GetAppsQuery) {
 		throw new DatabaseError("Failed to fetch apps", error);
 	}
 }
-// Version management functions
 export async function addVersion(
 	appId: string,
 	data: CreateVersionData,
-	file: Express.Multer.File,
 ) {
 	try {
 		const app = await appRepository.findById(appId);
@@ -144,10 +149,9 @@ export async function addVersion(
 			data: {
 				appId,
 				version: data.version,
-				changelog: data.changelog,
-				isStable: data.isStable,
-				downloadUrl: `/uploads/versions/${file.filename}`,
-				size: file.size,
+				changelog: data.changelog ?? null,
+				status: data.status ?? "BETA",
+				downloadUrl: data.downloadUrl,
 			},
 		});
 	} catch (error) {
@@ -170,7 +174,6 @@ export async function getVersions(appId: string) {
 }
 export async function getAppById(id: string) {
 	try {
-		// Кешируем на 10 минут (приложения редко меняются)
 		const cacheKey = `app:${id}`;
 		return await withCache(cacheKey, async () => {
 			return await appRepository.findByIdWithDetails(id);
@@ -182,27 +185,29 @@ export async function getAppById(id: string) {
 
 export async function getAppBySlug(slug: string) {
 	try {
-		// Кешируем на 10 минут
 		const cacheKey = `app:slug:${slug}`;
 		return await withCache(cacheKey, async () => {
 			return await appRepository.findBySlug(slug);
 		}, 600);
 	} catch (error) {
+		console.log(error);
 		throw new DatabaseError("Failed to fetch app by slug", error);
 	}
 }
 
 export async function addApp(data: CreateAppInput) {
 	try {
+		const { downloadUrl, ...appData } = data;
+
 		const category = await prisma.appsCategory.findUnique({
-			where: { id: data.categoryId },
+			where: { id: appData.categoryId },
 		});
 
 		if (!category) {
-			throw new NotFoundError("Category", data.categoryId);
+			throw new NotFoundError("Category", appData.categoryId);
 		}
 
-		const slug = data.slug || slugGenerator(data.name);
+		const slug = appData.slug || slugGenerator(appData.name);
 
 		const existingApp = await prisma.apps.findUnique({
 			where: { slug },
@@ -212,19 +217,45 @@ export async function addApp(data: CreateAppInput) {
 			throw new ConflictError("App with this slug already exists");
 		}
 
-		return await prisma.apps.create({
+		const app = await prisma.apps.create({
 			data: {
-				...data,
+				...appData,
 				slug,
-				changelog: data.changelog ?? null,
-				coverUrl: data.coverUrl ?? null,
-				sourceUrl: data.sourceUrl ?? null,
-				documentationUrl: data.documentationUrl ?? null,
+				coverUrl: appData.coverUrl ?? null,
+				sourceUrl: appData.sourceUrl ?? null,
+				documentationUrl: appData.documentationUrl ?? null
 			},
 			include: {
 				category: true,
+				author: {
+					select: {
+						id: true,
+						userName: true,
+						avatarUrl: true,
+					},
+				},
+				editions: {
+					select: {
+						id: true,
+						name: true,
+						slug: true,
+						price: true,
+					},
+				},
 			},
 		});
+
+		await prisma.appsVersion.create({
+			data: {
+				appId: app.id,
+				version: "1.0.0",
+				changelog: "Initial release",
+				status: appData.status ?? "BETA",
+				downloadUrl,
+			},
+		});
+
+		return app;
 	} catch (error) {
 		if (error instanceof NotFoundError || error instanceof ConflictError) {
 			throw error;
@@ -235,6 +266,8 @@ export async function addApp(data: CreateAppInput) {
 
 export async function updateAppById(id: string, data: UpdateAppInput) {
 	try {
+		const { ...appData } = data;
+
 		const app = await prisma.apps.findUnique({
 			where: { id },
 		});
@@ -243,19 +276,19 @@ export async function updateAppById(id: string, data: UpdateAppInput) {
 			throw new NotFoundError("App", id);
 		}
 
-		if (data.categoryId) {
+		if (appData.categoryId) {
 			const category = await prisma.appsCategory.findUnique({
-				where: { id: data.categoryId },
+				where: { id: appData.categoryId },
 			});
 
 			if (!category) {
-				throw new NotFoundError("Category", data.categoryId);
+				throw new NotFoundError("Category", appData.categoryId);
 			}
 		}
 
-		if (data.slug) {
+		if (appData.slug) {
 			const existingApp = await prisma.apps.findUnique({
-				where: { slug: data.slug },
+				where: { slug: appData.slug },
 			});
 
 			if (existingApp && existingApp.id !== id) {
@@ -266,18 +299,31 @@ export async function updateAppById(id: string, data: UpdateAppInput) {
 		const updatedApp = await prisma.apps.update({
 			where: { id },
 			data: {
-				...data,
-				changelog: data.changelog !== undefined ? (data.changelog ?? null) : undefined,
-				coverUrl: data.coverUrl !== undefined ? (data.coverUrl ?? null) : undefined,
-				sourceUrl: data.sourceUrl !== undefined ? (data.sourceUrl ?? null) : undefined,
-				documentationUrl: data.documentationUrl !== undefined ? (data.documentationUrl ?? null) : undefined,
+				...appData,
+				coverUrl: appData.coverUrl !== undefined ? (appData.coverUrl ?? null) : undefined,
+				sourceUrl: appData.sourceUrl !== undefined ? (appData.sourceUrl ?? null) : undefined,
+				documentationUrl: appData.documentationUrl !== undefined ? (appData.documentationUrl ?? null) : undefined,
 			},
 			include: {
 				category: true,
+				author: {
+					select: {
+						id: true,
+						userName: true,
+						avatarUrl: true,
+					},
+				},
+				editions: {
+					select: {
+						id: true,
+						name: true,
+						slug: true,
+						price: true,
+					},
+				},
 			},
 		});
 
-		// Инвалидируем кеш
 		await deleteCachedByPattern(`app:${id}*`);
 		await deleteCachedByPattern("apps:list:*");
 
@@ -300,7 +346,6 @@ export async function deleteAppById(id: string) {
 
 		const deletedApp = await appRepository.delete(id);
 
-		// Инвалидируем кеш
 		await deleteCachedByPattern(`app:${id}*`);
 		await deleteCachedByPattern("apps:list:*");
 
@@ -325,11 +370,13 @@ export async function recordDownload(
 			throw new NotFoundError("App", appId);
 		}
 
+		const version = metadata?.version ?? "unknown";
+
 		await prisma.downloads.create({
 			data: {
 				appId,
 				userId: userId ?? null,
-				version: metadata?.version || app.version,
+				version,
 				platform: metadata?.platform as Platform,
 				ipAddress: metadata?.ipAddress ?? null,
 				userAgent: metadata?.userAgent ?? null,
@@ -367,7 +414,7 @@ export async function getUserLibrary(userId: string, query: GetAppsQuery) {
 			page = 1,
 			limit = 20,
 			search,
-			sortBy = "purchasedAt",
+			sortBy = "createdAt",
 			order = "desc",
 		} = query;
 
@@ -402,6 +449,7 @@ export async function getUserLibrary(userId: string, query: GetAppsQuery) {
 
 		interface LibraryWhereCondition {
 			id: { in: string[] };
+			deletedAt: null;
 			OR?: Array<{
 				name?: { contains: string; mode: "insensitive" };
 				shortDesc?: { contains: string; mode: "insensitive" };
@@ -412,6 +460,7 @@ export async function getUserLibrary(userId: string, query: GetAppsQuery) {
 
 		const where: LibraryWhereCondition = {
 			id: { in: appIds },
+			deletedAt: null,
 		};
 
 		if (search) {
@@ -432,9 +481,31 @@ export async function getUserLibrary(userId: string, query: GetAppsQuery) {
 				where,
 				include: {
 					category: true,
+					author: {
+						select: {
+							id: true,
+							userName: true,
+							avatarUrl: true,
+						},
+					},
 					purchases: {
-						where: { userId },
+						where: {
+							userId,
+							status: "COMPLETED",
+						},
+						orderBy: { purchasedAt: "desc" },
+						take: 1,
 						select: { purchasedAt: true },
+					},
+					versions: {
+						orderBy: { releaseDate: "desc" },
+						take: 1,
+						select: {
+							id: true,
+							version: true,
+							downloadUrl: true,
+							releaseDate: true,
+						},
 					},
 					_count: {
 						select: {
@@ -473,9 +544,31 @@ export async function getUserLibrary(userId: string, query: GetAppsQuery) {
 				orderBy,
 				include: {
 					category: true,
+					author: {
+						select: {
+							id: true,
+							userName: true,
+							avatarUrl: true,
+						},
+					},
 					purchases: {
-						where: { userId },
+						where: {
+							userId,
+							status: "COMPLETED",
+						},
+						orderBy: { purchasedAt: "desc" },
+						take: 1,
 						select: { purchasedAt: true },
+					},
+					versions: {
+						orderBy: { releaseDate: "desc" },
+						take: 1,
+						select: {
+							id: true,
+							version: true,
+							downloadUrl: true,
+							releaseDate: true,
+						},
 					},
 					_count: {
 						select: {

@@ -22,6 +22,36 @@
 
 .actions {
     display: flex;
+    flex-direction: column;
     gap: rem(6);
 }
 
+.actionsRow {
+    display: flex;
+    gap: rem(6);
+}
+
+.managementBtn {
+    display: flex;
+    align-items: center;
+    gap: rem(4);
+    padding: rem(6) rem(10);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: rem(4);
+    color: var(--primary);
+    font-size: rem(12);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    
+    svg {
+        flex-shrink: 0;
+    }
+    
+    &:hover {
+        background: var(--primary-light);
+        border-color: var(--primary);
+    }
+}

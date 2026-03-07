@@ -8,44 +8,58 @@ import { userRepository } from "../../repositories/user.repository.js";
 
 export async function purchaseApp(userId: string, appId: string) {
 	try {
-		const app = await prisma.apps.findUnique({
-			where: { id: appId },
-			select: { id: true, name: true, price: true },
-		});
+		const now = new Date();
+		const [app, user, promotions] = await Promise.all([
+			prisma.apps.findUnique({
+				where: { id: appId },
+				select: { id: true, name: true, price: true },
+			}),
+			prisma.users.findUnique({
+				where: { id: userId },
+				select: { balance: true },
+			}),
+			prisma.appPromotion.findMany({
+				where: {
+					appId,
+					isActive: true,
+					startsAt: { lte: now },
+					endsAt: { gte: now },
+				},
+				orderBy: { startsAt: "desc" },
+				take: 1,
+			}),
+		]);
 
-		if (!app) {
-			throw new NotFoundError("App", appId);
+		if (!app) throw new NotFoundError("App", appId);
+		if (!user) throw new NotFoundError("User", userId);
+
+		const basePrice = Number(app.price);
+
+		let finalPrice = basePrice;
+		if (promotions.length > 0 && promotions[0]) {
+			const promotion = promotions[0];
+			if (promotion.discountAmount && Number(promotion.discountAmount) > 0) {
+				finalPrice = basePrice - Number(promotion.discountAmount);
+			} else if (promotion.discountPercent && promotion.discountPercent > 0) {
+				finalPrice = basePrice * (1 - promotion.discountPercent / 100);
+			}
+			finalPrice = Math.max(0, finalPrice);
 		}
-
-		const price = Number(app.price);
 
 		const existingPurchase = await prisma.purchases.findUnique({
 			where: { userId_appId: { userId, appId } },
 		});
 
-		if (existingPurchase) {
-			throw ApiError.conflict("You already own this app");
-		}
+		if (existingPurchase) throw ApiError.conflict("You already own this app");
 
-		const user = await prisma.users.findUnique({
-			where: { id: userId },
-			select: { balance: true },
-		});
+		if (Number(user.balance) < finalPrice) throw ApiError.badRequest("Insufficient balance");
 
-		if (!user) {
-			throw new NotFoundError("User", userId);
-		}
-
-		if (Number(user.balance) < price) {
-			throw ApiError.badRequest("Insufficient balance");
-		}
-
-		const [purchase, updatedUser] = await prisma.$transaction([
-			prisma.purchases.create({
+		const { purchase, balance } = await prisma.$transaction(async (tx) => {
+			const purchase = await tx.purchases.create({
 				data: {
 					userId,
 					appId,
-					price: app.price,
+					price: finalPrice,
 					status: "COMPLETED",
 				},
 				include: {
@@ -59,19 +73,26 @@ export async function purchaseApp(userId: string, appId: string) {
 						},
 					},
 				},
-			}),
-			userRepository.decrementBalance(userId, price),
-		]);
+			});
 
-		return { purchase, balance: updatedUser.balance };
+			const updatedUser = await tx.users.update({
+				where: { id: userId },
+				data: { balance: { decrement: finalPrice } },
+				select: { balance: true },
+			});
+
+			return { purchase, balance: updatedUser.balance };
+		});
+
+		return { purchase, balance };
 	} catch (error) {
-		if (
-			error instanceof NotFoundError ||
-			error instanceof ApiError
-		) {
-			throw error;
-		}
-		throw new DatabaseError("Failed to purchase app", error);
+		if (error instanceof NotFoundError || error instanceof ApiError) throw error;
+		console.error("purchaseApp error:", error);
+		throw new DatabaseError("Failed to purchase app", {
+			message: error instanceof Error ? error.message : String(error),
+			code: (error as any)?.code,
+			meta: (error as any)?.meta,
+		});
 	}
 }
 
@@ -150,7 +171,8 @@ export async function createCheckoutSession(userId: string, amount: number) {
 
 export async function createAppPurchaseSession(userId: string, appId: string) {
 	try {
-		const [user, app] = await Promise.all([
+		const now = new Date();
+		const [user, app, promotions] = await Promise.all([
 			prisma.users.findUnique({
 				where: { id: userId },
 				select: { email: true, id: true },
@@ -158,6 +180,16 @@ export async function createAppPurchaseSession(userId: string, appId: string) {
 			prisma.apps.findUnique({
 				where: { id: appId },
 				select: { id: true, name: true, price: true, iconUrl: true },
+			}),
+			prisma.appPromotion.findMany({
+				where: {
+					appId,
+					isActive: true,
+					startsAt: { lte: now },
+					endsAt: { gte: now },
+				},
+				orderBy: { startsAt: "desc" },
+				take: 1,
 			}),
 		]);
 
@@ -177,7 +209,19 @@ export async function createAppPurchaseSession(userId: string, appId: string) {
 			throw ApiError.conflict("You already own this app");
 		}
 
-		const price = Number(app.price);
+		const basePrice = Number(app.price);
+		let finalPrice = basePrice;
+		if (promotions.length > 0 && promotions[0]) {
+			const promotion = promotions[0];
+			if (promotion.discountAmount && Number(promotion.discountAmount) > 0) {
+				finalPrice = basePrice - Number(promotion.discountAmount);
+			} else if (promotion.discountPercent && promotion.discountPercent > 0) {
+				finalPrice = basePrice * (1 - promotion.discountPercent / 100);
+			}
+			finalPrice = Math.max(0, finalPrice);
+		}
+
+		const price = finalPrice;
 
 		const session = await stripe.checkout.sessions.create({
 			payment_method_types: ["card"],
@@ -190,7 +234,7 @@ export async function createAppPurchaseSession(userId: string, appId: string) {
 							description: `Purchase ${app.name}`,
 							images: app.iconUrl ? [`${env.BACKEND_URL}${app.iconUrl}`] : [],
 						},
-						unit_amount: Math.round(price * 100), // Convert to cents
+						unit_amount: Math.round(price * 100),
 					},
 					quantity: 1,
 				},
@@ -277,20 +321,45 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
 			throw new Error("Missing appId in metadata");
 		}
 
-		const app = await prisma.apps.findUnique({
-			where: { id: appId },
-			select: { price: true },
-		});
+		const now = new Date();
+		const [app, promotions] = await Promise.all([
+			prisma.apps.findUnique({
+				where: { id: appId },
+				select: { price: true },
+			}),
+			prisma.appPromotion.findMany({
+				where: {
+					appId,
+					isActive: true,
+					startsAt: { lte: now },
+					endsAt: { gte: now },
+				},
+				orderBy: { startsAt: "desc" },
+				take: 1,
+			}),
+		]);
 
 		if (!app) {
 			throw new NotFoundError("App", appId);
+		}
+
+		const basePrice = Number(app.price);
+		let finalPrice = basePrice;
+		if (promotions.length > 0 && promotions[0]) {
+			const promotion = promotions[0];
+			if (promotion.discountAmount && Number(promotion.discountAmount) > 0) {
+				finalPrice = basePrice - Number(promotion.discountAmount);
+			} else if (promotion.discountPercent && promotion.discountPercent > 0) {
+				finalPrice = basePrice * (1 - promotion.discountPercent / 100);
+			}
+			finalPrice = Math.max(0, finalPrice);
 		}
 
 		await prisma.purchases.create({
 			data: {
 				userId,
 				appId,
-				price: app.price,
+				price: finalPrice,
 				status: "COMPLETED",
 				paymentMethod: "STRIPE",
 				transactionId: session.payment_intent as string,
