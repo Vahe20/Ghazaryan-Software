@@ -16,12 +16,6 @@ export async function getCached<T>(key: string): Promise<T | null> {
     }
 }
 
-/**
- * Сохранить значение в кеш
- * @param key - ключ кеша
- * @param value - значение для сохранения
- * @param ttl - время жизни в секундах (по умолчанию 5 минут)
- */
 export async function setCached<T>(key: string, value: T, ttl: number = 300): Promise<void> {
     const redis = getRedisClient();
     if (!redis) return;
@@ -33,9 +27,6 @@ export async function setCached<T>(key: string, value: T, ttl: number = 300): Pr
     }
 }
 
-/**
- * Удалить значение из кеша
- */
 export async function deleteCached(key: string): Promise<void> {
     const redis = getRedisClient();
     if (!redis) return;
@@ -47,9 +38,6 @@ export async function deleteCached(key: string): Promise<void> {
     }
 }
 
-/**
- * Удалить все ключи по паттерну
- */
 export async function deleteCachedByPattern(pattern: string): Promise<void> {
     const redis = getRedisClient();
     if (!redis) return;
@@ -64,32 +52,23 @@ export async function deleteCachedByPattern(pattern: string): Promise<void> {
     }
 }
 
-/**
- * Создать хеш из объекта для использования в ключе кеша
- */
 export function hashObject(obj: any): string {
     const str = JSON.stringify(obj);
     return createHash("md5").update(str).digest("hex").substring(0, 8);
 }
 
-/**
- * Wrapper функция для кеширования результата функции
- */
 export async function withCache<T>(
     key: string,
     fn: () => Promise<T>,
     ttl: number = 300,
 ): Promise<T> {
-    // Проверяем кеш
     const cached = await getCached<T>(key);
     if (cached !== null) {
         return cached;
     }
 
-    // Выполняем функцию
     const result = await fn();
 
-    // Сохраняем в кеш
     await setCached(key, result, ttl);
 
     return result;

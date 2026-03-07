@@ -1,7 +1,7 @@
 "use client"
 
 import { useAppDispatch, useAppSelector } from "@/src/app/hooks";
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { api } from "@/src/features/api/baseApi";
 import ProfileHeader from '@/src/components/profile/profileHeader/ProfileHeader';
@@ -11,41 +11,37 @@ import TopUpModal from '@/src/components/profile/topUpModal/TopUpModal';
 import style from './page.module.scss';
 
 export default function Profile() {
+    return (
+        <Suspense fallback={<ProfileFallback />}>
+            <ProfileContent />
+        </Suspense>
+    );
+}
+
+function ProfileContent() {
     const user = useAppSelector(s => s.auth.user);
-    const loading = useAppSelector(s => s.auth.loading);
     const [showTopUpModal, setShowTopUpModal] = useState(false);
-    const [paymentStatus, setPaymentStatus] = useState<'success' | 'cancelled' | null>(null);
     const searchParams = useSearchParams();
     const router = useRouter();
     const dispatch = useAppDispatch();
+    const payment = searchParams.get('payment');
+    const paymentStatus: 'success' | 'cancelled' | null = payment === 'success' || payment === 'cancelled' ? payment : null;
 
     useEffect(() => {
-        const payment = searchParams.get('payment');
-        if (payment === 'success') {
-            setPaymentStatus('success');
-            // Invalidate user data to refresh balance
-            dispatch(api.util.invalidateTags([{ type: 'User', id: 'CURRENT' }]));
-            // Clear URL params after 3 seconds
-            setTimeout(() => {
-                setPaymentStatus(null);
-                router.replace('/profile');
-            }, 3000);
-        } else if (payment === 'cancelled') {
-            setPaymentStatus('cancelled');
-            setTimeout(() => {
-                setPaymentStatus(null);
-                router.replace('/profile');
-            }, 3000);
+        if (!paymentStatus) {
+            return;
         }
-    }, [searchParams, router, dispatch]);
 
-    if (loading) {
-        return (
-            <div className={style.loadingContainer}>
-                <div className={style.loader}></div>
-            </div>
-        );
-    }
+        if (paymentStatus === 'success') {
+            dispatch(api.util.invalidateTags([{ type: 'Users', id: 'CURRENT' }]));
+        }
+
+        const timer = setTimeout(() => {
+            router.replace('/profile');
+        }, 3000);
+
+        return () => clearTimeout(timer);
+    }, [paymentStatus, router, dispatch]);
 
     if (!user) {
         return (
@@ -92,6 +88,14 @@ export default function Profile() {
                 isOpen={showTopUpModal}
                 onClose={() => setShowTopUpModal(false)}
             />
+        </div>
+    );
+}
+
+function ProfileFallback() {
+    return (
+        <div className={style.loadingContainer}>
+            <div className={style.loader}></div>
         </div>
     );
 }

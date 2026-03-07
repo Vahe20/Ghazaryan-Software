@@ -80,7 +80,6 @@ export function configurePassport() {
                 return done(null, false);
             }
 
-            // Преобразуем объект User в формат Express.User
             const expressUser = {
                 userId: user.id,
                 role: user.role as any,

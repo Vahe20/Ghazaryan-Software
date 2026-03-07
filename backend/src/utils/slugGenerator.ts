@@ -1,4 +1,6 @@
-import slugify from "slugify";
+import slugifyModule from "slugify";
+
+const slugify = (slugifyModule as any).default || slugifyModule;
 
 export const slugGenerator = (title: string) => {
 	return slugify(title, {

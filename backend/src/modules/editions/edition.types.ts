@@ -1,11 +1,9 @@
 import { z } from "zod";
 
-// Для привязки существующего приложения как edition
 export const linkEditionSchema = z.object({
 	editionAppId: z.string().uuid("Invalid edition app ID"),
 });
 
-// Для создания нового edition
 export const createEditionSchema = z.object({
 	name: z.string().min(1).max(100),
 	slug: z.string().min(1).max(100).optional(),

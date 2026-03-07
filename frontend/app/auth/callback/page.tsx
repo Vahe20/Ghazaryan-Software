@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppDispatch } from "@/src/app/hooks";
 import { useLazyGetMeQuery } from "@/src/features/api/authApi";
 import { setUser, setInitialized } from "@/src/features/slices/authSlice";
 
 export default function AuthCallback() {
+    return (
+        <Suspense fallback={<AuthCallbackLoading />}>
+            <AuthCallbackContent />
+        </Suspense>
+    );
+}
+
+function AuthCallbackContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const dispatch = useAppDispatch();
@@ -17,30 +25,24 @@ export default function AuthCallback() {
         const error = searchParams.get("error");
 
         if (error) {
-            // Обработка ошибок
             console.error("Authentication error:", error);
             router.push(`/auth?error=${error}`);
             return;
         }
 
         if (token) {
-            // Сохраняем токен в localStorage
             localStorage.setItem("token", token);
             
-            // Загружаем информацию о пользователе
             getMe().then((response) => {
                 if (response.data) {
                     dispatch(setUser(response.data));
                     dispatch(setInitialized(true));
                 }
-                // Перенаправляем на главную страницу
                 router.push("/");
             }).catch(() => {
-                // На ошибку также перенаправляем на главную (пользователь будет перенаправлен на логин AuthInitializer)
                 router.push("/");
             });
         } else {
-            // Если нет токена, перенаправляем на страницу авторизации
             router.push("/auth");
         }
     }, [searchParams, router, dispatch, getMe]);
@@ -73,4 +75,8 @@ export default function AuthCallback() {
             </div>
         </>
     );
+}
+
+function AuthCallbackLoading() {
+    return <p>Loading...</p>;
 }

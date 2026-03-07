@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { Suspense, useCallback, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AppsFilters, AppsFiltersState } from "@/src/components/apps/appsFilters/AppsFilters";
 import type { PlatformType, StatusType } from "@/src/types/Entities";
@@ -12,6 +12,14 @@ import { useGetAppsQuery } from "@/src/features/api/appsApi";
 import style from "./page.module.scss";
 
 export default function AppsPage() {
+  return (
+    <Suspense fallback={<AppsPageFallback />}>
+      <AppsPageContent />
+    </Suspense>
+  );
+}
+
+function AppsPageContent() {
   const searchParams = useSearchParams();
 
   const { currentPage, goToPage, resetPage } = usePagination(1);
@@ -84,6 +92,16 @@ export default function AppsPage() {
           filters={filters}
           onChange={handleFiltersChange}
         />
+      </div>
+    </div>
+  );
+}
+
+function AppsPageFallback() {
+  return (
+    <div className={style.appsPage}>
+      <div className={style.header}>
+        <h1 className={style.title}>Loading applications...</h1>
       </div>
     </div>
   );

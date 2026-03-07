@@ -119,6 +119,9 @@
 .avatarInitial {
     font-size: rem(48);
     font-weight: 700;
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
     color: $text-primary;
     position: relative;
     z-index: 2;

@@ -51,7 +51,7 @@ export const createApp = asyncHandler(async (req: AuthRequest, res: Response) =>
 
 	const appData = {
 		...req.body,
-		authorId: req.user.id,
+		authorId: req.user.userId,
 	};
 
 	const app = await appsService.addApp(appData);
@@ -75,7 +75,7 @@ export const updateApp = asyncHandler(async (req: AuthRequest, res: Response) =>
 		throw new NotFoundError("App", id);
 	}
 
-	const isAuthor = existingApp.authorId === req.user.id;
+	const isAuthor = existingApp.authorId === req.user.userId;
 	const isAdmin = req.user.role === "ADMIN";
 
 	if (!isAuthor && !isAdmin) {
@@ -103,7 +103,7 @@ export const deleteApp = asyncHandler(async (req: AuthRequest, res: Response) =>
 		throw new NotFoundError("App", id);
 	}
 
-	const isAuthor = existingApp.authorId === req.user.id;
+	const isAuthor = existingApp.authorId === req.user.userId;
 	const isAdmin = req.user.role === "ADMIN";
 
 	if (!isAuthor && !isAdmin) {
@@ -162,7 +162,7 @@ export const createVersion = asyncHandler(async (req: AuthRequest, res: Response
 		throw new NotFoundError("App", req.params.appId);
 	}
 
-	const isAuthor = existingApp.authorId === req.user.id;
+	const isAuthor = existingApp.authorId === req.user.userId;
 	const isAdmin = req.user.role === "ADMIN";
 
 	if (!isAuthor && !isAdmin) {

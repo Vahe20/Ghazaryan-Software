@@ -9,7 +9,7 @@ export const uploadFile = asyncHandler(async (req: Request, res: Response) => {
 	}
 
 	const relativePath = `/uploads/${req.params.type}/${req.file.filename}`;
-	const fileUrl = `${config.BACKEND_URL}${relativePath}`;
+	const fileUrl = `${config.BACKEND_URL}/api${relativePath}`;
 
 	res.status(201).json({
 		url: fileUrl,

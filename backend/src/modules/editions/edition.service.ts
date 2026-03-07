@@ -34,17 +34,14 @@ export async function getEditions(appId: string) {
 
 export async function createEdition(appId: string, data: CreateEditionInput) {
 	try {
-		// Check parent app exists
 		const parentApp = await prisma.apps.findFirst({ 
 			where: { id: appId, deletedAt: null } 
 		});
 		
 		if (!parentApp) throw new NotFoundError("App", appId);
 
-		// Generate slug if not provided
 		const slug = data.slug || generateSlug(data.name);
 
-		// Check if slug is unique
 		const existingApp = await prisma.apps.findFirst({
 			where: { slug, deletedAt: null }
 		});
@@ -53,14 +50,13 @@ export async function createEdition(appId: string, data: CreateEditionInput) {
 			throw new ConflictError(`App with slug "${slug}" already exists`);
 		}
 
-		// Create new edition app with minimal required fields
 		return prisma.apps.create({
 			data: {
 				name: data.name,
 				slug,
 				shortDesc: data.shortDesc || `${data.name} edition`,
 				description: `${data.name} edition of ${parentApp.name}`,
-				iconUrl: parentApp.iconUrl, // Copy from parent
+				iconUrl: parentApp.iconUrl,
 				coverUrl: parentApp.coverUrl,
 				screenshots: parentApp.screenshots,
 				categoryId: parentApp.categoryId,
@@ -139,7 +135,6 @@ export async function updateEdition(appId: string, editionId: string, data: Upda
 
 		if (!edition) throw new NotFoundError("Edition", editionId);
 
-		// Check slug uniqueness if changing
 		if (data.slug && data.slug !== edition.slug) {
 			const existingApp = await prisma.apps.findFirst({
 				where: { 
@@ -186,7 +181,6 @@ export async function deleteEdition(appId: string, editionId: string) {
 
 		if (!edition) throw new NotFoundError("Edition", editionId);
 
-		// Unlink the edition (don't delete the app, just remove parent relationship)
 		await prisma.apps.update({
 			where: { id: editionId },
 			data: { parentAppId: null },

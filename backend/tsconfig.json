@@ -7,9 +7,6 @@
 		// Environment Settings
 		"module": "nodenext",
 		"target": "esnext",
-		"types": [],
-		"lib": ["esnext"],
-		"types": ["node"],
 
 		// Other Outputs
 		"sourceMap": true,

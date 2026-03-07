@@ -3,11 +3,7 @@ import config from "./env.js";
 
 let redisClient: Redis | null = null;
 
-/**
- * Получить Redis клиент (singleton)
- */
 export function getRedisClient(): Redis | null {
-    // Если Redis отключен в конфиге, возвращаем null
     if (!config.REDIS_ENABLED) {
         return null;
     }

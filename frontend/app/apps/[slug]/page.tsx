@@ -4,12 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/src/app/hooks";
-import {
-    useCreateReviewMutation,
-    useGetAppBySlugQuery,
-    useGetAppPromotionsQuery,
-    useGetAppReviewsQuery,
-} from "@/src/features/api/appsApi";
+import {useCreateReviewMutation,useGetAppBySlugQuery,useGetAppPromotionsQuery} from "@/src/features/api/appsApi";
 import { usePurchaseAppMutation } from "@/src/features/api/paymentApi";
 import { setUser } from "@/src/features/slices/authSlice";
 import ConfirmModal from "@/src/components/shared/ConfirmModal/ConfirmModal";
@@ -31,18 +26,12 @@ export default function AppPage() {
 
     const user = useAppSelector((s) => s.auth.user);
     const [purchaseApp, { isLoading: purchasing, error: purchaseError }] = usePurchaseAppMutation();
-    const [createReview, { isLoading: submittingReview }] = useCreateReviewMutation();
 
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
     const [pendingPurchase, setPendingPurchase] = useState<{ id: string; name: string; price: number } | null>(
         null
     );
     const [activeScreenshot, setActiveScreenshot] = useState(0);
-
-    const [reviewRating, setReviewRating] = useState(5);
-    const [reviewTitle, setReviewTitle] = useState("");
-    const [reviewComment, setReviewComment] = useState("");
-    const [reviewError, setReviewError] = useState<string | null>(null);
 
     const handlePurchaseClick = (id: string, name: string, price: number) => {
         if (!user) {
@@ -69,38 +58,6 @@ export default function AppPage() {
             setConfirmModalOpen(false);
             setPendingPurchase(null);
         } catch {
-        }
-    };
-
-    const handleSubmitReview = async () => {
-        if (!app || !reviewComment.trim()) {
-            setReviewError("Please write a comment");
-            return;
-        }
-
-        setReviewError(null);
-
-        try {
-            await createReview({
-                appId: app.id,
-                rating: reviewRating,
-                title: reviewTitle.trim() || undefined,
-                comment: reviewComment.trim(),
-            }).unwrap();
-
-            setReviewTitle("");
-            setReviewComment("");
-            setReviewRating(5);
-        } catch (e: unknown) {
-            const err = e as { data?: { error?: { code?: string; message?: string } | string } };
-            const errData = err?.data?.error;
-            setReviewError(
-                typeof errData === "string"
-                    ? errData
-                    : errData && typeof errData === "object"
-                        ? (errData.message ?? "Failed to submit review")
-                        : "Failed to submit review"
-            );
         }
     };
 

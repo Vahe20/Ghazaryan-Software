@@ -1,7 +1,7 @@
 import type { Response } from "express";
 import type { AuthRequest } from "../../types/index.js";
 import { asyncHandler } from "../../middlewares/error.middleware.js";
-import { ApiError } from "../../utils/errors.js";
+import { ApiError, ValidationError } from "../../utils/errors.js";
 import { createDeveloperRequestSchema, reviewDeveloperRequestSchema } from "./developer-request.types.js";
 import * as service from "./developer-request.service.js";
 
@@ -25,7 +25,11 @@ export const listRequests = asyncHandler(async (req: AuthRequest, res: Response)
 });
 
 export const reviewRequest = asyncHandler(async (req: AuthRequest, res: Response) => {
+	const { requestId } = req.params;
+	if (!requestId || Array.isArray(requestId)) {
+		throw new ValidationError("Invalid requestId parameter");
+	}
 	const data = reviewDeveloperRequestSchema.parse(req.body);
-	const request = await service.reviewRequest(req.params.requestId, data.status);
+	const request = await service.reviewRequest(requestId, data.status);
 	res.json(request);
 });

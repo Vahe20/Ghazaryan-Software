@@ -117,6 +117,7 @@ CREATE TABLE "appsversion" (
     "version" TEXT NOT NULL,
     "changelog" TEXT,
     "status" "AppStatus" NOT NULL DEFAULT 'BETA',
+    "downloadUrl" TEXT NOT NULL,
     "releaseDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "appsversion_pkey" PRIMARY KEY ("id")

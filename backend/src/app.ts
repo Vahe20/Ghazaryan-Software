@@ -59,7 +59,7 @@ app.use(apiVersionMiddleware);
 const rateLimitConfig = getCurrentRateLimitConfig();
 if (rateLimitConfig.enabled) app.use("/api/", apiLimiter);
 
-app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
+app.use("/api/v1/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 	customSiteTitle: "Ghazaryan Software API",
@@ -67,7 +67,6 @@ app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 }));
 app.get("/api-docs.json", (_req, res) => res.json(swaggerSpec));
 
-// API v1 routes
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/upload", uploadRoutes);
 app.use("/api/v1/apps", appsRoutes);
