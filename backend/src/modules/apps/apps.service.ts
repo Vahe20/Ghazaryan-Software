@@ -266,7 +266,7 @@ export async function addApp(data: CreateAppInput) {
 
 export async function updateAppById(id: string, data: UpdateAppInput) {
 	try {
-		const { ...appData } = data;
+		const { downloadUrl, ...appData } = data;
 
 		const app = await prisma.apps.findUnique({
 			where: { id },
@@ -296,6 +296,7 @@ export async function updateAppById(id: string, data: UpdateAppInput) {
 			}
 		}
 
+
 		const updatedApp = await prisma.apps.update({
 			where: { id },
 			data: {
@@ -323,6 +324,13 @@ export async function updateAppById(id: string, data: UpdateAppInput) {
 				},
 			},
 		});
+
+		if (downloadUrl) {
+			await prisma.appsVersion.updateMany({
+				where: { appId: id },
+				data: { downloadUrl },
+			});
+		}
 
 		await deleteCachedByPattern(`app:${id}*`);
 		await deleteCachedByPattern("apps:list:*");
@@ -372,7 +380,7 @@ export async function recordDownload(
 				appId,
 				userId: userId ?? null,
 				version: metadata?.version ?? "unknown",
-				platform: metadata?.platform as Platform,
+				platform: metadata?.platform ?? "WINDOWS",
 				ipAddress: metadata?.ipAddress ?? null,
 				userAgent: metadata?.userAgent ?? null,
 				country: metadata?.country ?? null,

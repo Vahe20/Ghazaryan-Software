@@ -48,7 +48,7 @@ model Apps {
 
   iconUrl     String
   coverUrl    String?
-  screenshots String[]
+  screenshots String[] @default([])
 
   category   AppsCategory @relation(fields: [categoryId], references: [id])
   categoryId String
@@ -84,16 +84,15 @@ model Apps {
   purchases  Purchases[]
   promotions AppPromotion[]
 
-  parentApp   Apps?  @relation("AppEditions", fields: [parentAppId], references: [id], onDelete: SetNull)
+  price Decimal @default(0) @db.Decimal(10, 2)
+
+  parentApp   Apps?  @relation("AppEditions", fields: [parentAppId], references: [id], onDelete: Cascade)
   parentAppId String?
   editions    Apps[] @relation("AppEditions")
-
-  price Decimal @default(0) @db.Decimal(10, 2)
 
   @@index([slug])
   @@index([categoryId])
   @@index([status])
-  @@index([parentAppId])
   @@map("apps")
 }
 

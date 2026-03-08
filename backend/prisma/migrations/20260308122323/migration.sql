@@ -47,7 +47,7 @@ CREATE TABLE "apps" (
     "description" TEXT NOT NULL,
     "iconUrl" TEXT NOT NULL,
     "coverUrl" TEXT,
-    "screenshots" TEXT[],
+    "screenshots" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "categoryId" TEXT NOT NULL,
     "tags" TEXT[],
     "size" INTEGER NOT NULL,
@@ -66,8 +66,8 @@ CREATE TABLE "apps" (
     "publishedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
-    "parentAppId" TEXT,
     "price" DECIMAL(10,2) NOT NULL DEFAULT 0,
+    "parentAppId" TEXT,
 
     CONSTRAINT "apps_pkey" PRIMARY KEY ("id")
 );
@@ -218,9 +218,6 @@ CREATE INDEX "apps_categoryId_idx" ON "apps"("categoryId");
 CREATE INDEX "apps_status_idx" ON "apps"("status");
 
 -- CreateIndex
-CREATE INDEX "apps_parentAppId_idx" ON "apps"("parentAppId");
-
--- CreateIndex
 CREATE INDEX "apppromotion_appId_idx" ON "apppromotion"("appId");
 
 -- CreateIndex
@@ -293,7 +290,7 @@ ALTER TABLE "apps" ADD CONSTRAINT "apps_categoryId_fkey" FOREIGN KEY ("categoryI
 ALTER TABLE "apps" ADD CONSTRAINT "apps_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "apps" ADD CONSTRAINT "apps_parentAppId_fkey" FOREIGN KEY ("parentAppId") REFERENCES "apps"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "apps" ADD CONSTRAINT "apps_parentAppId_fkey" FOREIGN KEY ("parentAppId") REFERENCES "apps"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "apppromotion" ADD CONSTRAINT "apppromotion_appId_fkey" FOREIGN KEY ("appId") REFERENCES "apps"("id") ON DELETE CASCADE ON UPDATE CASCADE;

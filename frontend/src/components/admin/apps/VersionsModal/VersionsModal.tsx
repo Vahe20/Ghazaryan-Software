@@ -50,7 +50,7 @@ export default function VersionsModal({ isOpen, app, onClose }: VersionsModalPro
                 throw new Error("Please upload a file");
             }
 
-            const res = await uploadFile({ type: "archives", file: downloadFile }).unwrap();
+            const res = await uploadFile({ type: "archives", file: downloadFile, appName: app.name }).unwrap();
             downloadUrl = res.url;
 
             await createVersion({

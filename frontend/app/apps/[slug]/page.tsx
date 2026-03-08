@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/src/app/hooks";
-import {useCreateReviewMutation,useGetAppBySlugQuery,useGetAppPromotionsQuery} from "@/src/features/api/appsApi";
+import {useCreateReviewMutation,useGetAppBySlugQuery,useGetAppPromotionsQuery,useGetAppEditionsQuery} from "@/src/features/api/appsApi";
 import { usePurchaseAppMutation } from "@/src/features/api/paymentApi";
 import { setUser } from "@/src/features/slices/authSlice";
 import ConfirmModal from "@/src/components/shared/ConfirmModal/ConfirmModal";
@@ -23,6 +23,7 @@ export default function AppPage() {
         { appId: app?.id ?? "", activeOnly: true },
         { skip: !app }
     );
+    const { data: editions } = useGetAppEditionsQuery(app?.id ?? "", { skip: !app });
 
     const user = useAppSelector((s) => s.auth.user);
     const [purchaseApp, { isLoading: purchasing, error: purchaseError }] = usePurchaseAppMutation();
@@ -347,11 +348,11 @@ export default function AppPage() {
                     </section>
                 )}
 
-                {app.editions && app.editions.length > 0 && (
+                {editions && editions.length > 0 && (
                     <section className={style.section}>
                         <h2 className={style.sectionTitle}>Available Editions</h2>
                         <div className={style.editionsList}>
-                            {app.editions.map((edition) => {
+                            {editions.map((edition) => {
                                 const editionBase = Number(edition.price);
                                 const editionFinal = calculateFinalPrice(editionBase, activePromotion);
                                 const editionHasDiscount = editionFinal < editionBase;

@@ -81,6 +81,7 @@ export const updateAppSchema = z.object({
 		.max(5, "Maximum 5 platforms allowed")
 		.optional(),
 	minVersion: z.string().optional(),
+	downloadUrl: z.string().url("Invalid download URL").optional(),
 	sourceUrl: z.string().url("Invalid source URL").or(z.literal("")).optional(),
 	documentationUrl: z.string().url("Invalid documentation URL").or(z.literal("")).optional(),
 	status: appStatusSchema.optional(),

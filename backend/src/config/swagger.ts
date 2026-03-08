@@ -1341,6 +1341,13 @@ const options: swaggerJsdoc.Options = {
                             required: true,
                             schema: { type: "string", enum: ["avatar", "mods", "screenshots", "archives", "news"] },
                         },
+                        {
+                            name: "appName",
+                            in: "query",
+                            required: false,
+                            description: "Application name for naming archive files (only used for archives type)",
+                            schema: { type: "string" },
+                        },
                     ],
                     requestBody: {
                         required: true,

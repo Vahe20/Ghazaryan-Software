@@ -52,9 +52,20 @@ const storage = multer.diskStorage({
 		cb: (error: Error | null, filename: string) => void,
 	) => {
 		const ext = path.extname(file.originalname).toLowerCase();
-		const name = crypto.randomUUID();
+		const type = req.params.type;
 
-		cb(null, `${name}${ext}`);
+		// Для архивов используем название приложения, если передано
+		if (type === "archives" && req.query.appName && typeof req.query.appName === "string") {
+			const appName = req.query.appName
+				.toLowerCase()
+				.replace(/[^a-z0-9]+/g, "-")
+				.replace(/^-+|-+$/g, "");
+			const timestamp = Date.now();
+			cb(null, `${appName}-${timestamp}${ext}`);
+		} else {
+			const name = crypto.randomUUID();
+			cb(null, `${name}${ext}`);
+		}
 	},
 });
 

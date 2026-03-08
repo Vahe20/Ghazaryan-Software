@@ -10,9 +10,19 @@ function generateSlug(name: string): string {
 
 export async function getEditions(appId: string) {
 	try {
+		// Get the app to check if it's an edition itself
+		const app = await prisma.apps.findFirst({
+			where: { id: appId, deletedAt: null }
+		});
+
+		if (!app) throw new NotFoundError("App", appId);
+
+		// If this app is an edition, get editions for its parent app
+		const targetParentId = app.parentAppId || appId;
+
 		return prisma.apps.findMany({
 			where: {
-				parentAppId: appId,
+				parentAppId: targetParentId,
 				deletedAt: null,
 			},
 			orderBy: { createdAt: "desc" },
@@ -28,17 +38,26 @@ export async function getEditions(appId: string) {
 			},
 		});
 	} catch (error) {
+		if (error instanceof ApiError) throw error;
 		throw new DatabaseError("Failed to fetch editions", error);
 	}
 }
 
 export async function createEdition(appId: string, data: CreateEditionInput) {
 	try {
-		const parentApp = await prisma.apps.findFirst({ 
-			where: { id: appId, deletedAt: null } 
+		const app = await prisma.apps.findFirst({
+			where: { id: appId, deletedAt: null }
 		});
-		
-		if (!parentApp) throw new NotFoundError("App", appId);
+
+		if (!app) throw new NotFoundError("App", appId);
+
+		// If this app is an edition, create new edition for its parent
+		const targetParentId = app.parentAppId || appId;
+		const parentApp = app.parentAppId
+			? await prisma.apps.findFirst({ where: { id: app.parentAppId, deletedAt: null } })
+			: app;
+
+		if (!parentApp) throw new NotFoundError("Parent app", targetParentId);
 
 		const slug = data.slug || generateSlug(data.name);
 
@@ -65,7 +84,7 @@ export async function createEdition(appId: string, data: CreateEditionInput) {
 				platform: parentApp.platform,
 				price: data.price,
 				status: data.status || "RELEASE",
-				parentAppId: appId,
+				parentAppId: targetParentId,
 				authorId: parentApp.authorId,
 			},
 			select: {
@@ -91,21 +110,22 @@ export async function linkEdition(appId: string, data: LinkEditionInput) {
 			throw new ValidationError("App cannot be an edition of itself");
 		}
 
-		const [parentApp, editionApp] = await Promise.all([
-			prisma.apps.findFirst({ where: { id: appId, deletedAt: null } }),
-			prisma.apps.findFirst({ where: { id: data.editionAppId, deletedAt: null } }),
-		]);
+		const app = await prisma.apps.findFirst({ where: { id: appId, deletedAt: null } });
+		const editionApp = await prisma.apps.findFirst({ where: { id: data.editionAppId, deletedAt: null } });
 
-		if (!parentApp) throw new NotFoundError("App", appId);
+		if (!app) throw new NotFoundError("App", appId);
 		if (!editionApp) throw new NotFoundError("Edition app", data.editionAppId);
 
-		if (editionApp.parentAppId && editionApp.parentAppId !== appId) {
+		// If current app is an edition, link to its parent
+		const targetParentId = app.parentAppId || appId;
+
+		if (editionApp.parentAppId && editionApp.parentAppId !== targetParentId) {
 			throw new ConflictError("Edition app is already attached to another app");
 		}
 
 		return prisma.apps.update({
 			where: { id: data.editionAppId },
-			data: { parentAppId: appId },
+			data: { parentAppId: targetParentId },
 			select: {
 				id: true,
 				name: true,
@@ -125,10 +145,16 @@ export async function linkEdition(appId: string, data: LinkEditionInput) {
 
 export async function updateEdition(appId: string, editionId: string, data: UpdateEditionInput) {
 	try {
+		const app = await prisma.apps.findFirst({ where: { id: appId, deletedAt: null } });
+		if (!app) throw new NotFoundError("App", appId);
+
+		// If current app is an edition, verify edition belongs to parent
+		const targetParentId = app.parentAppId || appId;
+
 		const edition = await prisma.apps.findFirst({
 			where: {
 				id: editionId,
-				parentAppId: appId,
+				parentAppId: targetParentId,
 				deletedAt: null,
 			},
 		});
@@ -137,8 +163,8 @@ export async function updateEdition(appId: string, editionId: string, data: Upda
 
 		if (data.slug && data.slug !== edition.slug) {
 			const existingApp = await prisma.apps.findFirst({
-				where: { 
-					slug: data.slug, 
+				where: {
+					slug: data.slug,
 					deletedAt: null,
 					id: { not: editionId }
 				}
@@ -171,10 +197,16 @@ export async function updateEdition(appId: string, editionId: string, data: Upda
 
 export async function deleteEdition(appId: string, editionId: string) {
 	try {
+		const app = await prisma.apps.findFirst({ where: { id: appId, deletedAt: null } });
+		if (!app) throw new NotFoundError("App", appId);
+
+		// If current app is an edition, remove edition from parent
+		const targetParentId = app.parentAppId || appId;
+
 		const edition = await prisma.apps.findFirst({
 			where: {
 				id: editionId,
-				parentAppId: appId,
+				parentAppId: targetParentId,
 				deletedAt: null,
 			},
 		});

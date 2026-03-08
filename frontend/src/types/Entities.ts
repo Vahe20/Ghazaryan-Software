@@ -55,22 +55,10 @@ export interface App {
     deletedAt: Date | null;
     price: number;
     reviews?: Review[];
-    editions?: AppEdition[];
+    editions?: App[];
     versions?: AppVersion[];
     promotions?: AppPromotion[];
     createdAt?: Date;
-    updatedAt?: Date;
-}
-
-export interface AppEdition {
-    id: string;
-    name: string;
-    slug?: string;
-    shortDesc?: string;
-    price: number;
-    status?: StatusType;
-    parentAppId?: string | null;
-    createdAt: Date;
     updatedAt?: Date;
 }
 

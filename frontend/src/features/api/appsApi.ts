@@ -1,5 +1,5 @@
 import { api } from "./baseApi";
-import type { App, AppEdition, AppVersion, AppPromotion, Review, Pagination } from "@/src/types/Entities";
+import type { App, AppVersion, AppPromotion, Review, Pagination } from "@/src/types/Entities";
 
 interface GetAppsParams {
     page?: number;
@@ -22,7 +22,7 @@ interface ReviewsResponse {
     pagination: Pagination;
 }
 
-interface CreateEditionInput {
+export interface CreateEditionInput {
     name: string;
     slug?: string;
     shortDesc?: string;
@@ -30,7 +30,7 @@ interface CreateEditionInput {
     status?: "BETA" | "RELEASE";
 }
 
-interface UpdateEditionInput {
+export interface UpdateEditionInput {
     name?: string;
     slug?: string;
     shortDesc?: string;
@@ -101,12 +101,13 @@ export const appsApi = api.injectEndpoints({
 
         uploadFile: builder.mutation<
             { url: string; filename: string; size: number },
-            { type: "avatar" | "mods" | "screenshots" | "archives" | "news"; file: File }
+            { type: "avatar" | "mods" | "screenshots" | "archives" | "news"; file: File; appName?: string }
         >({
-            query: ({ type, file }) => {
+            query: ({ type, file, appName }) => {
                 const formData = new FormData();
                 formData.append("file", file);
-                return { url: `/upload/${type}`, method: "POST", body: formData };
+                const url = appName ? `/upload/${type}?appName=${encodeURIComponent(appName)}` : `/upload/${type}`;
+                return { url, method: "POST", body: formData };
             },
         }),
 
@@ -146,24 +147,24 @@ export const appsApi = api.injectEndpoints({
             invalidatesTags: (_, __, { appId }) => [{ type: "Reviews", id: appId }, { type: "Apps", id: appId }],
         }),
 
-        getAppEditions: builder.query<AppEdition[], string>({
+        getAppEditions: builder.query<App[], string>({
             query: (appId) => `/apps/${appId}/editions`,
             providesTags: (_, __, appId) => [{ type: "Editions", id: appId }],
         }),
 
-        createEdition: builder.mutation<AppEdition, { appId: string } & CreateEditionInput>({
+        createEdition: builder.mutation<App, { appId: string } & CreateEditionInput>({
             query: ({ appId, ...data }) => ({ url: `/apps/${appId}/editions`, method: "POST", body: data }),
-            invalidatesTags: (_, __, { appId }) => [{ type: "Editions", id: appId }],
+            invalidatesTags: (_, __, { appId }) => [{ type: "Editions", id: appId }, { type: "Apps", id: appId }],
         }),
 
-        updateEdition: builder.mutation<AppEdition, { appId: string; editionId: string; data: UpdateEditionInput }>({
+        updateEdition: builder.mutation<App, { appId: string; editionId: string; data: UpdateEditionInput }>({
             query: ({ appId, editionId, data }) => ({ url: `/apps/${appId}/editions/${editionId}`, method: "PATCH", body: data }),
-            invalidatesTags: (_, __, { appId }) => [{ type: "Editions", id: appId }],
+            invalidatesTags: (_, __, { appId }) => [{ type: "Editions", id: appId }, { type: "Apps", id: appId }],
         }),
 
         deleteEdition: builder.mutation<void, { appId: string; editionId: string }>({
             query: ({ appId, editionId }) => ({ url: `/apps/${appId}/editions/${editionId}`, method: "DELETE" }),
-            invalidatesTags: (_, __, { appId }) => [{ type: "Editions", id: appId }],
+            invalidatesTags: (_, __, { appId }) => [{ type: "Editions", id: appId }, { type: "Apps", id: appId }],
         }),
 
         getAppPromotions: builder.query<AppPromotion[], { appId: string; activeOnly?: boolean }>({

@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { App, AppEdition } from "@/src/types/Entities";
+import { App } from "@/src/types/Entities";
 import {
     useGetAppEditionsQuery,
     useCreateEditionMutation,
     useUpdateEditionMutation,
     useDeleteEditionMutation,
+    useUploadFileMutation,
 } from "@/src/features/api/appsApi";
 import BaseModal from "@/src/components/shared/BaseModal/BaseModal";
 import { extractErrorMessage, formatDate } from "@/src/lib/utils";
@@ -27,6 +28,8 @@ interface EditionFormData {
     shortDesc: string;
     price: string;
     status: "BETA" | "RELEASE";
+    iconUrl: string | null;
+    downloadUrl: string | null;
 }
 
 const EMPTY_FORM: EditionFormData = {
@@ -35,16 +38,26 @@ const EMPTY_FORM: EditionFormData = {
     shortDesc: "",
     price: "",
     status: "RELEASE",
+    iconUrl: null,
+    downloadUrl: null,
 };
 
 export default function EditionsModal({ isOpen, app, onClose }: EditionsModalProps) {
-    const [editingEdition, setEditingEdition] = useState<AppEdition | null>(null);
+    const [editingEdition, setEditingEdition] = useState<App | null>(null);
     const [showForm, setShowForm] = useState(false);
+    const [iconFile, setIconFile] = useState<File | null>(null);
+    const [downloadFile, setDownloadFile] = useState<File | null>(null);
+    const [iconPreview, setIconPreview] = useState<string>("");
+    const [uploadingFiles, setUploadingFiles] = useState(false);
+
+    const iconRef = useRef<HTMLInputElement>(null);
+    const downloadRef = useRef<HTMLInputElement>(null);
 
     const { data: editions, isLoading } = useGetAppEditionsQuery(app.id, { skip: !isOpen });
     const [createEdition, { isLoading: creating, error: createError }] = useCreateEditionMutation();
     const [updateEdition, { isLoading: updating, error: updateError }] = useUpdateEditionMutation();
     const [deleteEdition, { isLoading: deleting }] = useDeleteEditionMutation();
+    const [uploadFile] = useUploadFileMutation();
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm<EditionFormData>({
         defaultValues: EMPTY_FORM,
@@ -53,16 +66,52 @@ export default function EditionsModal({ isOpen, app, onClose }: EditionsModalPro
     const loading = creating || updating || deleting;
     const apiError = createError || updateError;
 
-    const onSubmit = async (data: EditionFormData) => {
-        const payload = {
-            name: data.name,
-            slug: data.slug || undefined,
-            shortDesc: data.shortDesc || undefined,
-            price: parseFloat(data.price),
-            status: data.status,
-        };
+    const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setIconFile(file);
+        setIconPreview(URL.createObjectURL(file));
+    };
 
+    const handleDownloadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setDownloadFile(file);
+    };
+
+    const onSubmit = async (data: EditionFormData) => {
         try {
+            setUploadingFiles(true);
+
+            let iconUrl = data.iconUrl;
+            let downloadUrl = data.downloadUrl;
+
+            if (iconFile) {
+                const res = await uploadFile({ type: "avatar", file: iconFile }).unwrap();
+                iconUrl = res.url;
+            }
+
+            if (downloadFile) {
+                const res = await uploadFile({ type: "archives", file: downloadFile, appName: data.name }).unwrap();
+                downloadUrl = res.url;
+            }
+
+            if (!downloadUrl && !editingEdition) {
+                throw new Error("Download file is required for new editions");
+            }
+
+            setUploadingFiles(false);
+
+            const payload = {
+                name: data.name,
+                slug: data.slug || undefined,
+                shortDesc: data.shortDesc || undefined,
+                price: parseFloat(data.price),
+                status: data.status,
+                ...(iconUrl && { iconUrl }),
+                ...(downloadUrl && { downloadUrl }),
+            };
+
             if (editingEdition) {
                 await updateEdition({
                     appId: app.id,
@@ -78,10 +127,15 @@ export default function EditionsModal({ isOpen, app, onClose }: EditionsModalPro
             reset(EMPTY_FORM);
             setEditingEdition(null);
             setShowForm(false);
-        } catch { }
+            setIconFile(null);
+            setDownloadFile(null);
+            setIconPreview("");
+        } catch {
+            setUploadingFiles(false);
+        }
     };
 
-    const handleEdit = (edition: AppEdition) => {
+    const handleEdit = (edition: App) => {
         setEditingEdition(edition);
         reset({
             name: edition.name,
@@ -89,7 +143,10 @@ export default function EditionsModal({ isOpen, app, onClose }: EditionsModalPro
             shortDesc: edition.shortDesc || "",
             price: String(edition.price),
             status: edition.status || "RELEASE",
+            iconUrl: edition.iconUrl || null,
+            downloadUrl: edition.versions?.[0]?.downloadUrl || null,
         });
+        setIconPreview(edition.iconUrl || "");
         setShowForm(true);
     };
 
@@ -104,10 +161,13 @@ export default function EditionsModal({ isOpen, app, onClose }: EditionsModalPro
         setShowForm(false);
         setEditingEdition(null);
         reset(EMPTY_FORM);
+        setIconFile(null);
+        setDownloadFile(null);
+        setIconPreview("");
     };
 
     return (
-        <BaseModal isOpen={isOpen} onClose={onClose} title={`Manage Editions — ${app.name}`} size="large">
+        <BaseModal isOpen={isOpen} onClose={onClose} title={`Manage Editions — ${app.name}`}>
             <div className={s.container}>
                 <div className={s.header}>
                     <p className={s.subtitle}>
@@ -167,6 +227,36 @@ export default function EditionsModal({ isOpen, app, onClose }: EditionsModalPro
 
                         <div className={form.formGrid}>
                             <div className={form.formGroup}>
+                                <label className={form.formLabel}>Icon Image</label>
+                                <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                                    {iconPreview && (
+                                        <img src={iconPreview} alt="icon" style={{ width: 48, height: 48, borderRadius: 4, objectFit: "cover" }} />
+                                    )}
+                                    <button type="button" className={btns.btnSecondary} onClick={() => iconRef.current?.click()}>
+                                        {iconPreview ? "Change Icon" : "Upload Icon"}
+                                    </button>
+                                    <input
+                                        ref={iconRef}
+                                        type="file"
+                                        accept="image/png,image/jpeg,image/webp"
+                                        style={{ display: "none" }}
+                                        onChange={handleIconChange}
+                                    />
+                                </div>
+                                {!iconFile && (
+                                    <input
+                                        className={form.formInput}
+                                        style={{ marginTop: 6 }}
+                                        type="url"
+                                        placeholder="Or paste icon URL"
+                                        {...register("iconUrl")}
+                                    />
+                                )}
+                            </div>
+                        </div>
+
+                        <div className={form.formGrid}>
+                            <div className={form.formGroup}>
                                 <label className={form.formLabel}>
                                     Price ($) <span className={s.required}>*</span>
                                 </label>
@@ -193,6 +283,34 @@ export default function EditionsModal({ isOpen, app, onClose }: EditionsModalPro
                             </div>
                         </div>
 
+                        <div className={form.formGroup}>
+                            <label className={form.formLabel}>
+                                App File {!editingEdition && "*"} (Upload or enter URL)
+                            </label>
+                            <div style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 6 }}>
+                                {downloadFile && <span className={form.formHint}>📦 {downloadFile.name}</span>}
+                                <button type="button" className={btns.btnSecondary} onClick={() => downloadRef.current?.click()}>
+                                    {downloadFile ? "Change File" : "Upload Archive"}
+                                </button>
+                                <input
+                                    ref={downloadRef}
+                                    type="file"
+                                    accept=".zip,.rar,.7z,.exe,.msi,.dmg,.pkg,.tar,.gz,.deb,.rpm"
+                                    style={{ display: "none" }}
+                                    onChange={handleDownloadChange}
+                                />
+                            </div>
+                            {!downloadFile && (
+                                <input
+                                    className={form.formInput}
+                                    type="url"
+                                    placeholder="Or paste direct download URL"
+                                    {...register("downloadUrl", !editingEdition ? { required: "Download file is required for new editions" } : {})}
+                                />
+                            )}
+                            {errors.downloadUrl && <span className={form.formError}>{errors.downloadUrl.message}</span>}
+                        </div>
+
                         {apiError && (
                             <div className={form.alertError}>{extractErrorMessage(apiError, "Failed to save edition")}</div>
                         )}
@@ -201,8 +319,8 @@ export default function EditionsModal({ isOpen, app, onClose }: EditionsModalPro
                             <button type="button" onClick={handleCancel} className={btns.btnSecondary}>
                                 Cancel
                             </button>
-                            <button type="submit" disabled={loading} className={btns.btnPrimary}>
-                                {loading ? "Saving..." : editingEdition ? "Update Edition" : "Create Edition"}
+                            <button type="submit" disabled={loading || uploadingFiles} className={btns.btnPrimary}>
+                                {uploadingFiles ? "Uploading..." : loading ? "Saving..." : editingEdition ? "Update Edition" : "Create Edition"}
                             </button>
                         </div>
                     </form>
@@ -229,7 +347,7 @@ export default function EditionsModal({ isOpen, app, onClose }: EditionsModalPro
                                             <span className={`${s.statusBadge} ${s[edition.status?.toLowerCase() || "release"]}`}>
                                                 {edition.status}
                                             </span>
-                                            <span className={s.priceBadge}>${edition.price.toFixed(2)}</span>
+                                            <span className={s.priceBadge}>${Number(edition.price).toFixed(2)}</span>
                                         </div>
                                     </div>
                                     {edition.shortDesc && <p className={s.editionDesc}>{edition.shortDesc}</p>}

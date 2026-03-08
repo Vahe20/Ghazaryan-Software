@@ -90,6 +90,7 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
     const [iconFile, setIconFile] = useState<File | null>(null);
     const [coverFile, setCoverFile] = useState<File | null>(null);
     const [downloadFile, setDownloadFile] = useState<File | null>(null);
+    const [screenshotFiles, setScreenshotFiles] = useState<(File | null)[]>([]);
     const [iconPreview, setIconPreview] = useState<string>("");
     const [coverPreview, setCoverPreview] = useState<string>("");
     const [uploadingFiles, setUploadingFiles] = useState(false);
@@ -97,6 +98,7 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
     const iconRef = useRef<HTMLInputElement>(null);
     const coverRef = useRef<HTMLInputElement>(null);
     const downloadRef = useRef<HTMLInputElement>(null);
+    const screenshotFileRefs = useRef<(HTMLInputElement | null)[]>([]);
 
     const { register, handleSubmit, control, reset, setValue, watch, formState: { errors } } = useForm<AppFormData>({
         defaultValues: app ? appToForm(app) : EMPTY_FORM,
@@ -114,6 +116,7 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
         setIconFile(null);
         setCoverFile(null);
         setDownloadFile(null);
+        setScreenshotFiles([]);
         setIconPreview(app?.iconUrl ?? "");
         setCoverPreview(app?.coverUrl ?? "");
     }, [app, isOpen, reset]);
@@ -147,6 +150,14 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
         setDownloadFile(file);
     };
 
+    const handleScreenshotFileChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const newFiles = [...screenshotFiles];
+        newFiles[index] = file;
+        setScreenshotFiles(newFiles);
+    };
+
     const onSubmit = async (data: AppFormData) => {
         try {
             setUploadingFiles(true);
@@ -154,6 +165,7 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
             let iconUrl = data.iconUrl;
             let coverUrl = data.coverUrl;
             let downloadUrl = data.downloadUrl;
+            let screenshotUrls = data.screenshots.map(s => s.value).filter((url): url is string => Boolean(url && url.trim()));
 
             if (iconFile) {
                 const res = await uploadFile({ type: "avatar", file: iconFile }).unwrap();
@@ -165,8 +177,16 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
                 coverUrl = res.url;
             }
 
+            const uploadedScreenshots = await Promise.all(data.screenshots.map(async (_, i) => {
+                const file = screenshotFiles[i];
+                if (!file) return data.screenshots[i]?.value ?? null;
+                const res = await uploadFile({ type: "screenshots", file }).unwrap();
+                return res.url;
+            }));
+            screenshotUrls = uploadedScreenshots.filter((url): url is string => Boolean(url && url.trim()));
+
             if (downloadFile) {
-                const res = await uploadFile({ type: "archives", file: downloadFile }).unwrap();
+                const res = await uploadFile({ type: "archives", file: downloadFile, appName: data.name }).unwrap();
                 downloadUrl = res.url;
             }
 
@@ -189,8 +209,7 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
                 platform: data.platform || [],
                 status: data.status || "BETA",
                 tags: data.tags || [],
-                screenshots: data.screenshots
-                    .map(s => s.value)
+                screenshots: screenshotUrls.length > 0 ? screenshotUrls : data.screenshots.map(s => s.value)
                     .filter((url): url is string => Boolean(url && url.trim())),
                 price: parseFloat(data.price || "0") || 0,
             };
@@ -201,7 +220,7 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
             if (data.sourceUrl) payload.sourceUrl = data.sourceUrl;
             if (data.documentationUrl) payload.documentationUrl = data.documentationUrl;
 
-            if (!app && downloadUrl) {
+            if (downloadUrl) {
                 payload.downloadUrl = downloadUrl;
             }
 
@@ -446,18 +465,51 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
                     </div>
                 </div>
 
-                <p className={s.sectionTitle}>Screenshots (URLs)</p>
+                <p className={s.sectionTitle}>Screenshots (URLs or Files)</p>
                 <div className={form.screenshotList}>
                     {screenshotFields.map((field, i) => (
                         <div key={field.id} className={form.screenshotRow}>
+                            <div style={{ flex: 1 }}>
+                                <input
+                                    className={`${form.formInput} ${form.screenshotInput}`}
+                                    type="url"
+                                    placeholder="https://example.com/screenshot.png"
+                                    {...register(`screenshots.${i}.value`)}
+                                    disabled={!!screenshotFiles[i]}
+                                />
+                                {screenshotFiles[i] && (
+                                    <p className={form.formHint} style={{ marginTop: 6 }}>
+                                        📷 {screenshotFiles[i]!.name}
+                                    </p>
+                                )}
+                            </div>
+                            <button
+                                type="button"
+                                className={btns.btnSecondary}
+                                onClick={() => screenshotFileRefs.current[i]?.click()}
+                                style={{ marginLeft: 8 }}
+                            >
+                                {screenshotFiles[i] ? "Change" : "Upload"}
+                            </button>
                             <input
-                                className={`${form.formInput} ${form.screenshotInput}`}
-                                type="url"
-                                placeholder="https://example.com/screenshot.png"
-                                {...register(`screenshots.${i}.value`)}
+                                ref={el => { screenshotFileRefs.current[i] = el; }}
+                                type="file"
+                                accept="image/png,image/jpeg,image/webp"
+                                style={{ display: "none" }}
+                                onChange={(e) => handleScreenshotFileChange(e, i)}
                             />
                             {screenshotFields.length > 1 && (
-                                <button type="button" className={btns.btnIconDanger} onClick={() => removeScreenshot(i)}>
+                                <button
+                                    type="button"
+                                    className={btns.btnIconDanger}
+                                    onClick={() => {
+                                        removeScreenshot(i);
+                                        const newFiles = [...screenshotFiles];
+                                        newFiles.splice(i, 1);
+                                        setScreenshotFiles(newFiles);
+                                    }}
+                                    style={{ marginLeft: 6 }}
+                                >
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                                         <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                     </svg>

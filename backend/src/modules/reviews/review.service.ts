@@ -69,8 +69,8 @@ export async function deleteReview(reviewId: string, userId: string, role: strin
 
 export async function getReviews(appId: string, query: { page?: number; limit?: number; rating?: number; sortBy?: string; order?: string }) {
 	try {
-		const page = query.page ?? 1;
-		const limit = query.limit ?? 20;
+		const page = Number(query.page) || 1;
+		const limit = Number(query.limit) || 20;
 		const skip = (page - 1) * limit;
 
 		const where: any = { appId };
