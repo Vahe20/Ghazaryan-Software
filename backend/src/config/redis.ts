@@ -40,9 +40,6 @@ export function getRedisClient(): Redis | null {
     return redisClient;
 }
 
-/**
- * Закрыть Redis соединение
- */
 export async function closeRedisConnection(): Promise<void> {
     if (redisClient) {
         await redisClient.quit();

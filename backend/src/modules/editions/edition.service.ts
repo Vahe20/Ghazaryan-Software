@@ -10,14 +10,12 @@ function generateSlug(name: string): string {
 
 export async function getEditions(appId: string) {
 	try {
-		// Get the app to check if it's an edition itself
 		const app = await prisma.apps.findFirst({
 			where: { id: appId, deletedAt: null }
 		});
 
 		if (!app) throw new NotFoundError("App", appId);
 
-		// If this app is an edition, get editions for its parent app
 		const targetParentId = app.parentAppId || appId;
 
 		return prisma.apps.findMany({
@@ -51,7 +49,6 @@ export async function createEdition(appId: string, data: CreateEditionInput) {
 
 		if (!app) throw new NotFoundError("App", appId);
 
-		// If this app is an edition, create new edition for its parent
 		const targetParentId = app.parentAppId || appId;
 		const parentApp = app.parentAppId
 			? await prisma.apps.findFirst({ where: { id: app.parentAppId, deletedAt: null } })
@@ -116,7 +113,6 @@ export async function linkEdition(appId: string, data: LinkEditionInput) {
 		if (!app) throw new NotFoundError("App", appId);
 		if (!editionApp) throw new NotFoundError("Edition app", data.editionAppId);
 
-		// If current app is an edition, link to its parent
 		const targetParentId = app.parentAppId || appId;
 
 		if (editionApp.parentAppId && editionApp.parentAppId !== targetParentId) {
@@ -148,7 +144,6 @@ export async function updateEdition(appId: string, editionId: string, data: Upda
 		const app = await prisma.apps.findFirst({ where: { id: appId, deletedAt: null } });
 		if (!app) throw new NotFoundError("App", appId);
 
-		// If current app is an edition, verify edition belongs to parent
 		const targetParentId = app.parentAppId || appId;
 
 		const edition = await prisma.apps.findFirst({
@@ -200,7 +195,6 @@ export async function deleteEdition(appId: string, editionId: string) {
 		const app = await prisma.apps.findFirst({ where: { id: appId, deletedAt: null } });
 		if (!app) throw new NotFoundError("App", appId);
 
-		// If current app is an edition, remove edition from parent
 		const targetParentId = app.parentAppId || appId;
 
 		const edition = await prisma.apps.findFirst({

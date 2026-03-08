@@ -54,7 +54,6 @@ const storage = multer.diskStorage({
 		const ext = path.extname(file.originalname).toLowerCase();
 		const type = req.params.type;
 
-		// Для архивов используем название приложения, если передано
 		if (type === "archives" && req.query.appName && typeof req.query.appName === "string") {
 			const appName = req.query.appName
 				.toLowerCase()
