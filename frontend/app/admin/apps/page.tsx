@@ -126,7 +126,6 @@ export default function AdminAppsPage() {
                 )}
             </div>
 
-            {/* Modals */}
             {(modalType === 'create' || modalType === 'edit') && (
                 <AppModal
                     isOpen={true}

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/src/app/hooks";
-import {useCreateReviewMutation,useGetAppBySlugQuery,useGetAppPromotionsQuery,useGetAppEditionsQuery} from "@/src/features/api/appsApi";
+import { useGetAppBySlugQuery, useGetAppPromotionsQuery, useGetAppEditionsQuery } from "@/src/features/api/appsApi";
 import { usePurchaseAppMutation } from "@/src/features/api/paymentApi";
 import { setUser } from "@/src/features/slices/authSlice";
 import ConfirmModal from "@/src/components/shared/ConfirmModal/ConfirmModal";

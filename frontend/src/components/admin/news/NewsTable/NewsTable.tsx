@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { NewsItem, TagColor } from "@/src/types/Entities";
 import t from "../../shared/_table.module.scss";
 import btns from "../../shared/_buttons.module.scss";
@@ -64,10 +65,14 @@ export default function NewsTable({ items, onEdit, onDelete }: Props) {
                         </td>
                         <td className={t.tableTd}>
                             {item.coverUrl ? (
-                                <>
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img src={item.coverUrl} alt="" style={{ width: 56, height: 36, objectFit: "cover", borderRadius: 6, border: "1px solid rgba(255,255,255,.08)" }} />
-                                </>
+                                <Image
+                                    src={item.coverUrl}
+                                    alt=""
+                                    width={56}
+                                    height={36}
+                                    unoptimized
+                                    style={{ width: 56, height: 36, objectFit: "cover", borderRadius: 6, border: "1px solid rgba(255,255,255,.08)" }}
+                                />
                             ) : (
                                 <span style={{ color: "var(--text-muted, #666)" }}>—</span>
                             )}

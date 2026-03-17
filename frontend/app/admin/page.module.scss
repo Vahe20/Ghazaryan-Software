@@ -13,8 +13,11 @@
     gap: rem(24);
     margin-bottom: rem(24);
 
-    @media (max-width: 900px) {
-        grid-template-columns: 1fr;
+    @include tablet { grid-template-columns: 1fr; }
+
+    @include mobile-s {
+        gap: rem(16);
+        margin-bottom: rem(16);
     }
 }
 

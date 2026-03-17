@@ -42,9 +42,8 @@
     backdrop-filter: blur(20px);
     transition: $transition;
 
-    @media (max-width: 768px) {
-        width: 70px;
-    }
+    @include mobile { width: 70px; }
+    @include mobile-s { width: 52px; }
 }
 
 .sidebarHeader {
@@ -60,7 +59,7 @@
     font-weight: 700;
     font-size: rem(18);
 
-    @media (max-width: 768px) {
+    @include mobile {
         justify-content: center;
 
         span {
@@ -118,6 +117,8 @@
     position: relative;
     overflow: hidden;
 
+    @include mobile-s { padding: rem(10); }
+
     &::before {
         content: '';
         position: absolute;
@@ -155,7 +156,7 @@
         }
     }
 
-    @media (max-width: 768px) {
+    @include mobile {
         justify-content: center;
         padding: rem(12);
 
@@ -171,19 +172,23 @@
 }
 
 .navTitle {
-    @media (max-width: 768px) {
-        display: none;
-    }
+    @include mobile { display: none; }
 }
 
 .mainContent {
     flex: 1;
     margin-left: 280px;
     padding: rem(32) rem(40);
+    min-width: 0;
     animation: fadeIn 0.3s ease-out;
 
-    @media (max-width: 768px) {
+    @include mobile {
         margin-left: 70px;
         padding: rem(20) rem(16);
+    }
+
+    @include mobile-s {
+        margin-left: 52px;
+        padding: rem(16) rem(12);
     }
 }

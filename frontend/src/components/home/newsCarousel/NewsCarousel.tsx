@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useGetNewsQuery } from "@/src/features/api/newsApi";
 import { NewsItem, TagColor } from "@/src/types/Entities";
@@ -21,24 +21,22 @@ const FALLBACK: NewsItem[] = [
     title: "Welcome to Ghazaryan Software",
     description: "Discover hundreds of apps, tools, and software solutions for any task.",
     link: "/apps",
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    coverUrl: "",
+    publishedAt: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
 ];
 
 export function NewsCarousel() {
-  const [items, setItems] = useState<NewsItem[]>([]);
   const [current, setCurrent] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const { data, isLoading } = useGetNewsQuery({ limit: 10 });
 
-  useEffect(() => {
-    if (data?.news && data.news.length > 0) {
-      setItems(data.news);
-    } else if (!isLoading) {
-      setItems(FALLBACK);
-    }
+  const items = useMemo(() => {
+    if (data?.news && data.news.length > 0) return data.news;
+    if (!isLoading) return FALLBACK;
+    return [];
   }, [data, isLoading]);
 
   const total = items.length;
@@ -78,7 +76,6 @@ export function NewsCarousel() {
 
   return (
     <section className={style.carousel}>
-      {}
       <div className={style.bg}>
         {news.coverUrl && (
           <div

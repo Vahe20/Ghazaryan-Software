@@ -6,7 +6,7 @@
     padding: rem(40) rem(24);
     animation: pageEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 
-    @media (max-width: 768px) {
+    @include mobile {
         padding: rem(24) rem(16);
     }
 }
@@ -16,7 +16,7 @@
     margin-bottom: rem(48);
     animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
 
-    @media (max-width: 768px) {
+    @include mobile {
         margin-bottom: rem(32);
     }
 }
@@ -29,7 +29,7 @@
     letter-spacing: rem(-1.5);
     animation: slideInLeft 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
 
-    @media (max-width: 768px) {
+    @include mobile {
         font-size: rem(32);
     }
 }
@@ -49,7 +49,7 @@
     margin: 0;
     animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
 
-    @media (max-width: 768px) {
+    @include mobile {
         font-size: rem(16);
     }
 }
@@ -61,7 +61,7 @@
     align-items: start;
     animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
 
-    @media (max-width: 1024px) {
+    @include tablet {
         grid-template-columns: 1fr;
     }
 }

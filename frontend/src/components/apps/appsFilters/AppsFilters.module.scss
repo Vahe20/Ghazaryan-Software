@@ -36,7 +36,7 @@
         }
     }
 
-    @media (max-width: 1024px) {
+    @include tablet {
         position: static;
         margin-bottom: rem(24);
         animation: fadeInDown 0.35s ease;

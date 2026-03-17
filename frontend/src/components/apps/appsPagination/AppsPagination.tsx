@@ -4,17 +4,6 @@ import { memo, useCallback, useMemo } from "react";
 import { usePrefetch } from "@/src/features/api/appsApi";
 import style from "./AppsPagination.module.scss";
 
-interface GetAppsParams {
-	page?: number;
-	limit?: number;
-	search?: string;
-	categoryId?: string;
-	sortBy?: string;
-	order?: "asc" | "desc";
-	platform?: string;
-	status?: string;
-}
-
 interface AppsPaginationProps {
     totalPages: number;
     currentPage: number;
@@ -115,26 +104,5 @@ export const AppsPagination = memo(function AppsPagination({
                 </svg>
             </button>
         </div>
-    );
-});
-
-const PageButton = memo(function PageButton({
-    page,
-    isActive,
-    onClick,
-}: {
-    page: number;
-    isActive: boolean;
-    onClick: (page: number) => void;
-    preFetchApps: (options: GetAppsParams) => void
-}) {
-    const handleClick = useCallback(() => onClick(page), [onClick, page]);
-    return (
-        <button
-            onClick={handleClick}
-            className={`${style.pageButton} ${isActive ? style.active : ""}`}
-        >
-            {page}
-        </button>
     );
 });

@@ -1,4 +1,3 @@
-import { User } from '@/src/types/Entities';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppDispatch } from '@/src/app/hooks';
@@ -19,11 +18,7 @@ interface DeleteFormData {
     confirmation: string;
 }
 
-interface AccountSettingsProps {
-    user: User;
-}
-
-export default function AccountSettings({ user }: AccountSettingsProps) {
+export default function AccountSettings() {
     const dispatch = useAppDispatch();
     const [passwordSuccess, setPasswordSuccess] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);

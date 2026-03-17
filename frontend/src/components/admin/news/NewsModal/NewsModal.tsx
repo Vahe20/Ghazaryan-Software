@@ -70,11 +70,9 @@ export default function NewsModal({ isOpen, item, onClose, onSaved }: Props) {
     const loading = creating || updating || uploadingCover;
     const apiError = createError || updateError;
 
-    const { register, handleSubmit, control, reset, watch, formState: { errors } } = useForm<FormData>({
+    const { register, handleSubmit, control, reset, formState: { errors } } = useForm<FormData>({
         defaultValues: item ? itemToForm(item) : EMPTY,
     });
-
-    const tagColor = watch("tagColor");
 
     useEffect(() => {
         reset(item ? itemToForm(item) : EMPTY);
@@ -109,7 +107,7 @@ export default function NewsModal({ isOpen, item, onClose, onSaved }: Props) {
             tagColor: data.tagColor,
             link: data.link || null,
             coverUrl: coverUrl || null,
-            publishedAt: new Date(data.publishedAt).toISOString(),
+            publishedAt: new Date(data.publishedAt),
         };
 
         try {

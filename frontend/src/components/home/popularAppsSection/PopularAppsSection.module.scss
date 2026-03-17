@@ -124,7 +124,7 @@
 
     > a { height: 100%; }
 
-    @media (max-width: 480px) { flex: 0 0 85vw; }
+    @include mobile-s { flex: 0 0 85vw; }
 }
 
 .fadeLeft,
@@ -160,7 +160,7 @@
         &:nth-child(#{$i}) { animation-delay: #{$i * 0.08}s; }
     }
 
-    @media (max-width: 480px) { flex: 0 0 85vw; }
+    @include mobile-s { flex: 0 0 85vw; }
 }
 
 .empty {

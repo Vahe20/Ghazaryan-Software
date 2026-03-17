@@ -48,7 +48,7 @@
         box-shadow: $shadow-xl, 0 0 0 1px rgba($primary, 0.08);
     }
 
-    @media (max-width: 768px) {
+    @include mobile {
         flex-direction: column;
         text-align: center;
         padding: rem(32) rem(24);
@@ -130,38 +130,11 @@
     animation: countUp 0.5s ease 0.2s both;
 }
 
-.changeAvatarBtn {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: rem(38);
-    height: rem(38);
-    border-radius: 50%;
-    background: $primary;
-    border: 3px solid $background-tertiary;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background $transition, transform $transition-fast, box-shadow $transition;
-    box-shadow: $shadow-md;
-    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
-
-    &:hover {
-        background: $primary-hover;
-        transform: scale(1.15) rotate(15deg);
-        box-shadow: 0 4px 16px rgba($primary, 0.4);
-    }
-
-    &:active { transform: scale(0.95); }
-}
-
 .userInfo {
     flex: 1;
     animation: slideInLeft 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
 
-    @media (max-width: 768px) {
+    @include mobile {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -180,7 +153,7 @@
     background-clip: text;
     animation: gradientShift 6s ease infinite;
 
-    @media (max-width: 768px) { font-size: rem(28); }
+    @include mobile { font-size: rem(28); }
 }
 
 .userEmail {

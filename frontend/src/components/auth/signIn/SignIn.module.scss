@@ -130,28 +130,6 @@
     }
 }
 
-.options {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-bottom: rem(24);
-    font-size: rem(14);
-    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
-}
-
-.forgotLink {
-    color: $primary;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: rem(13);
-    transition: all $transition;
-
-    &:hover {
-        color: $primary-hover;
-        text-decoration: underline;
-    }
-}
-
 .submitBtn {
     width: 100%;
     padding: rem(16) rem(24);

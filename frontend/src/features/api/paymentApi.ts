@@ -1,11 +1,6 @@
 import { api } from "./baseApi";
 import type { Purchase } from "@/src/types/Entities";
 
-interface TopUpResponse {
-    message: string;
-    balance: number;
-}
-
 interface PurchaseResponse {
     message: string;
     purchase: Purchase;

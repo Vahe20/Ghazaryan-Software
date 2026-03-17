@@ -90,7 +90,7 @@ const TopUpModal = memo(function TopUpModal({ user, isOpen, onClose }: TopUpModa
                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
                     <path d="M12 16v-4m0-4h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
-                <span>You'll be redirected to Stripe to complete your payment securely.</span>
+                <span>You&apos;ll be redirected to Stripe to complete your payment securely.</span>
             </div>
         </BaseModal>
     );

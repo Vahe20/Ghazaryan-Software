@@ -80,7 +80,7 @@ function ProfileContent() {
                     onTopUpClick={() => setShowTopUpModal(true)} 
                 />
                 
-                <AccountSettings user={user} />
+                <AccountSettings />
             </div>
 
             <TopUpModal 

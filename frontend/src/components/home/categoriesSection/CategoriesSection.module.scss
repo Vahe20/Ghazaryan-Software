@@ -43,9 +43,9 @@
     grid-template-columns: repeat(4, 1fr);
     gap: rem(16);
 
-    @media (max-width: 1024px) { grid-template-columns: repeat(3, 1fr); }
-    @media (max-width: 640px)  { grid-template-columns: repeat(2, 1fr); }
-    @media (max-width: 360px)  { grid-template-columns: 1fr; }
+    @include tablet { grid-template-columns: repeat(3, 1fr); }
+    @include mobile { grid-template-columns: repeat(2, 1fr); }
+    @include mobile-s { grid-template-columns: 1fr; }
 }
 
 .card {

@@ -6,14 +6,14 @@ import { useGetCategoriesQuery } from "@/src/features/api/categoriesApi";
 import style from "./CategoriesSection.module.scss";
 
 const GRADIENTS = [
-    ["
-    ["
-    ["
-    ["
-    ["
-    ["
-    ["
-    ["
+    ["#0084ff", "#00c6ff"],
+    ["#ff006e", "#ff6b6b"],
+    ["#7c3aed", "#a855f7"],
+    ["#00ba88", "#34d399"],
+    ["#f59e0b", "#fbbf24"],
+    ["#ef4444", "#f97316"],
+    ["#06b6d4", "#0ea5e9"],
+    ["#8b5cf6", "#ec4899"],
 ];
 
 const ICONS = [

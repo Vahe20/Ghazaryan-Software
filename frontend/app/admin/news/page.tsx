@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { NewsItem } from "@/src/types/Entities";
-import { useGetNewsQuery, useDeleteNewsMutation } from "@/src/features/api/newsApi";
+import { useGetNewsQuery } from "@/src/features/api/newsApi";
 import NewsTable from "@/src/components/admin/news/NewsTable/NewsTable";
 import NewsModal from "@/src/components/admin/news/NewsModal/NewsModal";
 import DeleteNewsModal from "@/src/components/admin/news/DeleteNewsModal/DeleteNewsModal";

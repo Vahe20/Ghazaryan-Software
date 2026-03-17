@@ -7,8 +7,6 @@ import { formatDate } from "@/src/lib/utils";
 import s from "./UsersTable.module.scss";
 import table from "../../shared/_table.module.scss";
 import btns from "../../shared/_buttons.module.scss";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 interface UsersTableProps {
     users: AdminUser[];
@@ -17,8 +15,6 @@ interface UsersTableProps {
 }
 
 export default function UsersTable({ users, onEditRole, onDelete }: UsersTableProps) {
-    const router = useRouter();
-
     return (
         <table className={table.table}>
             <thead>

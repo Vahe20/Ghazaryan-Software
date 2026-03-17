@@ -6,7 +6,7 @@
     grid-template-columns: 1fr 1fr;
     gap: rem(16);
 
-    @media (max-width: 600px) { grid-template-columns: 1fr; }
+    @include mobile-s { grid-template-columns: 1fr; }
 }
 
 .formGroup {

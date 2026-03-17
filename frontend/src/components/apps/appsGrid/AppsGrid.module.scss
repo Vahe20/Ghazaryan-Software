@@ -6,7 +6,7 @@
     gap: rem(24);
     margin-bottom: rem(40);
 
-    @media (max-width: 768px) {
+    @include mobile {
         grid-template-columns: 1fr;
         gap: rem(16);
     }

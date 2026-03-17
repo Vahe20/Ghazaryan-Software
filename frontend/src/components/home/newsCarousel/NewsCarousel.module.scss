@@ -12,7 +12,7 @@
     justify-content: center;
     animation: fadeIn 0.6s ease both;
 
-    @media (max-width: 768px) {
+    @include mobile {
         margin: rem(16);
         min-height: rem(300);
     }
@@ -79,7 +79,7 @@
     text-align: center;
     transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 
-    @media (max-width: 768px) {
+    @include mobile {
         padding: rem(40) rem(16) rem(70);
     }
 }
@@ -140,7 +140,7 @@
     letter-spacing: -1.5px;
     animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
 
-    @media (max-width: 768px) {
+    @include mobile {
         font-size: rem(30);
         letter-spacing: -0.5px;
     }
@@ -154,7 +154,7 @@
     max-width: rem(580);
     animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.13s both;
 
-    @media (max-width: 768px) {
+    @include mobile {
         font-size: rem(15);
     }
 }

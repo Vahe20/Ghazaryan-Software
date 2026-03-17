@@ -118,7 +118,7 @@
     letter-spacing: 1px;
 }
 
-@media (max-width: 640px) {
+@include mobile-s {
     .pagination { gap: rem(6); }
 
     .navButton {

@@ -75,7 +75,7 @@
         box-shadow: $shadow-xl, 0 0 50px rgba($primary, 0.08);
     }
 
-    @media (max-width: 640px) {
+    @include mobile-s {
         padding: rem(32) rem(24);
     }
 }
@@ -110,7 +110,7 @@
     margin: 0 0 rem(10) 0;
     letter-spacing: -1px;
 
-    @media (max-width: 640px) { font-size: rem(26); }
+    @include mobile-s { font-size: rem(26); }
 }
 
 .subtitle {

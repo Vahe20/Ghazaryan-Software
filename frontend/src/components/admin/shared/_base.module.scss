@@ -14,6 +14,8 @@
     gap: rem(16);
     margin-bottom: rem(32);
     flex-wrap: wrap;
+
+    @include mobile-s { margin-bottom: rem(20); }
 }
 
 .pageTitle {
@@ -33,10 +35,15 @@
 
 .toolbar {
     display: flex;
-    gap: rem(12);
-    margin-bottom: rem(24);
+    gap: rem(10);
+    margin-bottom: rem(20);
     flex-wrap: wrap;
     align-items: center;
+
+    @include mobile-s {
+        gap: rem(8);
+        margin-bottom: rem(16);
+    }
 }
 
 .searchBox {
@@ -89,8 +96,11 @@
     background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8d91' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right rem(12) center;
+    max-width: 100%;
 
     &:focus { outline: none; border-color: $primary; }
+
+    @include mobile-s { width: 100%; }
 }
 
 

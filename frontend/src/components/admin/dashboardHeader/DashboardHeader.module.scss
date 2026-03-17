@@ -7,7 +7,7 @@
     margin-bottom: rem(32);
     animation: fadeInDown 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 
-    @media (max-width: 768px) {
+    @include mobile {
         flex-direction: column;
         align-items: flex-start;
         gap: rem(16);
@@ -25,7 +25,7 @@
     background-clip: text;
     animation: gradientShift 6s ease infinite;
 
-    @media (max-width: 768px) { font-size: rem(24); }
+    @include mobile { font-size: rem(24); }
 }
 
 .refreshBtn {

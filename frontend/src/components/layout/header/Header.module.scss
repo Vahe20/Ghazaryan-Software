@@ -33,7 +33,7 @@
     max-width: 1400px;
     margin: 0 auto;
 
-    @media (max-width: 768px) {
+    @include mobile {
         gap: rem(16);
         padding-inline: rem(16);
     }
@@ -67,7 +67,7 @@
             filter: brightness(1.2);
         }
 
-        @media (max-width: 768px) {
+        @include mobile {
             font-size: rem(18);
         }
     }

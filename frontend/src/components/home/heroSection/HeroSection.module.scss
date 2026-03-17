@@ -17,7 +17,7 @@
         box-shadow: 0 0 60px rgba($primary, 0.06);
     }
 
-    @media (max-width: 768px) {
+    @include mobile {
         padding: rem(60) rem(16) rem(48);
         margin: rem(16);
     }
@@ -132,7 +132,7 @@
     line-height: 1.1;
     letter-spacing: -2px;
 
-    @media (max-width: 768px) {
+    @include mobile {
         font-size: rem(40);
         letter-spacing: -1px;
     }
@@ -166,7 +166,7 @@
     line-height: 1.6;
     animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
 
-    @media (max-width: 768px) { font-size: rem(16); }
+    @include mobile { font-size: rem(16); }
 }
 
 .hero__userName {
@@ -270,7 +270,7 @@
         box-shadow: $shadow-md;
     }
 
-    @media (max-width: 480px) {
+    @include mobile-s {
         gap: rem(20);
         padding: rem(16) rem(24);
     }
@@ -297,7 +297,7 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
 
-    @media (max-width: 480px) { font-size: rem(18); }
+    @include mobile-s { font-size: rem(18); }
 }
 
 .hero__statLabel {

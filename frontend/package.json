@@ -10,22 +10,22 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.2",
-    "axios": "^1.13.3",
-    "next": "16.1.4",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "react-hook-form": "^7.71.1",
+    "axios": "^1.13.6",
+    "next": "16.1.7",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-hook-form": "^7.71.2",
     "react-modal": "^3.16.3",
     "react-redux": "^9.2.0",
-    "sass": "^1.97.3"
+    "sass": "^1.98.0"
   },
   "devDependencies": {
-    "@types/node": "^20.19.34",
+    "@types/node": "^25.5.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-modal": "^3.16.3",
-    "eslint": "^9",
-    "eslint-config-next": "16.1.4",
-    "typescript": "^5"
+    "eslint": "^10",
+    "eslint-config-next": "16.1.7",
+    "typescript": "^5.9.3"
   }
 }

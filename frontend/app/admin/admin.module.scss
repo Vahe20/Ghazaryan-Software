@@ -13,6 +13,8 @@
     gap: rem(16);
     margin-bottom: rem(32);
     flex-wrap: wrap;
+
+    @include mobile-s { margin-bottom: rem(20); }
 }
 
 .pageTitle {
@@ -21,6 +23,8 @@
     color: $text-primary;
     margin: 0 0 rem(4);
     letter-spacing: -0.5px;
+
+    @include mobile-s { font-size: rem(22); }
 }
 
 .pageSubtitle {
@@ -33,7 +37,8 @@
     background: $background-card;
     border: 1px solid $border-color;
     border-radius: $radius-lg;
-    overflow: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .loading,

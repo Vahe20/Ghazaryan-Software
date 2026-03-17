@@ -4,7 +4,8 @@
     background: $background-card;
     border: 1px solid $border-color;
     border-radius: $radius-lg;
-    overflow: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .table {

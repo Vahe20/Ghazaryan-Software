@@ -72,7 +72,7 @@
     transform: translateY(0);
   }
 
-  @media (max-width: 640px) {
+  @include mobile-s {
     padding: rem(10) rem(16);
 
     span {
@@ -86,7 +86,7 @@
   align-items: center;
   gap: rem(12);
 
-  @media (max-width: 640px) {
+  @include mobile-s {
     gap: rem(8);
   }
 }
@@ -109,7 +109,7 @@
     box-shadow: $shadow-sm;
   }
 
-  @media (max-width: 640px) {
+  @include mobile-s {
     padding: rem(6) rem(10);
     gap: rem(8);
   }
@@ -145,7 +145,7 @@
     scale: 1.1;
   }
 
-  @media (max-width: 640px) {
+  @include mobile-s {
     width: rem(32);
     height: rem(32);
 
@@ -165,7 +165,7 @@
   flex-direction: column;
   gap: rem(4);
 
-  @media (max-width: 640px) {
+  @include mobile-s {
     display: none;
   }
 }
@@ -264,7 +264,7 @@
     cursor: not-allowed;
   }
 
-  @media (max-width: 640px) {
+  @include mobile-s {
     padding: rem(10) rem(12);
 
     span {

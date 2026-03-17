@@ -138,7 +138,7 @@ export const appsApi = api.injectEndpoints({
         }),
 
         updateReview: builder.mutation<Review, { reviewId: string; appId: string; rating?: number; title?: string; comment?: string }>({
-            query: ({ reviewId, appId: _appId, ...data }) => ({ url: `/reviews/${reviewId}`, method: "PATCH", body: data }),
+            query: ({ reviewId, ...data }) => ({ url: `/reviews/${reviewId}`, method: "PATCH", body: data }),
             invalidatesTags: (_, __, { appId }) => [{ type: "Reviews", id: appId }],
         }),
 
