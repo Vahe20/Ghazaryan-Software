@@ -47,7 +47,7 @@ export default function ConfirmModal({
                 </svg>
             </div>
             <h3 className={s.title}>{title}</h3>
-            <p className={s.desc}>{description}</p>
+            <div className={s.desc}>{description}</div>
             {error && <div className={s.error}>{error}</div>}
             <div className={s.actions}>
                 <button className={btns.btnSecondary} onClick={onClose} disabled={loading}>
