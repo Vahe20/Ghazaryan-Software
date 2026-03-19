@@ -54,7 +54,7 @@ export default function ConfirmModal({
                     {cancelLabel}
                 </button>
                 <button className={btns.btnDanger} onClick={onConfirm} disabled={loading} style={{ padding: "10px 24px" }}>
-                    {loading ? "Deleting..." : confirmLabel}
+                    {loading ? `${confirmLabel}...` : confirmLabel}
                 </button>
             </div>
         </ReactModal>

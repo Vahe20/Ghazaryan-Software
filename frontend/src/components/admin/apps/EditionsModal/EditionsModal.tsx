@@ -154,7 +154,9 @@ export default function EditionsModal({ isOpen, app, onClose }: EditionsModalPro
         if (!confirm("Delete this edition? This action cannot be undone.")) return;
         try {
             await deleteEdition({ appId: app.id, editionId }).unwrap();
-        } catch { }
+        } catch (err) {
+            console.error('Failed to delete edition:', err);
+        }
     };
 
     const handleCancel = () => {

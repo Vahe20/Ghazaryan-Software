@@ -17,7 +17,9 @@ export default function DeleteUserModal({ isOpen, user, onClose, onDeleted }: De
         try {
             await deleteUser(user.id).unwrap();
             onDeleted();
-        } catch {}
+        } catch (err) {
+            console.error('Failed to delete user:', err);
+        }
     };
 
     const getErrorMessage = (error: FetchBaseQueryError | SerializedError | undefined): string | null => {

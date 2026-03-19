@@ -19,7 +19,9 @@ export default function DeleteAppModal({ isOpen, app, onClose, onDeleted }: Dele
         try {
             await deleteApp(app.id).unwrap();
             onDeleted();
-        } catch {}
+        } catch (err) {
+            console.error('Failed to delete app:', err);
+        }
     };
 
     const getErrorMessage = (error: FetchBaseQueryError | SerializedError | undefined): string | null => {

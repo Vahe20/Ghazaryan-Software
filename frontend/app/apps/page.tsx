@@ -1,9 +1,7 @@
 "use client";
 
 import { Suspense, useCallback, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { AppsFilters, AppsFiltersState } from "@/src/components/apps/appsFilters/AppsFilters";
-import type { PlatformType, StatusType } from "@/src/types/Entities";
 import { AppsGrid } from "@/src/components/apps/appsGrid/AppsGrid";
 import { AppsPagination } from "@/src/components/apps/appsPagination/AppsPagination";
 import { useDebounce } from "@/src/hooks/useDebounce";
@@ -20,23 +18,15 @@ export default function AppsPage() {
 }
 
 function AppsPageContent() {
-  const searchParams = useSearchParams();
-
   const { currentPage, goToPage, resetPage } = usePagination(1);
 
-  const platformParam = searchParams.get("platform");
-  const statusParam = searchParams.get("status");
-
-  const platform = isPlatformType(platformParam) ? platformParam : "";
-  const status = isStatusType(statusParam) ? statusParam : "";
-
   const [filters, setFilters] = useState<AppsFiltersState>({
-    searchQuery: searchParams.get("search") ?? "",
-    sortBy: (searchParams.get("sortBy") as AppsFiltersState["sortBy"]) ?? "downloadCount",
-    order: (searchParams.get("order") as "asc" | "desc") ?? "desc",
-    categoryId: searchParams.get("categoryId") ?? "",
-    platform,
-    status,
+    searchQuery: "",
+    sortBy: "downloadCount",
+    order: "desc",
+    categoryId: "",
+    platform: "",
+    status: "",
   });
 
   const debouncedSearch = useDebounce(filters.searchQuery, 400);
@@ -106,12 +96,3 @@ function AppsPageFallback() {
     </div>
   );
 }
-
-const PLATFORM_VALUES: PlatformType[] = ["WINDOWS", "MAC", "LINUX", "ANDROID", "IOS"];
-const STATUS_VALUES: StatusType[] = ["BETA", "RELEASE"];
-
-const isPlatformType = (value: string | null): value is PlatformType =>
-  value !== null && PLATFORM_VALUES.includes(value as PlatformType);
-
-const isStatusType = (value: string | null): value is StatusType =>
-  value !== null && STATUS_VALUES.includes(value as StatusType);

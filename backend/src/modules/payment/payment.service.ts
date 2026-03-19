@@ -96,6 +96,20 @@ export async function purchaseApp(userId: string, appId: string) {
 	}
 }
 
+export async function checkAppPurchase(userId: string, appId: string): Promise<boolean> {
+	try {
+		const purchase = await prisma.purchases.findUnique({
+			where: { userId_appId: { userId, appId } },
+			select: { id: true, status: true },
+		});
+
+		return purchase?.status === "COMPLETED";
+	} catch (error) {
+		console.error("checkAppPurchase error:", error);
+		return false;
+	}
+}
+
 export async function getPaymentHistory(userId: string) {
 	try {
 		const purchases = await prisma.purchases.findMany({

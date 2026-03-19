@@ -23,7 +23,7 @@ export const AppCard: React.FC<Props> = memo(({ app }) => {
         : app.platform ? [app.platform] : [];
 
     return (
-        <Link href={`/apps/${app.slug}`} className={style.card}>
+        <Link href={app.slug ? `/apps/${app.slug}` : '/apps'} className={style.card}>
             <div className={style.glow} />
             <div className={style.coverWrap}>
                 {app.coverUrl

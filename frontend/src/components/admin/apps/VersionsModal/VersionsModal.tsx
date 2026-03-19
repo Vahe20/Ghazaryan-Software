@@ -62,7 +62,9 @@ export default function VersionsModal({ isOpen, app, onClose }: VersionsModalPro
             }).unwrap();
             reset(EMPTY_FORM);
             setShowForm(false);
-        } catch { }
+        } catch (err) {
+            console.error('Failed to create version:', err);
+        }
     };
 
     const handleCancel = () => {

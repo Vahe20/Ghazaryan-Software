@@ -20,7 +20,9 @@ export default function DeleteCategoryModal({ isOpen, item, onClose, onDeleted }
         try {
             await deleteCategory(item.id).unwrap();
             onDeleted();
-        } catch {}
+        } catch (err) {
+            console.error('Failed to delete category:', err);
+        }
     };
 
     const getErrorMessage = (error: FetchBaseQueryError | SerializedError | undefined): string | null => {

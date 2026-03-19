@@ -19,7 +19,9 @@ export default function DeleteNewsModal({ isOpen, item, onClose, onDeleted }: Pr
         try {
             await deleteNews(item.id).unwrap();
             onDeleted();
-        } catch {}
+        } catch (err) {
+            console.error('Failed to delete news:', err);
+        }
     };
 
     const getErrorMessage = (error: FetchBaseQueryError | SerializedError | undefined): string | null => {

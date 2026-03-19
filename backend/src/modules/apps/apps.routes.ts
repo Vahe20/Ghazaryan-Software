@@ -28,7 +28,7 @@ router.get("/slug/:slug", readLimiter, appsController.getAppBySlug);
 
 router.get("/:id", readLimiter, appsController.getAppById);
 
-router.post("/:id/download", downloadLimiter, appsController.downloadApp);
+router.post("/:id/download", downloadLimiter, authMiddleware, appsController.downloadApp);
 
 router.post(
 	"/",

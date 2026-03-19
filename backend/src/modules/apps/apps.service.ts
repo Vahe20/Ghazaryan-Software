@@ -6,6 +6,7 @@ import type { DownloadMetadata, Platform, AppStatus } from "../../types/index.js
 import { NotFoundError, ConflictError, DatabaseError } from "../../utils/errors.js";
 import { appRepository } from "../../repositories/app.repository.js";
 import { prisma } from "../../config/prisma.js";
+import * as paymentService from "../payment/payment.service.js";
 
 export async function getAllApps(query: GetAppsQuery) {
 	try {
@@ -172,6 +173,11 @@ export async function getVersions(appId: string) {
 		throw new DatabaseError("Failed to fetch versions", error);
 	}
 }
+
+export async function checkAppPurchase(userId: string, appId: string): Promise<boolean> {
+	return paymentService.checkAppPurchase(userId, appId);
+}
+
 export async function getAppById(id: string) {
 	try {
 		const cacheKey = `app:${id}`;

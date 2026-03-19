@@ -28,7 +28,9 @@ export default function RoleModal({ isOpen, user, onClose, onSaved }: RoleModalP
         try {
             await updateUserRole({ userId: user.id, role }).unwrap();
             onSaved();
-        } catch {}
+        } catch (err) {
+            console.error('Failed to update role:', err);
+        }
     };
 
     const getErrorMessage = (error: FetchBaseQueryError | SerializedError | undefined): string | null => {

@@ -83,7 +83,9 @@ export default function PromotionsModal({ isOpen, app, onClose }: PromotionsModa
             reset(EMPTY_FORM);
             setEditingPromotion(null);
             setShowForm(false);
-        } catch { }
+        } catch (err) {
+            console.error('Failed to save promotion:', err);
+        }
     };
 
     const handleEdit = (promotion: AppPromotion) => {
@@ -103,7 +105,9 @@ export default function PromotionsModal({ isOpen, app, onClose }: PromotionsModa
         if (!confirm("Delete this promotion? This action cannot be undone.")) return;
         try {
             await deletePromotion({ appId: app.id, promotionId }).unwrap();
-        } catch { }
+        } catch (err) {
+            console.error('Failed to delete promotion:', err);
+        }
     };
 
     const handleCancel = () => {
