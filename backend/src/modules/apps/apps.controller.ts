@@ -130,7 +130,11 @@ export const downloadApp = asyncHandler(async (req: AuthRequest, res: Response) 
 
 	// Verify purchase for paid apps
 	const app = await appsService.getAppById(id);
-	if (app.price > 0) {
+	if (!app) {
+		throw new NotFoundError("App", id);
+	}
+
+	if (app.price.gt(0)) {
 		const hasPurchase = await appsService.checkAppPurchase(userId, id);
 		if (!hasPurchase) {
 			throw ApiError.forbidden("You must purchase this app to download it");
