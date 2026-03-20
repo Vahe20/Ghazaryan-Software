@@ -221,6 +221,12 @@
     color: $warning;
 }
 
+.hero__status_removed {
+    background: rgba($error, 0.18);
+    border: 1px solid rgba($error, 0.35);
+    color: $error;
+}
+
 .hero__desc {
     font-size: rem(14);
     color: $text-secondary;

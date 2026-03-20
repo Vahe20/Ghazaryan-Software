@@ -456,7 +456,6 @@ export async function getUserLibrary(userId: string, query: GetAppsQuery) {
 
 		interface LibraryWhereCondition {
 			id: { in: string[] };
-			deletedAt: null;
 			OR?: Array<{
 				name?: { contains: string; mode: "insensitive" };
 				shortDesc?: { contains: string; mode: "insensitive" };
@@ -467,7 +466,6 @@ export async function getUserLibrary(userId: string, query: GetAppsQuery) {
 
 		const where: LibraryWhereCondition = {
 			id: { in: appIds },
-			deletedAt: null,
 		};
 
 		if (search) {

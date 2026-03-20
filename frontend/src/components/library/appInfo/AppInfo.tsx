@@ -164,6 +164,11 @@ export const AppInfo = () => {
                             <span className={`${style.hero__status} ${app.status === "BETA" ? style.hero__status_beta : style.hero__status_release}`}>
                                 {app.status === "BETA" ? "Beta" : "Release"}
                             </span>
+                            {app.deletedAt && (
+                                <span className={`${style.hero__status} ${style.hero__status_removed}`}>
+                                    Removed from store
+                                </span>
+                            )}
                         </div>
 
                         {app.shortDesc && <p className={style.hero__desc}>{app.shortDesc}</p>}
@@ -264,7 +269,7 @@ export const AppInfo = () => {
                         Docs
                     </a>
                 )}
-                {app.slug && (
+                {app.slug && !app.deletedAt && (
                     <Link href={app.slug ? `/apps/${app.slug}` : '/apps'} className={style.btn}>
                         <svg viewBox="0 0 24 24" fill="none">
                             <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8"/>

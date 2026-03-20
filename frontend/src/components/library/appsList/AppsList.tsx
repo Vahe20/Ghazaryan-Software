@@ -136,6 +136,9 @@ export const AppsList = () => {
                                                 {(app.size / 1024 / 1024).toFixed(1)} MB
                                             </span>
                                         )}
+                                        {app.deletedAt && (
+                                            <span className={style.card__removed}>Removed</span>
+                                        )}
                                     </div>
                                 </div>
                                 {isActive && <div className={style.card__dot} aria-hidden />}

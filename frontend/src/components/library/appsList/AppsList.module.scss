@@ -240,6 +240,17 @@
     &::before { content: '·'; margin-right: rem(6); }
 }
 
+.card__removed {
+    font-size: rem(10);
+    font-weight: 700;
+    color: $error;
+    background: rgba($error, 0.12);
+    border: 1px solid rgba($error, 0.25);
+    border-radius: $radius-full;
+    padding: rem(1) rem(6);
+    margin-left: rem(4);
+}
+
 .card__dot {
     width: rem(6);
     height: rem(6);
