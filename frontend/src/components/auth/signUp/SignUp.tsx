@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useAppDispatch } from "@/src/app/hooks";
 import { useRegisterMutation } from "@/src/features/api/authApi";
@@ -155,7 +156,7 @@ export const SignUp = () => {
                     {...register("agreeToTerms", { required: "You must agree to the terms and conditions" })}
                 />
                 <span>
-                    I agree to the <a href="/terms">Terms and Conditions</a>
+                    I agree to the <Link href="/terms">Terms and Conditions</Link>
                 </span>
             </label>
             {errors.agreeToTerms && <span className={style.error}>{errors.agreeToTerms.message}</span>}

@@ -5,6 +5,7 @@ import { useChangePasswordMutation, useDeleteAccountMutation } from '@/src/featu
 import { logout } from '@/src/features/slices/authSlice';
 import { extractErrorMessage } from '@/src/lib/utils';
 import BaseModal from '@/src/components/shared/BaseModal/BaseModal';
+import { useRouter } from 'next/navigation';
 import style from './AccountSettings.module.scss';
 
 interface PasswordFormData {
@@ -20,6 +21,7 @@ interface DeleteFormData {
 
 export default function AccountSettings() {
     const dispatch = useAppDispatch();
+    const router = useRouter();
     const [passwordSuccess, setPasswordSuccess] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [changePassword, { isLoading: passwordLoading, error: passwordError }] = useChangePasswordMutation();
@@ -63,9 +65,15 @@ export default function AccountSettings() {
         try {
             await deleteAccount({ password: data.password }).unwrap();
             dispatch(logout());
+            router.replace('/auth');
         } catch {
         }
     };
+
+    const onLogout = () => {
+        dispatch(logout());
+        router.replace('/auth');
+    }
 
     const handleCloseDeleteModal = () => {
         setShowDeleteModal(false);
@@ -150,7 +158,7 @@ export default function AccountSettings() {
                 </div>
 
                 <div className={style.actions}>
-                    <button className={style.logoutBtn} onClick={() => dispatch(logout())}>
+                    <button className={style.logoutBtn} onClick={() => onLogout()}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                             <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                             <path d="M16 17L21 12L16 7M21 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

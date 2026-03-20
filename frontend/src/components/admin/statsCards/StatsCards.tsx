@@ -4,9 +4,7 @@ import style from "./StatsCards.module.scss";
 interface StatCard {
     title: string;
     value: string;
-    change: string;
     icon: React.ReactNode;
-    trend: string;
 }
 
 interface StatsCardsProps {
@@ -28,7 +26,6 @@ const StatCardItem = memo(function StatCardItem({ stat }: { stat: StatCard }) {
         <div className={style.statCard}>
             <div className={style.statHeader}>
                 <div className={style.statIcon}>{stat.icon}</div>
-                <span className={`${style.statChange} ${style[stat.trend]}`}>{stat.change}</span>
             </div>
             <div className={style.statBody}>
                 <p className={style.statTitle}>{stat.title}</p>

@@ -1,0 +1,53 @@
+@use "../../../src/styles/helpers/"as *;
+
+.activityList {
+    display: flex;
+    flex-direction: column;
+    gap: rem(12);
+}
+
+.activityItem {
+    display: flex;
+    gap: rem(12);
+    padding: rem(14);
+    background: $background-tertiary;
+    border: 1px solid $border-color-light;
+    border-radius: $radius-md;
+    transition: $transition;
+
+    &:hover {
+        background: $background-secondary;
+        border-color: $border-color;
+    }
+}
+
+.activityIcon {
+    width: rem(36);
+    height: rem(36);
+    border-radius: 50%;
+    background: $background-card;
+    border: 1px solid $border-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary;
+    flex-shrink: 0;
+}
+
+.activityContent {
+    flex: 1;
+    min-width: 0;
+}
+
+.activityText {
+    margin: 0 0 rem(4) 0;
+    color: $text-primary;
+    font-size: rem(14);
+    line-height: 1.4;
+}
+
+.activityTime {
+    margin: 0;
+    color: $text-tertiary;
+    font-size: rem(12);
+}
