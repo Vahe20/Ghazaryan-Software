@@ -14,16 +14,16 @@ export default function AdminLayout({
 }) {
     const pathname = usePathname();
     const user = useAppSelector(s => s.auth.user);
-    const loading = useAppSelector(s => s.auth.loading);
+    const isInitialized = useAppSelector(s => s.auth.isInitialized);
     const router = useRouter();
 
     useEffect(() => {
-        if (!loading && (!user || user.role !== 'ADMIN')) {
+        if (isInitialized && (!user || user.role !== 'ADMIN')) {
             router.push('/');
         }
-    }, [user, loading, router]);
+    }, [isInitialized, user, router]);
 
-    if (loading) {
+    if (!isInitialized) {
         return (
             <div className={style.loadingContainer}>
                 <div className={style.loader}></div>

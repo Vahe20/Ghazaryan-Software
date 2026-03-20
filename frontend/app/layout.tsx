@@ -14,16 +14,16 @@ export default function RootLayout({
         <title>Ghazaryan SoftWare</title>
         <meta name="description" content="my application" />
       </head>
-      <ReduxProvider>
-        <AuthInitializer>
-          <body className="container">
+      <body className="container">
+        <ReduxProvider>
+          <AuthInitializer>
             <Header />
             <main>
               {children}
             </main>
-          </body>
-        </AuthInitializer>
-      </ReduxProvider>
+          </AuthInitializer>
+        </ReduxProvider>
+      </body>
     </html>
   );
 }
