@@ -121,14 +121,12 @@ export const downloadApp = asyncHandler(async (req: AuthRequest, res: Response) 
 		throw new ValidationError("Invalid ID parameter");
 	}
 
-	// Require authentication
 	if (!req.user) {
 		throw ApiError.unauthorized("Authentication required to download apps");
 	}
 
 	const userId = req.user.userId;
 
-	// Verify purchase for paid apps
 	const app = await appsService.getAppById(id);
 	if (!app) {
 		throw new NotFoundError("App", id);

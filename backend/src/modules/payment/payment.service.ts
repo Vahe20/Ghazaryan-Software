@@ -38,8 +38,8 @@ export async function purchaseApp(userId: string, appId: string) {
 		let finalPrice = basePrice;
 		if (promotions.length > 0 && promotions[0]) {
 			const promotion = promotions[0];
-			if (promotion.discountAmount && Number(promotion.discountAmount) > 0) {
-				finalPrice = basePrice - Number(promotion.discountAmount);
+			if (promotion.discountAmount?.gt(0)) {
+				finalPrice = basePrice - promotion.discountAmount.toNumber();
 			} else if (promotion.discountPercent && promotion.discountPercent > 0) {
 				finalPrice = basePrice * (1 - promotion.discountPercent / 100);
 			}
@@ -52,7 +52,7 @@ export async function purchaseApp(userId: string, appId: string) {
 
 		if (existingPurchase) throw ApiError.conflict("You already own this app");
 
-		if (Number(user.balance) < finalPrice) throw ApiError.badRequest("Insufficient balance");
+		if (user.balance.lt(finalPrice)) throw ApiError.badRequest("Insufficient balance");
 
 		const { purchase, balance } = await prisma.$transaction(async (tx) => {
 			const purchase = await tx.purchases.create({
@@ -227,8 +227,8 @@ export async function createAppPurchaseSession(userId: string, appId: string) {
 		let finalPrice = basePrice;
 		if (promotions.length > 0 && promotions[0]) {
 			const promotion = promotions[0];
-			if (promotion.discountAmount && Number(promotion.discountAmount) > 0) {
-				finalPrice = basePrice - Number(promotion.discountAmount);
+			if (promotion.discountAmount?.gt(0)) {
+				finalPrice = basePrice - promotion.discountAmount.toNumber();
 			} else if (promotion.discountPercent && promotion.discountPercent > 0) {
 				finalPrice = basePrice * (1 - promotion.discountPercent / 100);
 			}
@@ -361,8 +361,8 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
 		let finalPrice = basePrice;
 		if (promotions.length > 0 && promotions[0]) {
 			const promotion = promotions[0];
-			if (promotion.discountAmount && Number(promotion.discountAmount) > 0) {
-				finalPrice = basePrice - Number(promotion.discountAmount);
+			if (promotion.discountAmount?.gt(0)) {
+				finalPrice = basePrice - promotion.discountAmount.toNumber();
 			} else if (promotion.discountPercent && promotion.discountPercent > 0) {
 				finalPrice = basePrice * (1 - promotion.discountPercent / 100);
 			}

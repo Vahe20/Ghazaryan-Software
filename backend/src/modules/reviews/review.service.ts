@@ -8,7 +8,7 @@ export async function createReview(userId: string, appId: string, data: CreateRe
 		const app = await prisma.apps.findUnique({ where: { id: appId } });
 		if (!app) throw ApiError.notFound("App not found");
 
-		if (Number(app.price) > 0) {
+		if (app.price.gt(0)) {
 			const purchase = await prisma.purchases.findUnique({
 				where: { userId_appId: { userId, appId } },
 			});
