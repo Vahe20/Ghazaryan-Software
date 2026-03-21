@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { AdminUser } from "@/src/types/Admin";
 import { useUpdateUserRoleMutation } from "@/src/features/api/adminApi";
-import { SerializedError } from "@reduxjs/toolkit";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { extractErrorMessage } from "@/src/lib/utils";
 import UserAvatar from "../UserAvatar/UserAvatar";
 import BaseModal from "@/src/components/shared/BaseModal/BaseModal";
 import s from "./RoleModal.module.scss";
@@ -33,15 +32,7 @@ export default function RoleModal({ isOpen, user, onClose, onSaved }: RoleModalP
         }
     };
 
-    const getErrorMessage = (error: FetchBaseQueryError | SerializedError | undefined): string | null => {
-        if (!error) return null;
-        if ("data" in error && error.data && typeof error.data === "object" && "message" in error.data) {
-            return error.data.message as string;
-        }
-        return "Failed to update role";
-    };
-
-    const errorMessage = getErrorMessage(error);
+    const errorMessage = error ? extractErrorMessage(error, "Failed to update role") : null;
 
     return (
         <BaseModal

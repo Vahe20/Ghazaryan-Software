@@ -5,8 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import { NewsItem, TagColor } from "@/src/types/Entities";
 import { useCreateNewsMutation, useUpdateNewsMutation } from "@/src/features/api/newsApi";
 import { useUploadFileMutation } from "@/src/features/api/appsApi";
-import { SerializedError } from "@reduxjs/toolkit";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { extractErrorMessage } from "@/src/lib/utils";
 import BaseModal from "@/src/components/shared/BaseModal/BaseModal";
 import form from "../../shared/_form.module.scss";
 import btns from "../../shared/_buttons.module.scss";
@@ -122,15 +121,7 @@ export default function NewsModal({ isOpen, item, onClose, onSaved }: Props) {
         }
     };
 
-    const getErrorMessage = (error: FetchBaseQueryError | SerializedError | undefined): string | null => {
-        if (!error) return null;
-        if ("data" in error && error.data && typeof error.data === "object" && "message" in error.data) {
-            return error.data.message as string;
-        }
-        return "Failed to save";
-    };
-
-    const errorMessage = getErrorMessage(apiError);
+    const errorMessage = apiError ? extractErrorMessage(apiError, "Failed to save") : null;
 
     return (
         <BaseModal

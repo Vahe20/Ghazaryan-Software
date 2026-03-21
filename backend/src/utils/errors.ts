@@ -10,8 +10,6 @@ export class ApiError extends Error {
 		this.statusCode = statusCode;
 		this.details = details;
 
-		console.log(details);
-
 		if (Error.captureStackTrace) {
 			Error.captureStackTrace(this, this.constructor);
 		}

@@ -2,6 +2,7 @@ import { memo, useCallback, useMemo, useState } from "react";
 import { useCreateCheckoutSessionMutation } from "@/src/features/api/paymentApi";
 import { User } from "@/src/types/Entities";
 import BaseModal from "@/src/components/shared/BaseModal/BaseModal";
+import { extractErrorMessage } from "@/src/lib/utils";
 import style from "./TopUpModal.module.scss";
 
 interface TopUpModalProps {
@@ -15,6 +16,7 @@ const QUICK_AMOUNTS = ["10", "25", "50", "100"] as const;
 const TopUpModal = memo(function TopUpModal({ user, isOpen, onClose }: TopUpModalProps) {
     const [topUpAmount, setTopUpAmount] = useState("");
     const [loading, setLoading] = useState(false);
+    const [paymentError, setPaymentError] = useState<string | null>(null);
     const [createCheckoutSession] = useCreateCheckoutSessionMutation();
 
     const parsedAmount = useMemo(() => parseFloat(topUpAmount), [topUpAmount]);
@@ -23,11 +25,12 @@ const TopUpModal = memo(function TopUpModal({ user, isOpen, onClose }: TopUpModa
     const handleTopUp = useCallback(async () => {
         if (!isAmountValid) return;
         setLoading(true);
+        setPaymentError(null);
         try {
             const result = await createCheckoutSession(parsedAmount).unwrap();
             window.location.href = result.url;
         } catch (error) {
-            console.error("Failed to create checkout session:", error);
+            setPaymentError(extractErrorMessage(error, "Failed to create checkout session"));
             setLoading(false);
         }
     }, [isAmountValid, parsedAmount, createCheckoutSession]);
@@ -76,6 +79,9 @@ const TopUpModal = memo(function TopUpModal({ user, isOpen, onClose }: TopUpModa
                 />
                 {parsedAmount > 10000 && (
                     <span className={style.errorText}>Maximum amount is $10,000</span>
+                )}
+                {paymentError && (
+                    <span className={style.errorText}>{paymentError}</span>
                 )}
             </div>
             <div className={style.quickAmounts}>

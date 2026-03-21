@@ -2,6 +2,7 @@ import type { Response } from "express";
 import type { AuthRequest } from "../../types/index.js";
 import * as adminService from "./admin.service.js";
 import { asyncHandler } from "../../middlewares/error.middleware.js";
+import { ApiError } from "../../utils/errors.js";
 
 export const getUsers = asyncHandler(
 	async (req: AuthRequest, res: Response) => {
@@ -16,7 +17,7 @@ export const getUserById = asyncHandler(
 		const { id } = req.params;
 
 		if (!id || Array.isArray(id))
-			return res.status(400).json({ message: "Invalid user ID" });
+			throw ApiError.badRequest("Invalid user ID");
 
 		const data = await adminService.getUserById(id);
 		return res.json(data);
@@ -29,7 +30,7 @@ export const updateUserRole = asyncHandler(
 		const { role } = req.body;
 
 		if (!id || Array.isArray(id))
-			return res.status(400).json({ message: "Invalid user ID" });
+			throw ApiError.badRequest("Invalid user ID");
 
 		const data = await adminService.updateUserRole(id, role);
 		return res.json(data);
@@ -44,7 +45,7 @@ export const banUser = asyncHandler(async (req: AuthRequest, res: Response) => {
 	};
 
 	if (!id || Array.isArray(id))
-		return res.status(400).json({ message: "Invalid user ID" });
+		throw ApiError.badRequest("Invalid user ID");
 
 	const data = await adminService.banUser(id, { reason, until });
 	return res.json(data);
@@ -55,7 +56,7 @@ export const unbanUser = asyncHandler(
 		const { id } = req.params;
 
 		if (!id || Array.isArray(id))
-			return res.status(400).json({ message: "Invalid user ID" });
+			throw ApiError.badRequest("Invalid user ID");
 
 		const data = await adminService.unbanUser(id);
 		return res.json(data);
@@ -67,7 +68,7 @@ export const deleteUser = asyncHandler(
 		const { id } = req.params;
 
 		if (!id || Array.isArray(id))
-			return res.status(400).json({ message: "Invalid user ID" });
+			throw ApiError.badRequest("Invalid user ID");
 
 		const data = await adminService.deleteUser(id);
 		return res.json(data);
@@ -80,7 +81,7 @@ export const getUserPurchases = asyncHandler(
 		const { page, limit } = req.query;
 
 		if (!id || Array.isArray(id))
-			return res.status(400).json({ message: "Invalid user ID" });
+			throw ApiError.badRequest("Invalid user ID");
 
 		const data = await adminService.getUserPurchases(id, {
 			page: page ? Number(page) : undefined,
@@ -96,7 +97,7 @@ export const getUserDownloads = asyncHandler(
 		const { page, limit } = req.query;
 
 		if (!id || Array.isArray(id))
-			return res.status(400).json({ message: "Invalid user ID" });
+			throw ApiError.badRequest("Invalid user ID");
 
 		const data = await adminService.getUserDownloads(id, {
 			page: page ? Number(page) : undefined,
@@ -112,7 +113,7 @@ export const getUserReviews = asyncHandler(
 		const { page, limit } = req.query;
 
 		if (!id || Array.isArray(id))
-			return res.status(400).json({ message: "Invalid user ID" });
+			throw ApiError.badRequest("Invalid user ID");
 
 		const data = await adminService.getUserReviews(id, {
 			page: page ? Number(page) : undefined,

@@ -1,8 +1,7 @@
 import ConfirmModal from "@/src/components/shared/ConfirmModal/ConfirmModal";
 import { useDeleteNewsMutation } from "@/src/features/api/newsApi";
-import { SerializedError } from "@reduxjs/toolkit";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { NewsItem } from "@/src/types/Entities";
+import { extractErrorMessage } from "@/src/lib/utils";
 
 interface Props {
     isOpen: boolean;
@@ -24,15 +23,7 @@ export default function DeleteNewsModal({ isOpen, item, onClose, onDeleted }: Pr
         }
     };
 
-    const getErrorMessage = (error: FetchBaseQueryError | SerializedError | undefined): string | null => {
-        if (!error) return null;
-        if ("data" in error && error.data && typeof error.data === "object" && "message" in error.data) {
-            return error.data.message as string;
-        }
-        return "Failed to delete";
-    };
-
-    const errorMessage = getErrorMessage(error);
+    const errorMessage = error ? extractErrorMessage(error, "Failed to delete") : null;
 
     return (
         <ConfirmModal

@@ -4,8 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { App } from "@/src/types/Entities";
 import { useCreateAppMutation, useUpdateAppMutation, useUploadFileMutation } from "@/src/features/api/appsApi";
-import { SerializedError } from "@reduxjs/toolkit";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { extractErrorMessage } from "@/src/lib/utils";
 import TagsInput from "../TagsInput/TagsInput";
 import BaseModal from "@/src/components/shared/BaseModal/BaseModal";
 import s from "./AppModal.module.scss";
@@ -238,18 +237,7 @@ export default function AppModal({ isOpen, app, categories, onClose, onSaved }: 
 
     const busy = loading || uploadingFiles;
 
-    const getErrorMessage = (error: FetchBaseQueryError | SerializedError | undefined): string | null => {
-        if (!error) return null;
-        if ("message" in error && typeof error.message === "string") {
-            return error.message;
-        }
-        if ("data" in error && error.data && typeof error.data === "object" && "message" in error.data) {
-            return error.data.message as string;
-        }
-        return "Failed to save app";
-    };
-
-    const errorMessage = getErrorMessage(apiError);
+    const errorMessage = apiError ? extractErrorMessage(apiError, "Failed to save app") : null;
 
     return (
         <BaseModal

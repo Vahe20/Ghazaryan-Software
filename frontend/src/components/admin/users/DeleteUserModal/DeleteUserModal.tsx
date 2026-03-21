@@ -1,6 +1,7 @@
 import ConfirmModal from "@/src/components/shared/ConfirmModal/ConfirmModal";
 import { useDeleteUserMutation } from "@/src/features/api/adminApi";
 import { AdminUser } from "@/src/types/Admin";
+import { extractErrorMessage } from "@/src/lib/utils";
 
 interface DeleteUserModalProps {
     isOpen: boolean;
@@ -22,15 +23,7 @@ export default function DeleteUserModal({ isOpen, user, onClose, onDeleted }: De
         }
     };
 
-    const getErrorMessage = (error: FetchBaseQueryError | SerializedError | undefined): string | null => {
-        if (!error) return null;
-        if ("data" in error && error.data && typeof error.data === "object" && "message" in error.data) {
-            return error.data.message as string;
-        }
-        return "Failed to delete user";
-    };
-
-    const errorMessage = getErrorMessage(error);
+    const errorMessage = error ? extractErrorMessage(error, "Failed to delete user") : null;
 
     return (
         <ConfirmModal

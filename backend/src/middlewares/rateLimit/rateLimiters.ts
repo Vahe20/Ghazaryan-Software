@@ -4,7 +4,10 @@ export const apiLimiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
 	max: 1000,
 	message: {
-		error: "Too many requests from this IP, please try again later.",
+		error: {
+			code: "TOO_MANY_REQUESTS",
+			message: "Too many requests from this IP, please try again later.",
+		},
 	},
 	standardHeaders: true,
 	legacyHeaders: false,
@@ -19,7 +22,10 @@ export const authLimiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
 	max: 5,
 	message: {
-		error: "Too many authentication attempts, please try again after 15 minutes.",
+		error: {
+			code: "TOO_MANY_REQUESTS",
+			message: "Too many authentication attempts, please try again after 15 minutes.",
+		},
 	},
 	standardHeaders: true,
 	legacyHeaders: false,
@@ -35,7 +41,10 @@ export const registerLimiter = rateLimit({
 	windowMs: 60 * 60 * 1000,
 	max: 3,
 	message: {
-		error: "Too many accounts created from this IP, please try again after an hour.",
+		error: {
+			code: "TOO_MANY_REQUESTS",
+			message: "Too many accounts created from this IP, please try again after an hour.",
+		},
 	},
 	standardHeaders: true,
 	legacyHeaders: false,
@@ -46,7 +55,10 @@ export const uploadLimiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
 	max: 20,
 	message: {
-		error: "Too many uploads from this IP, please try again later.",
+		error: {
+			code: "TOO_MANY_REQUESTS",
+			message: "Too many uploads from this IP, please try again later.",
+		},
 	},
 	standardHeaders: true,
 	legacyHeaders: false,
@@ -56,7 +68,10 @@ export const downloadLimiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
 	max: 50,
 	message: {
-		error: "Too many downloads from this IP, please try again later.",
+		error: {
+			code: "TOO_MANY_REQUESTS",
+			message: "Too many downloads from this IP, please try again later.",
+		},
 	},
 	standardHeaders: true,
 	legacyHeaders: false,
@@ -66,7 +81,10 @@ export const reviewLimiter = rateLimit({
 	windowMs: 60 * 60 * 1000,
 	max: 5,
 	message: {
-		error: "Too many reviews submitted, please try again later.",
+		error: {
+			code: "TOO_MANY_REQUESTS",
+			message: "Too many reviews submitted, please try again later.",
+		},
 	},
 	standardHeaders: true,
 	legacyHeaders: false,
@@ -76,7 +94,10 @@ export const readLimiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
 	max: 500,
 	message: {
-		error: "Too many read requests, please slow down.",
+		error: {
+			code: "TOO_MANY_REQUESTS",
+			message: "Too many read requests, please slow down.",
+		},
 	},
 	standardHeaders: true,
 	legacyHeaders: false,
@@ -86,7 +107,10 @@ export const writeLimiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
 	max: 30,
 	message: {
-		error: "Too many write requests, please try again later.",
+		error: {
+			code: "TOO_MANY_REQUESTS",
+			message: "Too many write requests, please try again later.",
+		},
 	},
 	standardHeaders: true,
 	legacyHeaders: false,

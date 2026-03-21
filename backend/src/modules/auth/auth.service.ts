@@ -154,7 +154,7 @@ export async function loginUser(data: LoginInput) {
 
 			if (attempts >= MAX_ATTEMPTS) {
 				throw new AuthenticationError(
-					"Too many failed attempts. Account blocked for 15 minutes",
+					`Too many failed attempts. Account blocked for ${BLOCK_TIME_MS / 60000} minutes`,
 				);
 			}
 

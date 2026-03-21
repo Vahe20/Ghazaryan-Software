@@ -1,7 +1,6 @@
 import ConfirmModal from "@/src/components/shared/ConfirmModal/ConfirmModal";
 import { useDeleteCategoryMutation } from "@/src/features/api/categoriesApi";
-import { SerializedError } from "@reduxjs/toolkit";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { extractErrorMessage } from "@/src/lib/utils";
 
 interface Category { id: string; name: string; slug: string; }
 
@@ -25,15 +24,7 @@ export default function DeleteCategoryModal({ isOpen, item, onClose, onDeleted }
         }
     };
 
-    const getErrorMessage = (error: FetchBaseQueryError | SerializedError | undefined): string | null => {
-        if (!error) return null;
-        if ("data" in error && error.data && typeof error.data === "object" && "message" in error.data) {
-            return error.data.message as string;
-        }
-        return "Failed to delete";
-    };
-
-    const errorMessage = getErrorMessage(error);
+    const errorMessage = error ? extractErrorMessage(error, "Failed to delete") : null;
 
     return (
         <ConfirmModal

@@ -10,7 +10,7 @@ import {
     useGetAppPromotionsQuery,
     useCreateReviewMutation,
 } from "@/src/features/api/appsApi";
-import { formatSize, calculateFinalPrice } from "@/src/lib/utils";
+import { formatSize, calculateFinalPrice, extractErrorMessage } from "@/src/lib/utils";
 import { StarRating } from "@/src/components/shared/StarRating/StarRating";
 import { PlatformIcon, getPlatformLabel } from "@/src/components/shared/PlatformIcon/PlatformIcon";
 import BaseModal from "../../shared/BaseModal/BaseModal";
@@ -137,13 +137,7 @@ export const AppInfo = () => {
             setReviewComment("");
             setReviewRating(5);
         } catch (e: unknown) {
-            const err = e as { data?: { error?: { code?: string; message?: string } | string } };
-            const errData = err?.data?.error;
-            setReviewError(
-                typeof errData === "string" ? errData :
-                errData && typeof errData === "object" ? (errData.message ?? "Failed to submit review") :
-                "Failed to submit review"
-            );
+            setReviewError(extractErrorMessage(e, "Failed to submit review"));
         }
     };
 

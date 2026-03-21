@@ -1,8 +1,7 @@
 import ConfirmModal from "@/src/components/shared/ConfirmModal/ConfirmModal";
 import { useDeleteAppMutation } from "@/src/features/api/appsApi";
-import { SerializedError } from "@reduxjs/toolkit";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { App } from "@/src/types/Entities";
+import { extractErrorMessage } from "@/src/lib/utils";
 
 interface DeleteAppModalProps {
     isOpen: boolean;
@@ -24,15 +23,7 @@ export default function DeleteAppModal({ isOpen, app, onClose, onDeleted }: Dele
         }
     };
 
-    const getErrorMessage = (error: FetchBaseQueryError | SerializedError | undefined): string | null => {
-        if (!error) return null;
-        if ("data" in error && error.data && typeof error.data === "object" && "message" in error.data) {
-            return error.data.message as string;
-        }
-        return "Failed to delete";
-    };
-
-    const errorMessage = getErrorMessage(error);
+    const errorMessage = error ? extractErrorMessage(error, "Failed to delete") : null;
 
     return (
         <ConfirmModal

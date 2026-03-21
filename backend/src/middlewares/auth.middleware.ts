@@ -12,7 +12,12 @@ const authMiddleware = (
 		const token = req.headers.authorization?.split(" ")[1];
 
 		if (!token) {
-			return res.status(401).json({ error: "No token provided" });
+			return res.status(401).json({
+				error: {
+					code: "UNAUTHORIZED",
+					message: "No token provided",
+				},
+			});
 		}
 
 		const decoded = jwt.verify(token, config.JWT_ACCESS_SECRET) as { userId: string; role: UserRole };
@@ -23,7 +28,12 @@ const authMiddleware = (
 
 		next();
 	} catch {
-		return res.status(401).json({ error: "Invalid token" });
+		return res.status(401).json({
+			error: {
+				code: "INVALID_TOKEN",
+				message: "Invalid token",
+			},
+		});
 	}
 };
 

@@ -36,8 +36,7 @@ export const SignIn = () => {
             dispatch(setUser(result.user));
             dispatch(setInitialized(true));
             router.replace("/");
-        } catch {
-        }
+        } catch {}
     };
 
     return (

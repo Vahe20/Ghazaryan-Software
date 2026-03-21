@@ -33,6 +33,37 @@ const buildRateLimitError = (
     };
 };
 
+const extractErrorMessage = (data: unknown): string | null => {
+    if (!data || typeof data !== "object") return null;
+
+    const payload = data as Record<string, unknown>;
+    if (typeof payload.message === "string" && payload.message.trim()) return payload.message;
+
+    const nestedError = payload.error;
+    if (nestedError && typeof nestedError === "object") {
+        const nestedPayload = nestedError as Record<string, unknown>;
+        if (typeof nestedPayload.message === "string" && nestedPayload.message.trim()) {
+            return nestedPayload.message;
+        }
+    }
+
+    if (typeof payload.error === "string" && payload.error.trim()) return payload.error;
+    return null;
+};
+
+const normalizeErrorData = (data: unknown): unknown => {
+    if (!data || typeof data !== "object" || Array.isArray(data)) return data;
+
+    const message = extractErrorMessage(data);
+    if (!message) return data;
+
+    const payload = data as Record<string, unknown>;
+    return {
+        ...payload,
+        message,
+    };
+};
+
 const baseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> =
     async (args, api, extraOptions) => {
         if (typeof args === "object" && args.body instanceof FormData) {
@@ -51,11 +82,16 @@ const baseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> =
                     return {
                         error: buildRateLimitError(
                             { response, request: new Request(`${apiBaseUrl}/${typeof args === "string" ? args : args.url}`) },
-                            data,
+                            normalizeErrorData(data),
                         ),
                     };
                 }
-                return { error: { status: response.status, data } as FetchBaseQueryError };
+                return {
+                    error: {
+                        status: response.status,
+                        data: normalizeErrorData(data),
+                    } as FetchBaseQueryError,
+                };
             }
             return { data };
         }
@@ -64,8 +100,16 @@ const baseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> =
             return {
                 error: buildRateLimitError(
                     result.meta as FetchBaseQueryMeta | undefined,
-                    result.error.data,
+                    normalizeErrorData(result.error.data),
                 ),
+            };
+        }
+        if (result.error) {
+            return {
+                error: {
+                    ...result.error,
+                    data: normalizeErrorData(result.error.data),
+                },
             };
         }
         return result;

@@ -1,5 +1,13 @@
 import type { NextFunction, Request, Response } from "express";
-import {type ZodSchema, ZodError } from "zod";
+import { type ZodSchema, ZodError } from "zod";
+
+const buildValidationError = (error: ZodError) => ({
+	error: {
+		code: "VALIDATION_ERROR",
+		message: "Validation failed",
+		details: error.flatten(),
+	},
+});
 
 export const validate = (schema: ZodSchema) => {
 	return async (req: Request, res: Response, next: NextFunction) => {
@@ -9,10 +17,7 @@ export const validate = (schema: ZodSchema) => {
 			next();
 		} catch (error) {
 			if (error instanceof ZodError) {
-				return res.status(400).json({
-					error: "Validation failed",
-					details: error,
-				});
+				return res.status(400).json(buildValidationError(error));
 			}
 			next(error);
 		}
@@ -28,10 +33,7 @@ export const validateQuery = (schema: ZodSchema) => {
 			next();
 		} catch (error) {
 			if (error instanceof ZodError) {
-				return res.status(400).json({
-					error: "Validation failed",
-					details: error,
-				});
+				return res.status(400).json(buildValidationError(error));
 			}
 			next(error);
 		}

@@ -24,9 +24,14 @@ export function requireApiVersion(version: string) {
     return (req: Request, res: Response, next: NextFunction) => {
         if (req.apiVersion !== version) {
             return res.status(400).json({
-                error: "API_VERSION_MISMATCH",
-                message: `This endpoint requires API version ${version}`,
-                currentVersion: req.apiVersion,
+                error: {
+                    code: "API_VERSION_MISMATCH",
+                    message: `This endpoint requires API version ${version}`,
+                    details: {
+                        currentVersion: req.apiVersion,
+                        requiredVersion: version,
+                    },
+                },
             });
         }
         next();
