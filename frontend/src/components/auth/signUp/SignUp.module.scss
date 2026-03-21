@@ -188,7 +188,6 @@
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(135deg, $primary-hover 0%, $primary 100%);
         opacity: 0;
         transition: opacity $transition;
     }
@@ -200,7 +199,6 @@
     }
 
     &:hover:not(:disabled) {
-        transform: translateY(rem(-2));
         box-shadow: $shadow-glow-strong;
 
         &::after { opacity: 1; }
