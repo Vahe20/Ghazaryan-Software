@@ -138,11 +138,6 @@ This application provides a set of professional tools designed for daily use. It
 						SCREENSHOTS[(i + 4) % SCREENSHOTS.length],
 						SCREENSHOTS[(i + 5) % SCREENSHOTS.length],
 						SCREENSHOTS[(i + 6) % SCREENSHOTS.length],
-						SCREENSHOTS[(i + 7) % SCREENSHOTS.length],
-						SCREENSHOTS[(i + 8) % SCREENSHOTS.length],
-						SCREENSHOTS[(i + 9) % SCREENSHOTS.length],
-						SCREENSHOTS[(i + 10) % SCREENSHOTS.length],
-						SCREENSHOTS[(i + 11) % SCREENSHOTS.length],
 					],
 					categoryId: categoryList[i % categoryList.length].id,
 					tags: ["software", "tool", baseName.toLowerCase()],
@@ -154,30 +149,10 @@ This application provides a set of professional tools designed for daily use. It
 							: i % 3 === 1
 								? ["WINDOWS", "MAC"]
 								: ["WINDOWS", "MAC", "LINUX"],
-					sourceUrl: "https://github.com",
 					status: i % 4 === 0 ? "BETA" : "RELEASE",
 					featured: i % 10 === 0,
 					authorId: user.id,
 				},
-			});
-
-			await prisma.appsVersion.createMany({
-				data: [
-					{
-						appId: app.id,
-						version: "0.9.0",
-						changelog: "Initial beta release",
-						downloadUrl: "https://example.com/download/v0.9.0",
-						status: "BETA",
-					},
-					{
-						appId: app.id,
-						version: "1.0.0",
-						changelog: "First stable release",
-						downloadUrl: "https://example.com/download/v1.0.0",
-						status: "RELEASE",
-					},
-				],
 			});
 
 			createdAppIds.push(app.id);

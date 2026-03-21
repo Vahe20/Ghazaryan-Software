@@ -7,16 +7,18 @@ import { useGetAppBySlugQuery, useGetAppPromotionsQuery, useGetAppEditionsQuery 
 import { usePurchaseAppMutation } from "@/src/features/api/paymentApi";
 import { setUser } from "@/src/features/slices/authSlice";
 import ConfirmModal from "@/src/components/shared/ConfirmModal/ConfirmModal";
+import {
+    AboutSection,
+    ChangelogSection,
+    EditionsSection,
+    ErrorState,
+    HeroSection,
+    LoadingState,
+    ReviewsSection,
+    ScreenshotsSection,
+    TopBar,
+} from "@/src/components/apps/appDetails";
 import { calculateFinalPrice, extractErrorMessage } from "@/src/lib/utils";
-import { LoadingState } from "./components/LoadingState";
-import { ErrorState } from "./components/ErrorState";
-import { TopBar } from "./components/TopBar";
-import { HeroSection } from "./components/HeroSection";
-import { ScreenshotsSection } from "./components/ScreenshotsSection";
-import { EditionsSection } from "./components/EditionsSection";
-import { AboutSection } from "./components/AboutSection";
-import { ChangelogSection } from "./components/ChangelogSection";
-import { ReviewsSection } from "./components/ReviewsSection";
 import style from "./page.module.scss";
 
 export default function AppPage() {

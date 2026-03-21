@@ -1,0 +1,135 @@
+@use "../../../../styles/helpers/"as *;
+
+.section {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-xl;
+    padding: rem(28) rem(28);
+    backdrop-filter: blur(12px);
+    animation: slideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transition: border-color $transition;
+
+    &:hover {
+        border-color: $border-color-medium;
+    }
+}
+
+.sectionTitle {
+    margin: 0 0 rem(20);
+    font-size: rem(18);
+    font-weight: 700;
+    color: $text-primary;
+    display: flex;
+    align-items: center;
+    gap: rem(10);
+    letter-spacing: -0.01em;
+
+    &::before {
+        content: "";
+        display: block;
+        width: rem(3);
+        height: rem(18);
+        border-radius: rem(2);
+        background: linear-gradient(180deg, $primary, $accent);
+        flex-shrink: 0;
+    }
+}
+
+.timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.timelineItem {
+    display: grid;
+    grid-template-columns: rem(12) rem(1) 1fr;
+    gap: 0 rem(16);
+    min-height: rem(60);
+
+    &:last-child .timelineLine {
+        display: none;
+    }
+}
+
+.timelineDot {
+    width: rem(12);
+    height: rem(12);
+    border-radius: 50%;
+    background: $primary;
+    border: 2px solid $primary-light;
+    box-shadow: 0 0 8px rgba($primary, 0.4);
+    margin-top: rem(4);
+    grid-row: 1;
+    grid-column: 1;
+    align-self: start;
+    justify-self: center;
+}
+
+.timelineLine {
+    width: 1px;
+    background: $border-color;
+    grid-row: 1;
+    grid-column: 2;
+    margin: rem(18) 0 0;
+    height: 100%;
+}
+
+.timelineContent {
+    grid-row: 1;
+    grid-column: 3;
+    padding-bottom: rem(24);
+}
+
+.timelineHeader {
+    display: flex;
+    align-items: center;
+    gap: rem(10);
+    margin-bottom: rem(8);
+    flex-wrap: wrap;
+}
+
+.versionTag {
+    font-size: rem(15);
+    font-weight: 800;
+    color: $text-primary;
+}
+
+.versionStatus {
+    padding: rem(2) rem(8);
+    border-radius: $radius-full;
+    font-size: rem(10);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: $primary-light;
+    color: $primary;
+}
+
+.versionDate {
+    font-size: rem(12);
+    color: $text-muted;
+    margin-left: auto;
+}
+
+.versionChangelog {
+    margin: 0;
+    color: $text-secondary;
+    font-size: rem(14);
+    line-height: 1.6;
+}
+
+@include mobile {
+    .section {
+        padding: rem(18) rem(14);
+    }
+
+    .sectionTitle {
+        font-size: rem(16);
+    }
+
+    .timelineItem {
+        grid-template-columns: rem(10) rem(1) 1fr;
+        gap: 0 rem(12);
+    }
+}

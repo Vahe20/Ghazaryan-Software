@@ -1,0 +1,101 @@
+@use "../../../../styles/helpers/" as *;
+
+.section {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-xl;
+    padding: rem(28) rem(28);
+    backdrop-filter: blur(12px);
+    animation: slideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transition: border-color $transition;
+
+    &:hover {
+        border-color: $border-color-medium;
+    }
+}
+
+.sectionTitle {
+    margin: 0 0 rem(20);
+    font-size: rem(18);
+    font-weight: 700;
+    color: $text-primary;
+    display: flex;
+    align-items: center;
+    gap: rem(10);
+    letter-spacing: -0.01em;
+
+    &::before {
+        content: "";
+        display: block;
+        width: rem(3);
+        height: rem(18);
+        border-radius: rem(2);
+        background: linear-gradient(180deg, $primary, $accent);
+        flex-shrink: 0;
+    }
+}
+
+.aboutText {
+    margin: 0 0 rem(24);
+    color: $text-secondary;
+    line-height: 1.8;
+    white-space: pre-line;
+    overflow: hidden;
+    overflow-wrap: break-word;
+    font-size: rem(15);
+}
+
+.aboutMeta {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(rem(200), 1fr));
+    gap: rem(12);
+    padding-top: rem(20);
+    border-top: 1px solid $border-color-light;
+}
+
+.metaItem {
+    display: flex;
+    flex-direction: column;
+    gap: rem(4);
+}
+
+.metaKey {
+    font-size: rem(11);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: $text-muted;
+}
+
+.metaVal {
+    font-size: rem(14);
+    font-weight: 600;
+    color: $text-primary;
+}
+
+.metaLink {
+    font-size: rem(14);
+    font-weight: 600;
+    color: $primary;
+    text-decoration: none;
+    transition: color $transition;
+
+    &:hover {
+        color: $primary-hover;
+        text-decoration: underline;
+    }
+}
+
+@include mobile {
+    .section {
+        padding: rem(18) rem(14);
+    }
+
+    .sectionTitle {
+        font-size: rem(16);
+    }
+
+    .aboutMeta {
+        grid-template-columns: 1fr 1fr;
+    }
+}

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { calculateFinalPrice } from "@/src/lib/utils";
 import type { App, AppPromotion } from "@/src/types/Entities";
-import style from "../page.module.scss";
+import style from "./EditionsSection.module.scss";
 
 interface EditionsSectionProps {
     editions?: App[];
@@ -30,7 +30,7 @@ export function EditionsSection({ editions, activePromotion, purchasing, onPurch
                     return (
                         <div key={edition.id} className={style.editionCard}>
                             <div className={style.editionInfo}>
-                                <Link href={edition.slug ? `/apps/${edition.slug}` : '/apps'} className={style.editionName}>
+                                <Link href={edition.slug ? `/apps/${edition.slug}` : "/apps"} className={style.editionName}>
                                     {edition.name}
                                 </Link>
                                 {edition.shortDesc && <p className={style.editionDesc}>{edition.shortDesc}</p>}

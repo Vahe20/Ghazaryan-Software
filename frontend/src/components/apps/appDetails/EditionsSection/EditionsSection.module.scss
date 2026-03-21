@@ -1,0 +1,169 @@
+@use "../../../../styles/helpers/"as *;
+
+.section {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-xl;
+    padding: rem(28) rem(28);
+    backdrop-filter: blur(12px);
+    animation: slideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transition: border-color $transition;
+
+    &:hover {
+        border-color: $border-color-medium;
+    }
+}
+
+.sectionTitle {
+    margin: 0 0 rem(20);
+    font-size: rem(18);
+    font-weight: 700;
+    color: $text-primary;
+    display: flex;
+    align-items: center;
+    gap: rem(10);
+    letter-spacing: -0.01em;
+
+    &::before {
+        content: "";
+        display: block;
+        width: rem(3);
+        height: rem(18);
+        border-radius: rem(2);
+        background: linear-gradient(180deg, $primary, $accent);
+        flex-shrink: 0;
+    }
+}
+
+.editionsList {
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
+}
+
+.editionCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: rem(16);
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    padding: rem(16) rem(20);
+    background: $background-glass;
+    transition: border-color $transition, transform $transition;
+
+    &:hover {
+        border-color: $border-color-medium;
+        transform: translateX(4px);
+    }
+}
+
+.editionInfo {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: rem(4);
+}
+
+.editionName {
+    color: $primary;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: rem(15);
+    transition: color $transition;
+
+    &:hover {
+        color: $primary-hover;
+        text-decoration: underline;
+    }
+}
+
+.editionDesc {
+    margin: 0;
+    font-size: rem(13);
+    color: $text-tertiary;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.editionPriceRow {
+    display: flex;
+    align-items: center;
+    gap: rem(10);
+    white-space: nowrap;
+}
+
+.discountPill {
+    padding: rem(3) rem(8);
+    border-radius: $radius-full;
+    font-size: rem(11);
+    font-weight: 800;
+    background: rgba(#22c55e, 0.2);
+    border: 1px solid rgba(#22c55e, 0.35);
+    color: #4ade80;
+}
+
+.priceStack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: rem(1);
+}
+
+.oldPriceSm {
+    font-size: rem(11);
+    color: $text-muted;
+    text-decoration: line-through;
+    line-height: 1;
+}
+
+.newPriceSm {
+    font-size: rem(16);
+    font-weight: 800;
+    color: $text-primary;
+    line-height: 1;
+}
+
+.buyBtnSm {
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+    color: #fff;
+    border: none;
+    border-radius: $radius-md;
+    padding: rem(10) rem(18);
+    font-size: rem(13);
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform $transition, box-shadow $transition;
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+    }
+
+    &:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+}
+
+@include mobile {
+    .section {
+        padding: rem(18) rem(14);
+    }
+
+    .sectionTitle {
+        font-size: rem(16);
+    }
+
+    .editionCard {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .editionPriceRow {
+        width: 100%;
+        justify-content: space-between;
+    }
+}

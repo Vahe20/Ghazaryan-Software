@@ -1,6 +1,6 @@
 "use client";
 
-import style from "../page.module.scss";
+import style from "./TopBar.module.scss";
 
 interface TopBarProps {
     onBack: () => void;

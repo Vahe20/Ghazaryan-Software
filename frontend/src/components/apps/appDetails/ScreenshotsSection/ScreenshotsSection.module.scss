@@ -1,0 +1,197 @@
+@use "../../../../styles/helpers/" as *;
+
+.section {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-xl;
+    padding: rem(28) rem(28);
+    backdrop-filter: blur(12px);
+    animation: slideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transition: border-color $transition;
+
+    &:hover {
+        border-color: $border-color-medium;
+    }
+}
+
+.sectionTitle {
+    margin: 0 0 rem(20);
+    font-size: rem(18);
+    font-weight: 700;
+    color: $text-primary;
+    display: flex;
+    align-items: center;
+    gap: rem(10);
+    letter-spacing: -0.01em;
+
+    &::before {
+        content: "";
+        display: block;
+        width: rem(3);
+        height: rem(18);
+        border-radius: rem(2);
+        background: linear-gradient(180deg, $primary, $accent);
+        flex-shrink: 0;
+    }
+}
+
+.screenshotViewer {
+    display: flex;
+    flex-direction: column;
+    gap: rem(12);
+}
+
+.screenshotMain {
+    position: relative;
+    border-radius: $radius-lg;
+    overflow: hidden;
+    background: $background-primary;
+    border: 1px solid $border-color-light;
+    aspect-ratio: 16 / 9;
+}
+
+.screenshotBig {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    animation: fadeIn 0.25s ease both;
+}
+
+.ssNav {
+    position: absolute;
+    top: 50%;
+    background: rgba($background-primary, 0.75);
+    border: 1px solid $border-color-medium;
+    border-radius: $radius-md;
+    width: rem(40);
+    height: rem(40);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: $text-primary;
+    backdrop-filter: blur(8px);
+    transition: background $transition, transform $transition;
+    z-index: 2;
+
+    &:hover {
+        background: rgba($background-tertiary, 0.9);
+    }
+}
+
+.ssNavPrev {
+    left: rem(12);
+}
+
+.ssNavNext {
+    right: rem(12);
+}
+
+.ssDots {
+    position: absolute;
+    bottom: rem(12);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: rem(6);
+    z-index: 2;
+}
+
+.ssDot {
+    width: rem(6);
+    height: rem(6);
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+    padding: 0;
+    transition: background $transition, transform $transition;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.65);
+    }
+}
+
+.ssDotActive {
+    background: #fff;
+    transform: scale(1.4);
+}
+
+.screenshotThumbs {
+    display: flex;
+    gap: rem(10);
+    overflow-x: auto;
+    padding-bottom: rem(4);
+
+    &::-webkit-scrollbar {
+        height: rem(4);
+    }
+
+    &::-webkit-scrollbar-track {
+        background: $background-tertiary;
+        border-radius: rem(2);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $border-color-medium;
+        border-radius: rem(2);
+    }
+}
+
+.ssThumbnail {
+    flex-shrink: 0;
+    width: rem(120);
+    height: rem(72);
+    border-radius: $radius-md;
+    overflow: hidden;
+    border: 2px solid transparent;
+    background: $background-primary;
+    cursor: pointer;
+    padding: 0;
+    transition: border-color $transition, transform $transition;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        opacity: 0.6;
+        transition: opacity $transition;
+    }
+
+    &:hover img {
+        opacity: 0.85;
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+    }
+}
+
+.ssThumbnailActive {
+    border-color: $primary;
+
+    img {
+        opacity: 1;
+    }
+}
+
+@include mobile {
+    .section {
+        padding: rem(18) rem(14);
+    }
+
+    .sectionTitle {
+        font-size: rem(16);
+    }
+
+    .screenshotThumbs {
+        gap: rem(8);
+    }
+
+    .ssThumbnail {
+        width: rem(88);
+        height: rem(52);
+    }
+}

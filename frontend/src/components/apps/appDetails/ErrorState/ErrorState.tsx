@@ -1,6 +1,6 @@
 "use client";
 
-import style from "../page.module.scss";
+import style from "./ErrorState.module.scss";
 
 interface ErrorStateProps {
     onBackToApps: () => void;

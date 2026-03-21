@@ -2,7 +2,7 @@
 
 import { StarRating } from "@/src/components/shared/StarRating/StarRating";
 import type { Review } from "@/src/types/Entities";
-import style from "../page.module.scss";
+import style from "./ReviewsSection.module.scss";
 
 interface ReviewsSectionProps {
     reviews: Review[];
@@ -34,7 +34,7 @@ export function ReviewsSection({ reviews }: ReviewsSectionProps) {
                                 </div>
 
                                 <div className={style.reviewStars}>
-                                    <StarRating rating={review.rating} />
+                                    <StarRating rating={review.rating} fullClassName={style.starOn} halfClassName={style.starOn} emptyClassName={style.starOff} />
                                     <span className={style.reviewRatingNum}>{review.rating}/5</span>
                                 </div>
                             </div>

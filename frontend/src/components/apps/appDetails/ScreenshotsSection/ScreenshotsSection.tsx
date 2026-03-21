@@ -1,6 +1,6 @@
 "use client";
 
-import style from "../page.module.scss";
+import style from "./ScreenshotsSection.module.scss";
 
 interface ScreenshotsSectionProps {
     appName: string;

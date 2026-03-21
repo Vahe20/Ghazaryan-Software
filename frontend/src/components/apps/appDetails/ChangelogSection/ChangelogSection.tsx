@@ -1,7 +1,7 @@
 "use client";
 
 import type { AppVersion } from "@/src/types/Entities";
-import style from "../page.module.scss";
+import style from "./ChangelogSection.module.scss";
 
 interface ChangelogSectionProps {
     versions?: AppVersion[];

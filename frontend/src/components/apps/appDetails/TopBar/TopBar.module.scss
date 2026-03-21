@@ -1,0 +1,35 @@
+@use "../../../styles/helpers/" as *;
+
+.topBar {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: rem(1180);
+    margin: 0 auto;
+}
+
+.backNavBtn {
+    position: absolute;
+    top: rem(20);
+    left: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: rem(7);
+    background: rgba($background-tertiary, 0.7);
+    border: 1px solid $border-color;
+    border-radius: $radius-full;
+    color: $text-secondary;
+    font-size: rem(13);
+    font-weight: 600;
+    padding: rem(7) rem(14);
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: background $transition, color $transition, border-color $transition, transform $transition;
+
+    &:hover {
+        background: rgba($background-tertiary, 1);
+        color: $text-primary;
+        border-color: $border-color-medium;
+        transform: translateX(-2px);
+    }
+}

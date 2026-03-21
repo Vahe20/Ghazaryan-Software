@@ -1,7 +1,7 @@
 "use client";
 
 import type { App } from "@/src/types/Entities";
-import style from "../page.module.scss";
+import style from "./AboutSection.module.scss";
 
 interface AboutSectionProps {
     app: App;

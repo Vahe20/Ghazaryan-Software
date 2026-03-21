@@ -3,7 +3,7 @@
 import { PlatformIcon, getPlatformLabel } from "@/src/components/shared/PlatformIcon/PlatformIcon";
 import { StarRating } from "@/src/components/shared/StarRating/StarRating";
 import type { App, AppPromotion } from "@/src/types/Entities";
-import style from "../page.module.scss";
+import style from "./HeroSection.module.scss";
 
 interface HeroSectionProps {
     app: App;

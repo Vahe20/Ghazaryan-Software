@@ -1,0 +1,187 @@
+@use "../../../../styles/helpers/" as *;
+
+.section {
+    background: $background-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-xl;
+    padding: rem(28) rem(28);
+    backdrop-filter: blur(12px);
+    animation: slideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transition: border-color $transition;
+
+    &:hover {
+        border-color: $border-color-medium;
+    }
+}
+
+.sectionTitle {
+    margin: 0 0 rem(20);
+    font-size: rem(18);
+    font-weight: 700;
+    color: $text-primary;
+    display: flex;
+    align-items: center;
+    gap: rem(10);
+    letter-spacing: -0.01em;
+
+    &::before {
+        content: "";
+        display: block;
+        width: rem(3);
+        height: rem(18);
+        border-radius: rem(2);
+        background: linear-gradient(180deg, $primary, $accent);
+        flex-shrink: 0;
+    }
+}
+
+.reviewCountBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: rem(26);
+    height: rem(26);
+    padding: 0 rem(8);
+    border-radius: $radius-full;
+    background: $primary-light;
+    color: $primary;
+    font-size: rem(13);
+    font-weight: 700;
+}
+
+.reviewsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(rem(300), 1fr));
+    gap: rem(14);
+}
+
+.reviewCard {
+    border: 1px solid $border-color-light;
+    border-radius: $radius-md;
+    padding: rem(16) rem(18);
+    background: $background-glass;
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
+    transition: border-color $transition, transform $transition;
+
+    &:hover {
+        border-color: $border-color-medium;
+        transform: translateY(-2px);
+    }
+}
+
+.reviewTop {
+    display: flex;
+    align-items: center;
+    gap: rem(12);
+}
+
+.reviewAvatar {
+    width: rem(36);
+    height: rem(36);
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, $primary, $accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: rem(14);
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+}
+
+.reviewMeta {
+    display: flex;
+    flex-direction: column;
+    gap: rem(2);
+    flex: 1;
+    min-width: 0;
+}
+
+.reviewerName {
+    font-size: rem(14);
+    font-weight: 700;
+    color: $text-primary;
+}
+
+.reviewDate {
+    font-size: rem(11);
+    color: $text-muted;
+}
+
+.reviewStars {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: rem(2);
+}
+
+.starOn {
+    color: #f59e0b;
+}
+
+.starOff {
+    color: rgba(255, 255, 255, 0.15);
+}
+
+.reviewRatingNum {
+    font-size: rem(11);
+    color: $text-muted;
+}
+
+.reviewTitle {
+    margin: 0;
+    font-size: rem(14);
+    font-weight: 700;
+    color: $text-primary;
+}
+
+.reviewComment {
+    margin: 0;
+    font-size: rem(13);
+    color: $text-secondary;
+    line-height: 1.6;
+}
+
+.emptyReviews {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: rem(12);
+    padding: rem(32) 0;
+    color: $text-muted;
+
+    p {
+        margin: 0;
+        font-size: rem(14);
+    }
+}
+
+@include tablet {
+    .reviewsGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@include mobile {
+    .section {
+        padding: rem(18) rem(14);
+    }
+
+    .sectionTitle {
+        font-size: rem(16);
+    }
+
+    .reviewsGrid {
+        grid-template-columns: 1fr;
+    }
+}

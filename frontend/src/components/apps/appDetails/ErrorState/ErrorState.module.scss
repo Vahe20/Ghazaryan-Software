@@ -1,0 +1,44 @@
+@use "../../../../styles/helpers/" as *;
+
+.errorPage {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: rem(16);
+    color: $text-secondary;
+    text-align: center;
+    animation: fadeIn 0.4s ease;
+
+    h2 {
+        margin: 0;
+        font-size: rem(24);
+        color: $text-primary;
+        font-weight: 700;
+    }
+
+    p {
+        margin: 0;
+        color: $text-secondary;
+        font-size: rem(14);
+    }
+}
+
+.backBtn {
+    background: $background-tertiary;
+    color: $text-primary;
+    border: 1px solid $border-color-medium;
+    border-radius: $radius-md;
+    padding: rem(10) rem(20);
+    font-size: rem(14);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background $transition, transform $transition;
+    margin-top: rem(8);
+
+    &:hover {
+        background: $background-hover;
+        transform: translateY(-2px);
+    }
+}

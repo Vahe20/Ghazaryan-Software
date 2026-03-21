@@ -1,6 +1,6 @@
 "use client";
 
-import style from "../page.module.scss";
+import style from "./LoadingState.module.scss";
 
 export function LoadingState() {
     return (
