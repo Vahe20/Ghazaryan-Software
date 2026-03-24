@@ -46,7 +46,6 @@
     align-items: center;
     justify-content: space-between;
     overflow: hidden;
-    flex-wrap: wrap;
     gap: rem(16);
     border: 1px solid $border-color;
     border-radius: $radius-md;
@@ -85,9 +84,6 @@
     margin: 0;
     font-size: rem(13);
     color: $text-tertiary;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .editionPriceRow {
