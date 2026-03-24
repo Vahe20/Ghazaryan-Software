@@ -6,6 +6,12 @@ interface AuthResponse {
     accessToken: string;
 }
 
+interface RegisterResponse {
+    id: string;
+    email: string;
+    username: string;
+}
+
 interface MessageResponse {
     message: string;
 }
@@ -22,23 +28,51 @@ export const authApi = api.injectEndpoints({
         }),
 
         login: builder.mutation<AuthResponse, { email: string; password: string }>({
-            query: (credentials) => ({ url: "/auth/login", method: "POST", body: credentials }),
+            query: (credentials) => ({
+                url: "/auth/login",
+                method: "POST",
+                body: credentials,
+            }),
         }),
 
-        register: builder.mutation<AuthResponse, { userName: string; email: string; password: string }>({
-            query: (data) => ({ url: "/auth/register", method: "POST", body: data }),
+        register: builder.mutation<RegisterResponse, { userName: string; email: string; password: string }>({
+            query: (data) => ({
+                url: "/auth/register",
+                method: "POST",
+                body: data,
+            }),
+        }),
+
+        refreshToken: builder.mutation<{ accessToken: string }, void>({
+            query: () => ({ url: "/auth/refresh", method: "POST" }),
+        }),
+
+        logout: builder.mutation<MessageResponse, void>({
+            query: () => ({ url: "/auth/logout", method: "POST" }),
         }),
 
         changePassword: builder.mutation<MessageResponse, { currentPassword: string; newPassword: string }>({
-            query: (data) => ({ url: "/auth/password", method: "PATCH", body: data }),
+            query: (data) => ({
+                url: "/auth/password",
+                method: "PATCH",
+                body: data,
+            }),
         }),
 
         changeAvatar: builder.mutation<AvatarResponse, FormData>({
-            query: (formData) => ({ url: "/auth/avatar", method: "PATCH", body: formData }),
+            query: (formData) => ({
+                url: "/auth/avatar",
+                method: "PATCH",
+                body: formData,
+            }),
         }),
 
         deleteAccount: builder.mutation<MessageResponse, { password: string }>({
-            query: (data) => ({ url: "/auth/account", method: "DELETE", body: data }),
+            query: (data) => ({
+                url: "/auth/account",
+                method: "DELETE",
+                body: data,
+            }),
         }),
     }),
 });
@@ -51,4 +85,6 @@ export const {
     useChangePasswordMutation,
     useChangeAvatarMutation,
     useDeleteAccountMutation,
+    useRefreshTokenMutation,
+    useLogoutMutation,
 } = authApi;

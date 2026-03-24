@@ -178,10 +178,44 @@
 .sidebarFooter {
     padding: rem(12);
     border-top: 1px solid $border-color;
+
+    @include mobile { display: none; }
 }
 
 .backLink {
     color: $text-primary;
+}
+
+.mobileBackLink {
+    display: none;
+
+    @include mobile {
+        display: inline-flex;
+        align-items: center;
+        gap: rem(8);
+        margin-bottom: rem(16);
+        padding: rem(10) rem(12);
+        border-radius: $radius-md;
+        background: $background-card;
+        border: 1px solid $border-color;
+        color: $text-primary;
+        text-decoration: none;
+        font-size: rem(13);
+        font-weight: 600;
+        width: fit-content;
+    }
+
+    @include mobile-s {
+        margin-bottom: rem(12);
+        font-size: rem(12);
+        padding: rem(8) rem(10);
+    }
+}
+
+.mobileBackIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .mainContent {

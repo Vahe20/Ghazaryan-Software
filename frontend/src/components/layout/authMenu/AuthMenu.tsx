@@ -3,6 +3,7 @@
 import { memo, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/src/app/hooks";
+import { useLogoutMutation } from "@/src/features/api/authApi";
 import { logout } from "@/src/features/slices/authSlice";
 import style from "./AuthMenu.module.scss";
 import Link from "next/link";
@@ -10,13 +11,15 @@ import Link from "next/link";
 export const AuthMenu = memo(function AuthMenu() {
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const user = useAppSelector(s => s.auth.user);
-    const isInitialized = useAppSelector(s => s.auth.isInitialized);
+    const user = useAppSelector((s) => s.auth.user);
+    const isInitialized = useAppSelector((s) => s.auth.isInitialized);
+    const [logoutRequest] = useLogoutMutation();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     const handleLogout = useCallback(async () => {
         try {
             setIsLoggingOut(true);
+            await logoutRequest().unwrap();
             await dispatch(logout());
             router.push("/");
         } catch (error) {
@@ -24,7 +27,7 @@ export const AuthMenu = memo(function AuthMenu() {
         } finally {
             setIsLoggingOut(false);
         }
-    }, [dispatch, router]);
+    }, [dispatch, logoutRequest, router]);
 
     const handleSignIn = useCallback(() => {
         router.push("/auth");
@@ -42,7 +45,7 @@ export const AuthMenu = memo(function AuthMenu() {
 
     if (!user) {
         return (
-            <button onClick={handleSignIn} className={style.authButton} type="button">
+            <button type="button" onClick={handleSignIn} className={style.authButton}>
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M15 3V7M15 7V11M15 7H11M15 7H19M10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -74,10 +77,10 @@ export const AuthMenu = memo(function AuthMenu() {
                 </div>
             </Link>
             <button
+                type="button"
                 onClick={handleLogout}
                 className={style.logoutButton}
                 disabled={isLoggingOut}
-                type="button"
             >
                 {isLoggingOut ? (
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className={style.spinner}>
@@ -93,3 +96,4 @@ export const AuthMenu = memo(function AuthMenu() {
         </div>
     );
 });
+

@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useAppDispatch } from "@/src/app/hooks";
-import { useRegisterMutation } from "@/src/features/api/authApi";
+import { useLoginMutation, useRegisterMutation } from "@/src/features/api/authApi";
 import { setInitialized, setUser } from "@/src/features/slices/authSlice";
 import { extractErrorMessage } from "@/src/lib/utils";
 import { useState } from "react";
@@ -22,26 +22,42 @@ export const SignUp = () => {
     const router = useRouter();
     const dispatch = useAppDispatch();
     const [registerUser, { isLoading }] = useRegisterMutation();
+    const [login] = useLoginMutation();
     const [regError, setRegError] = useState<string | null>(null);
 
-    const { register, handleSubmit, watch, formState: { errors } } = useForm<SignUpFormData>({
-        defaultValues: { userName: "", email: "", password: "", confirmPassword: "", agreeToTerms: false }
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors },
+    } = useForm<SignUpFormData>({
+        defaultValues: {
+            userName: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            agreeToTerms: false,
+        },
     });
 
-    const googleAuthUrl = process.env.BACKEND_URL
-        ? `${process.env.BACKEND_URL}/auth/google`
+    const googleAuthUrl = process.env.NEXT_PUBLIC_BACKEND_URL
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google`
         : "/auth/google";
 
     const onSignUp = async (data: SignUpFormData) => {
         try {
             setRegError(null);
-            const result = await registerUser({
+            await registerUser({
                 userName: data.userName,
                 email: data.email,
                 password: data.password,
             }).unwrap();
-            localStorage.setItem("token", result.accessToken);
-            dispatch(setUser(result.user));
+            const loginResult = await login({
+                email: data.email,
+                password: data.password,
+            }).unwrap();
+            localStorage.setItem("token", loginResult.accessToken);
+            dispatch(setUser(loginResult.user));
             dispatch(setInitialized(true));
             router.push("/");
         } catch (error) {
@@ -202,3 +218,4 @@ export const SignUp = () => {
         </form>
     );
 };
+

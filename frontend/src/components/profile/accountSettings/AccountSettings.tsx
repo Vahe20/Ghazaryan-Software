@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppDispatch } from '@/src/app/hooks';
-import { useChangePasswordMutation, useDeleteAccountMutation } from '@/src/features/api/authApi';
+import { useChangePasswordMutation, useDeleteAccountMutation, useLogoutMutation } from '@/src/features/api/authApi';
 import { logout } from '@/src/features/slices/authSlice';
 import { extractErrorMessage } from '@/src/lib/utils';
 import BaseModal from '@/src/components/shared/BaseModal/BaseModal';
 import { useRouter } from 'next/navigation';
-import style from './AccountSettings.module.scss';
+import style from "./AccountSettings.module.scss";
 
 interface PasswordFormData {
     currentPassword: string;
@@ -26,6 +26,7 @@ export default function AccountSettings() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [changePassword, { isLoading: passwordLoading, error: passwordError }] = useChangePasswordMutation();
     const [deleteAccount, { isLoading: deleteLoading, error: deleteError }] = useDeleteAccountMutation();
+    const [logoutRequest] = useLogoutMutation();
     const passwordErrorMessage = passwordError
         ? extractErrorMessage(passwordError, "Failed to change password")
         : null;
@@ -64,16 +65,18 @@ export default function AccountSettings() {
     const onDeleteSubmit = async (data: DeleteFormData) => {
         try {
             await deleteAccount({ password: data.password }).unwrap();
-            dispatch(logout());
+            await logoutRequest().unwrap();
+            await dispatch(logout());
             router.replace('/auth');
         } catch {
         }
     };
 
-    const onLogout = () => {
-        dispatch(logout());
-        router.replace('/auth');
-    }
+    const onLogout = async () => {
+        await logoutRequest().unwrap();
+        await dispatch(logout());
+        router.replace("/auth");
+    };
 
     const handleCloseDeleteModal = () => {
         setShowDeleteModal(false);
@@ -158,7 +161,7 @@ export default function AccountSettings() {
                 </div>
 
                 <div className={style.actions}>
-                    <button className={style.logoutBtn} onClick={() => onLogout()}>
+                    <button type="button" className={style.logoutBtn} onClick={onLogout}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                             <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                             <path d="M16 17L21 12L16 7M21 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -191,7 +194,14 @@ export default function AccountSettings() {
                             className={style.confirmDeleteBtn}
                             disabled={deleteLoading || watchDelete('confirmation') !== 'DELETE'}
                         >
-                            {deleteLoading ? <><span className={style.spinner} />Deleting...</> : 'Delete my account'}
+                            {deleteLoading ? (
+                                <>
+                                    <span className={style.spinner} />
+                                    Deleting...
+                                </>
+                            ) : (
+                                "Delete my account"
+                            )}
                         </button>
                     </div>
                 }
@@ -216,7 +226,9 @@ export default function AccountSettings() {
                 <form id="delete-account-form" onSubmit={handleDeleteSubmit(onDeleteSubmit)} className={style.deleteForm}>
                     <div className={style.inputWrap}>
                         <input
-                            {...regDelete('password', { required: 'Password is required' })}
+                            {...regDelete("password", {
+                                required: "Password is required",
+                            })}
                             type="password"
                             placeholder="Enter your password"
                             className={style.inputField}
@@ -226,9 +238,10 @@ export default function AccountSettings() {
                     </div>
                     <div className={style.inputWrap}>
                         <input
-                            {...regDelete('confirmation', {
-                                required: 'Please type DELETE to confirm',
-                                validate: v => v === 'DELETE' || 'Type DELETE exactly',
+                            {...regDelete("confirmation", {
+                                required: "Please type DELETE to confirm",
+                                validate: (v) =>
+                                    v === "DELETE" || "Type DELETE exactly",
                             })}
                             type="text"
                             placeholder='Type "DELETE" to confirm'
@@ -242,3 +255,4 @@ export default function AccountSettings() {
         </>
     );
 }
+

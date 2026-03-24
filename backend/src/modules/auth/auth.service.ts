@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { jwtConfig } from "../../config/jwt.js";
+import config from "../../config/env.js";
 import type { UserCreateData, LoginInput } from "./auth.types.js";
 import {
 	NotFoundError,
@@ -9,6 +10,7 @@ import {
 	DatabaseError,
 } from "../../utils/errors.js";
 import { userRepository } from "../../repositories/user.repository.js";
+import { sessionRepository } from "../../repositories/session.repository.js";
 
 export async function getUserById(id: string) {
 	try {
@@ -40,7 +42,7 @@ export async function registerUser(data: UserCreateData) {
 			throw new ConflictError(`User with this ${field} already exists`);
 		}
 
-		const passwordHash = await bcrypt.hash(data.password, 10);
+		const passwordHash = await bcrypt.hash(data.password, config.BCRYPT_SALT_ROUNDS);
 
 		const user = await userRepository.create({
 			email: data.email,
@@ -57,66 +59,8 @@ export async function registerUser(data: UserCreateData) {
 	}
 }
 
-export async function changeUserPassword(
-	userId: string,
-	currentPassword: string,
-	newPassword: string,
-) {
-	try {
-		const user = await userRepository.findById(userId);
-
-		if (!user) {
-			throw new NotFoundError("User", userId);
-		}
-
-		const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
-
-		if (!isValid) {
-			throw new AuthenticationError("Current password is incorrect");
-		}
-
-		const passwordHash = await bcrypt.hash(newPassword, 10);
-
-		await userRepository.update(userId, { passwordHash });
-	} catch (error) {
-		if (
-			error instanceof NotFoundError ||
-			error instanceof AuthenticationError
-		) {
-			throw error;
-		}
-		throw new DatabaseError("Failed to change password", error);
-	}
-}
-
-export async function deleteUserAccount(userId: string, password: string) {
-	try {
-		const user = await userRepository.findById(userId);
-
-		if (!user) {
-			throw new NotFoundError("User", userId);
-		}
-
-		const isValid = await bcrypt.compare(password, user.passwordHash);
-
-		if (!isValid) {
-			throw new AuthenticationError("Password is incorrect");
-		}
-
-		await userRepository.delete(userId);
-	} catch (error) {
-		if (
-			error instanceof NotFoundError ||
-			error instanceof AuthenticationError
-		) {
-			throw error;
-		}
-		throw new DatabaseError("Failed to delete account", error);
-	}
-}
-
-const MAX_ATTEMPTS = 5;
-const BLOCK_TIME_MS = 15 * 60 * 1000;
+const MAX_ATTEMPTS = config.AUTH_MAX_ATTEMPTS;
+const BLOCK_TIME_MS = config.AUTH_BLOCK_MINUTES * 60 * 1000;
 
 export async function loginUser(data: LoginInput) {
 	try {
@@ -169,8 +113,19 @@ export async function loginUser(data: LoginInput) {
 			{ expiresIn: jwtConfig.accessExpiresIn },
 		);
 
+		const refreshToken = jwt.sign(
+			{ userId: user.id },
+			jwtConfig.refreshSecret,
+			{ expiresIn: jwtConfig.refreshExpiresIn },
+		);
+
+		await sessionRepository.createSession({ userId: user.id, refreshToken });
+
+		await userRepository.update(user.id, { lastLoginAt: new Date() });
+
 		return {
 			accessToken,
+			refreshToken,
 			user: {
 				id: user.id,
 				email: user.email,
@@ -191,7 +146,140 @@ export async function loginUser(data: LoginInput) {
 		if (error instanceof AuthenticationError) {
 			throw error;
 		}
-		throw new DatabaseError(error);
+		throw new DatabaseError("Failed to login user", error);
+	}
+}
+
+export async function refreshToken(oldRefreshToken: string) {
+	try {
+		if (!oldRefreshToken) {
+			throw new AuthenticationError("Refresh token is required");
+		}
+
+		let payload: jwt.JwtPayload;
+		try {
+			payload = jwt.verify(
+				oldRefreshToken,
+				jwtConfig.refreshSecret,
+			) as jwt.JwtPayload;
+		} catch {
+			throw new AuthenticationError("Invalid or expired refresh token");
+		}
+
+		const session = await sessionRepository.findSessionByToken(oldRefreshToken);
+
+		if (!session || session.revoked || session.expiresAt < new Date()) {
+			throw new AuthenticationError("Invalid refresh token");
+		}
+
+		const user = await userRepository.findById(payload.userId as string);
+
+		if (!user) {
+			throw new NotFoundError("User", payload.userId as string);
+		}
+
+		const accessToken = jwt.sign(
+			{ userId: user.id, role: user.role },
+			jwtConfig.accessSecret,
+			{ expiresIn: jwtConfig.accessExpiresIn },
+		);
+
+		const newRefreshToken = jwt.sign(
+			{ userId: user.id },
+			jwtConfig.refreshSecret,
+			{ expiresIn: jwtConfig.refreshExpiresIn },
+		);
+
+		await sessionRepository.rotateSessionToken(session.id, newRefreshToken);
+
+		return { accessToken, refreshToken: newRefreshToken };
+	} catch (error) {
+		if (
+			error instanceof AuthenticationError ||
+			error instanceof NotFoundError
+		) {
+			throw error;
+		}
+		throw new DatabaseError("Failed to refresh token", error);
+	}
+}
+
+export async function logoutUser(refreshToken: string) {
+	try {
+		if (!refreshToken) {
+			throw new AuthenticationError("Refresh token is required");
+		}
+
+		const session = await sessionRepository.findSessionByToken(refreshToken);
+
+		if (!session) {
+			throw new AuthenticationError("Invalid refresh token");
+		}
+
+		await sessionRepository.deleteSession(session.id);
+	} catch (error) {
+		if (error instanceof AuthenticationError) {
+			throw error;
+		}
+		throw new DatabaseError("Failed to logout user", error);
+	}
+}
+
+export async function changeUserPassword(
+	userId: string,
+	currentPassword: string,
+	newPassword: string,
+) {
+	try {
+		const user = await userRepository.findById(userId);
+
+		if (!user) {
+			throw new NotFoundError("User", userId);
+		}
+
+		const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+
+		if (!isValid) {
+			throw new AuthenticationError("Current password is incorrect");
+		}
+
+		const passwordHash = await bcrypt.hash(newPassword, config.BCRYPT_SALT_ROUNDS);
+
+		await userRepository.update(userId, { passwordHash });
+	} catch (error) {
+		if (
+			error instanceof NotFoundError ||
+			error instanceof AuthenticationError
+		) {
+			throw error;
+		}
+		throw new DatabaseError("Failed to change password", error);
+	}
+}
+
+export async function deleteUserAccount(userId: string, password: string) {
+	try {
+		const user = await userRepository.findById(userId);
+
+		if (!user) {
+			throw new NotFoundError("User", userId);
+		}
+
+		const isValid = await bcrypt.compare(password, user.passwordHash);
+
+		if (!isValid) {
+			throw new AuthenticationError("Password is incorrect");
+		}
+
+		await userRepository.delete(userId);
+	} catch (error) {
+		if (
+			error instanceof NotFoundError ||
+			error instanceof AuthenticationError
+		) {
+			throw error;
+		}
+		throw new DatabaseError("Failed to delete account", error);
 	}
 }
 
@@ -244,3 +332,23 @@ export function generateAuthToken(userId: string, role: string) {
 
 	return accessToken;
 }
+
+export async function generateAuthTokens(userId: string, role: string) {
+	const accessToken = jwt.sign(
+		{ userId, role },
+		jwtConfig.accessSecret,
+		{ expiresIn: jwtConfig.accessExpiresIn },
+	);
+
+	const refreshToken = jwt.sign(
+		{ userId },
+		jwtConfig.refreshSecret,
+		{ expiresIn: jwtConfig.refreshExpiresIn },
+	);
+
+	await sessionRepository.createSession({ userId, refreshToken });
+
+	return { accessToken, refreshToken };
+}
+
+

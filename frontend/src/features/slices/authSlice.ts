@@ -18,11 +18,14 @@ export const authSlice = createAppSlice({
 	reducers: create => ({
 		logout: create.asyncThunk(
 			async () => {
-				localStorage.removeItem("token");
+				if (typeof window !== "undefined") {
+					localStorage.removeItem("token");
+				}
 			},
 			{
 				fulfilled: state => {
 					state.user = null;
+					state.isInitialized = true;
 				},
 			},
 		),

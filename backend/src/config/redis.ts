@@ -11,10 +11,10 @@ export function getRedisClient(): Redis | null {
     if (!redisClient) {
         try {
             redisClient = new Redis({
-                host: config.REDIS_HOST || "localhost",
-                port: config.REDIS_PORT || 6379,
+                host: config.REDIS_HOST,
+                port: config.REDIS_PORT,
                 password: config.REDIS_PASSWORD,
-                db: config.REDIS_DB || 0,
+                db: config.REDIS_DB,
                 retryStrategy: (times) => {
                     const delay = Math.min(times * 50, 2000);
                     return delay;

@@ -63,6 +63,14 @@
 
     @include tablet {
         grid-template-columns: 1fr;
+
+        .sidebar {
+            order: 2;
+        }
+
+        .mainContent {
+            order: 1;
+        }
     }
 }
 

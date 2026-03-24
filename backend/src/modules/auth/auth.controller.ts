@@ -3,7 +3,10 @@ import passport from "passport";
 import * as authService from "./auth.service.js";
 import { updateUserAvatar } from "./avatar.service.js";
 import type { AuthRequest } from "../../types/index.js";
-import type { LoginInput, ChangePasswordInput } from "./auth.types.js";
+import type {
+	LoginInput,
+	ChangePasswordInput,
+} from "./auth.types.js";
 import { asyncHandler } from "../../middlewares/error.middleware.js";
 import { ApiError } from "../../utils/errors.js";
 import env from "../../config/env.js";
@@ -27,9 +30,41 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 	});
 });
 
+const REFRESH_COOKIE = "refreshToken";
+const COOKIE_OPTIONS = {
+	httpOnly: true,
+	sameSite: env.COOKIE_SAME_SITE,
+	secure: env.COOKIE_SECURE,
+	maxAge: env.SESSION_EXPIRES_DAYS * 24 * 60 * 60 * 1000,
+};
+
 export const login = asyncHandler(async (req: Request, res: Response) => {
-	const result = await authService.loginUser(req.body as LoginInput);
-	return res.json(result);
+	const { accessToken, refreshToken, user } = await authService.loginUser(req.body as LoginInput);
+	res.cookie(REFRESH_COOKIE, refreshToken, COOKIE_OPTIONS);
+	return res.json({ accessToken, user });
+});
+
+export const refreshToken = asyncHandler(async (req: Request, res: Response) => {
+	const token = req.cookies?.[REFRESH_COOKIE] as string | undefined;
+	if (!token) {
+		throw ApiError.unauthorized("Refresh token missing");
+	}
+	const result = await authService.refreshToken(token);
+	res.cookie(REFRESH_COOKIE, result.refreshToken, COOKIE_OPTIONS);
+	return res.json({ accessToken: result.accessToken });
+});
+
+export const logout = asyncHandler(async (req: Request, res: Response) => {
+	const token = req.cookies?.[REFRESH_COOKIE] as string | undefined;
+	if (token) {
+		try {
+			await authService.logoutUser(token);
+		} catch {
+			// session may have already been deleted — still clear the cookie
+		}
+	}
+	res.clearCookie(REFRESH_COOKIE, { httpOnly: true, sameSite: env.COOKIE_SAME_SITE, secure: env.COOKIE_SECURE });
+	return res.json({ message: "Logged out successfully" });
 });
 
 export const changePassword = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -91,14 +126,14 @@ export const googleAuthCallback = (req: Request, res: Response) => {
 			}
 
 			try {
-				const accessToken = authService.generateAuthToken(
-					user.id,
-					user.role
-				);
-
-				return res.redirect(
-					`${env.FRONTEND_URL}/auth/callback?token=${accessToken}`
-				);
+				const { accessToken, refreshToken } = await authService.generateAuthTokens(
+user.id,
+user.role
+);
+res.cookie(REFRESH_COOKIE, refreshToken, COOKIE_OPTIONS);
+return res.redirect(
+`${env.FRONTEND_URL}/auth/callback?token=${accessToken}`
+);
 			} catch (error) {
 				return res.redirect(
 					`${env.FRONTEND_URL}/auth?error=token_generation_failed`
@@ -107,4 +142,7 @@ export const googleAuthCallback = (req: Request, res: Response) => {
 		}
 	)(req, res);
 };
+
+
+
 

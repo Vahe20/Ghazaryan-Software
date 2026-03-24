@@ -17,16 +17,18 @@ export const SignIn = () => {
     const router = useRouter();
     const dispatch = useAppDispatch();
     const [login, { isLoading, error }] = useLoginMutation();
-    const errorMessage = error
-        ? extractErrorMessage(error, "Login failed")
-        : null;
+    const errorMessage = error ? extractErrorMessage(error, "Login failed") : null;
 
-    const { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>({
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<SignInFormData>({
         defaultValues: { email: "", password: "" },
     });
 
-    const googleAuthUrl = process.env.BACKEND_URL
-        ? `${process.env.BACKEND_URL}/auth/google`
+    const googleAuthUrl = process.env.NEXT_PUBLIC_BACKEND_URL
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google`
         : "/auth/google";
 
     const onSignIn = async (data: SignInFormData) => {
@@ -135,3 +137,4 @@ export const SignIn = () => {
         </form>
     );
 };
+

@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import passport from "passport";
@@ -32,16 +33,15 @@ const allowedOrigins = [config.FRONTEND_URL];
 
 app.set("trust proxy", 1);
 
-const isDevelopment = process.env.NODE_ENV !== "production";
-
 app.use(cors({
 	origin: function (origin, callback) {
-		if (!origin || allowedOrigins.includes(origin) || isDevelopment) {
+		if (!origin || allowedOrigins.includes(origin) || !config.IS_PRODUCTION) {
 			callback(null, true);
 		} else {
 			callback(new Error("Not allowed by CORS"));
 		}
 	},
+	credentials: true,
 }));
 
 app.use("/api/v1/payment/webhook", express.raw({ type: "application/json" }), async (req, res, next) => {
@@ -50,6 +50,7 @@ app.use("/api/v1/payment/webhook", express.raw({ type: "application/json" }), as
 });
 
 app.use(express.json());
+app.use(cookieParser());
 
 configurePassport();
 app.use(passport.initialize());
@@ -87,3 +88,7 @@ app.get("/auth/callback", (req, res) => {
 
 app.use(notFoundHandler);
 app.use(errorHandler);
+
+
+
+
