@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAppDispatch } from "@/src/app/hooks";
 import { useLazyGetMeQuery } from "@/src/features/api/authApi";
 import { setUser, setInitialized } from "@/src/features/slices/authSlice";
+import style from "./page.module.scss";
 
 export default function AuthCallback() {
     return (
@@ -48,32 +49,10 @@ function AuthCallbackContent() {
     }, [searchParams, router, dispatch, getMe]);
 
     return (
-        <>
-            <style>{`
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            `}</style>
-            <div style={{ 
-                display: "flex", 
-                justifyContent: "center", 
-                alignItems: "center", 
-                minHeight: "100vh",
-                flexDirection: "column",
-                gap: "1rem"
-            }}>
-                <div style={{ 
-                    width: "48px", 
-                    height: "48px", 
-                    border: "4px solid #f3f3f3",
-                    borderTop: "4px solid #3498db",
-                    borderRadius: "50%",
-                    animation: "spin 1s linear infinite"
-                }} />
-                <p>Authenticating...</p>
-            </div>
-        </>
+        <div className={style.authCallback}>
+            <div className={style.loader} />
+            <p className={style.text}>Authenticating...</p>
+        </div>
     );
 }
 
